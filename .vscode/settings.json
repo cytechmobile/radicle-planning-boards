@@ -1,3 +1,16 @@
 {
-  "git.alwaysSignOff": true
+  "git.alwaysSignOff": true,
+  "conventionalCommits.scopes": [
+    "repo",
+    "dev",
+    "build",
+    "lint",
+    "ci",
+    "git",
+    "deps",
+    "changelog",
+    "readme",
+    "contributing",
+  ],
+  "conventionalCommits.gitmoji": false,
 }
