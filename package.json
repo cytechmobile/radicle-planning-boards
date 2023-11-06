@@ -1,5 +1,6 @@
 {
   "name": "nuxt-app",
+  "license": "./LICENSE",
   "private": true,
   "type": "module",
   "scripts": {
