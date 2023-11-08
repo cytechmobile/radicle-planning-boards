@@ -2,5 +2,6 @@
 export default defineNuxtConfig({
   ssr: false,
   modules: ['@pinia/nuxt', '@nuxtjs/tailwindcss', '@vueuse/nuxt', 'nuxt-icon'],
+  experimental: { typedPages: false },
   devtools: { enabled: true },
 })
