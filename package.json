@@ -9,8 +9,7 @@
     "verify-deps": "npx pnpm i --frozen-lockfile --prefer-offline",
     "dev": "npm run verify-deps && nuxt dev",
     "build": "nuxt build",
-    "preview": "nuxt preview",
-    "analyze": "npx nuxi analyze"
+    "preview": "nuxt preview"
   },
   "engines": {
     "npm": "^7",
