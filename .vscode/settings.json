@@ -11,6 +11,7 @@
     "changelog",
     "readme",
     "contributing",
+    "package"
   ],
   "conventionalCommits.gitmoji": false,
 }
