@@ -6,10 +6,11 @@
   "scripts": {
     "preinstall": "npx -y only-allow pnpm",
     "postinstall": "nuxt prepare",
-    "dev": "nuxt dev",
+    "verify-deps": "npx pnpm i --frozen-lockfile --prefer-offline",
+    "dev": "npm run verify-deps && nuxt dev",
     "build": "nuxt build",
     "preview": "nuxt preview",
-    "analyze": "pnpx nuxi analyze"
+    "analyze": "npx nuxi analyze"
   },
   "devDependencies": {
     "@nuxt/devtools": "latest",
