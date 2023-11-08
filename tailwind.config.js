@@ -1,0 +1,55 @@
+/** @type {import('tailwindcss').Config} */
+export default {
+  darkMode: 'class',
+  theme: {
+    extend: {
+      colors: {
+        rad: {
+          // as defined in assets/css/tailwind.css
+          'background-default': 'var(--color-background-default)',
+          'background-float': 'var(--color-background-float)',
+          'background-dip': 'var(--color-background-dip)',
+          'foreground-contrast': 'var(--color-foreground-contrast)',
+          'foreground-dim': 'var(--color-foreground-dim)',
+          'foreground-emphasized': 'var(--color-foreground-emphasized)',
+          'foreground-emphasized-hover': 'var(--color-foreground-emphasized-hover)',
+          'foreground-match-background': 'var(--color-foreground-match-background)',
+          'foreground-white': 'var(--color-foreground-white)',
+          'foreground-black': 'var(--color-foreground-black)',
+          'foreground-primary': 'var(--color-foreground-primary)',
+          'foreground-success': 'var(--color-foreground-success)',
+          'foreground-red': 'var(--color-foreground-red)',
+          'foreground-yellow': 'var(--color-foreground-yellow)',
+          'foreground-gray': 'var(--color-foreground-gray)',
+          'foreground-disabled': 'var(--color-foreground-disabled)',
+          'border-hint': 'var(--color-border-hint)',
+          'border-focus': 'var(--color-border-focus)',
+          'border-contrast': 'var(--color-border-contrast)',
+          'border-default': 'var(--color-border-default)',
+          'border-error': 'var(--color-border-error)',
+          'border-merged': 'var(--color-border-merged)',
+          'border-match-background': 'var(--color-border-match-background)',
+          'fill-secondary': 'var(--color-fill-secondary)',
+          'fill-secondary-hover': 'var(--color-fill-secondary-hover)',
+          'fill-ghost': 'var(--color-fill-ghost)',
+          'fill-ghost-hover': 'var(--color-fill-ghost-hover)',
+          'fill-separator': 'var(--color-fill-separator)',
+          'fill-primary': 'var(--color-fill-primary)',
+          'fill-success': 'var(--color-fill-success)',
+          'fill-yellow': 'var(--color-fill-yellow)',
+          'fill-danger': 'var(--color-fill-danger)',
+          'fill-gray': 'var(--color-fill-gray)',
+          'fill-primary-hover': 'var(--color-fill-primary-hover)',
+          'fill-diff-green': 'var(--color-fill-diff-green)',
+          'fill-diff-green-light': 'var(--color-fill-diff-green-light)',
+          'fill-diff-red': 'var(--color-fill-diff-red)',
+          'fill-diff-red-light': 'var(--color-fill-diff-red-light)',
+          'fill-float': 'var(--color-fill-float)',
+          'fill-float-hover': 'var(--color-fill-float-hover)',
+          'fill-merged': 'var(--color-fill-merged)',
+        }
+      },
+    },
+  },
+}
+
