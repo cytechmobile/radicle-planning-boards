@@ -12,14 +12,17 @@
     "preview": "nuxt preview",
     "analyze": "npx nuxi analyze"
   },
+  "engines": {
+    "npm": "^7",
+    "node": ">=20.0.0"
+  },
   "devDependencies": {
     "@nuxt/devtools": "latest",
     "nuxt": "^3.8.1",
     "vue": "^3.3.8",
     "vue-router": "^4.2.5"
   },
-  "engines": {
-    "npm": "^7",
-    "node": ">=20.0.0"
+  "dependencies": {
+    "@pinia/nuxt": "^0.5.1"
   }
 }
