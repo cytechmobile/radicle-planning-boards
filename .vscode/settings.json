@@ -25,5 +25,5 @@
     "strings": true
   },
 
-
+  "vue.inlayHints.missingProps": true,
 }
