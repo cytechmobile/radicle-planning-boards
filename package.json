@@ -4,6 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "preinstall": "npx -y only-allow pnpm",
     "postinstall": "nuxt prepare",
     "dev": "nuxt dev",
     "build": "nuxt build",
@@ -15,5 +16,8 @@
     "nuxt": "^3.8.1",
     "vue": "^3.3.8",
     "vue-router": "^4.2.5"
+  },
+  "engines": {
+    "npm": "^7"
   }
 }
