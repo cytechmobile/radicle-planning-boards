@@ -15,4 +15,15 @@
     "app"
   ],
   "conventionalCommits.gitmoji": false,
+
+  // tailwindcss
+  "css.validate": false,
+  "files.associations": {
+    "*.css": "tailwindcss"
+  },
+  "editor.quickSuggestions": {
+    "strings": true
+  },
+
+
 }
