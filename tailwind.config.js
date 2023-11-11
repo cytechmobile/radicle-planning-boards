@@ -47,6 +47,13 @@ export default {
           'fill-float': 'var(--color-fill-float)',
           'fill-float-hover': 'var(--color-fill-float-hover)',
           'fill-merged': 'var(--color-fill-merged)',
+          'foreground-primary-hover': 'var(--color-foreground-primary-hover)',
+          'border-primary': 'var(--color-border-primary)',
+          'border-primary-hover': 'var(--color-border-primary-hover)',
+          'border-selected': 'var(--color-border-selected)',
+          'fill-primary-hover': 'var(--color-fill-primary-hover)',
+          'fill-selected': 'var(--color-fill-selected)',
+          'fill-yellow-iconic': 'var(--color-fill-yellow-iconic)',
         }
       },
     },
