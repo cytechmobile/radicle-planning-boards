@@ -17,12 +17,13 @@
   },
   "devDependencies": {
     "@nuxt/devtools": "latest",
-    "@nuxtjs/tailwindcss": "^6.9.4",
     "nuxt": "^3.8.1",
     "vue": "^3.3.8",
     "vue-router": "^4.2.5"
   },
   "dependencies": {
+    "@iconify/json": "^2.2.140",
+    "@nuxt/ui": "^2.10.0",
     "@pinia/nuxt": "^0.5.1",
     "@vueuse/nuxt": "^10.5.0",
     "nuxt-icon": "^0.6.5"

@@ -1,9 +1,23 @@
-/** @type {import('tailwindcss').Config} */
-export default {
-  darkMode: 'class',
+import type { Config } from 'tailwindcss'
+import defaultTheme from 'tailwindcss/defaultTheme'
+
+export default <Partial<Config>> {
   theme: {
     extend: {
       colors: {
+        'moody-blue': {
+          '50': '#ebedff',
+          '100': '#e0e5ff',
+          '200': '#c2c9ff',
+          '300': '#9ea6ff',
+          '400': '#7070ff', // `--color-fill-secondary` from assets/css/tailwind.css
+          '500': '#6a5df9',
+          '600': '#593fee',
+          '700': '#4c31d3',
+          '800': '#3c29a8',
+          '900': '#352985',
+          '950': '#21184e',
+        },
         rad: {
           // as defined in assets/css/tailwind.css
           'background-default': 'var(--color-background-default)',
@@ -31,7 +45,6 @@ export default {
           'fill-gray': 'var(--color-fill-gray)',
           'fill-merged': 'var(--color-fill-merged)',
           'fill-primary-hover': 'var(--color-fill-primary-hover)',
-          'fill-primary-hover': 'var(--color-fill-primary-hover)',
           'fill-primary': 'var(--color-fill-primary)',
           'fill-secondary-hover': 'var(--color-fill-secondary-hover)',
           'fill-secondary': 'var(--color-fill-secondary)',
@@ -54,7 +67,7 @@ export default {
           'foreground-success': 'var(--color-foreground-success)',
           'foreground-white': 'var(--color-foreground-white)',
           'foreground-yellow': 'var(--color-foreground-yellow)',
-        }
+        },
       },
     },
   },

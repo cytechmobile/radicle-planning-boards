@@ -17,13 +17,23 @@
   "conventionalCommits.gitmoji": false,
 
   // tailwindcss
-  "css.validate": false,
   "files.associations": {
     "*.css": "tailwindcss"
   },
   "editor.quickSuggestions": {
-    "strings": true
+      "strings": true
   },
+  "tailwindCSS.experimental.configFile": "tailwind.config.ts",
+  "tailwindCSS.experimental.classRegex": [
+    ["ui:\\s*{([^)]*)\\s*}", "[\"'`]([^\"'`]*).*?[\"'`]"],
+    ["/\\*ui\\*/\\s*{([^;]*)}", ":\\s*[\"'`]([^\"'`]*).*?[\"'`]"]
+  ],
+  "tailwindCSS.classAttributes": [
+    "class",
+    "className",
+    "ngClass",
+    "ui"
+  ],
 
-  "vue.inlayHints.missingProps": true,
+  "vue.inlayHints.missingProps": true
 }
