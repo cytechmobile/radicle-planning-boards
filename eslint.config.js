@@ -7,6 +7,19 @@ const prettier = interopDefault(pluginPrettier)
 const prettierRulesFixingConflictsWithEslint = { ...interopDefault(configPrettier).rules }
 delete prettierRulesFixingConflictsWithEslint['vue/html-self-closing']
 
+/** @type {import("prettier").Config} */
+const prettierConfig = {
+  printWidth: 95,
+  useTabs: false,
+  tabWidth: 2,
+  semi: false,
+  singleQuote: true,
+  trailingComma: 'all',
+  quoteProps: 'consistent',
+  arrowParens: 'always',
+  htmlWhitespaceSensitivity: 'ignore',
+}
+
 export default antfu(
   {
     // typescript: { tsconfigPath: 'tsconfig.json' }, TODO: uncomment and disable for non-ts files
@@ -16,7 +29,7 @@ export default antfu(
     rules: {
       ...prettierRulesFixingConflictsWithEslint,
       ...prettier.configs.recommended.rules,
-      'prettier/prettier': 'warn',
+      'prettier/prettier': ['warn', prettierConfig],
     },
   },
 )
