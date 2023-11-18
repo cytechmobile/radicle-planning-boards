@@ -1,23 +1,21 @@
 import antfu from '@antfu/eslint-config'
-import * as _pluginPrettier from 'eslint-plugin-prettier'
-import * as _configPrettier from 'eslint-config-prettier'
+import * as pluginPrettier from 'eslint-plugin-prettier'
+import * as configPrettier from 'eslint-config-prettier'
 
-const pluginPrettier = interopDefault(_pluginPrettier)
+const prettier = interopDefault(pluginPrettier)
 
-const prettierConflictRules = { ...interopDefault(_configPrettier).rules }
-delete prettierConflictRules['vue/html-self-closing']
+const prettierRulesFixingConflictsWithEslint = { ...interopDefault(configPrettier).rules }
+delete prettierRulesFixingConflictsWithEslint['vue/html-self-closing']
 
 export default antfu(
   {
     // typescript: { tsconfigPath: 'tsconfig.json' }, TODO: uncomment and disable for non-ts files
   },
   {
-    plugins: {
-      prettier: pluginPrettier,
-    },
+    plugins: { prettier },
     rules: {
-      ...prettierConflictRules,
-      ...pluginPrettier.configs.recommended.rules,
+      ...prettierRulesFixingConflictsWithEslint,
+      ...prettier.configs.recommended.rules,
       'prettier/prettier': 'warn',
     },
   },
