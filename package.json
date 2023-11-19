@@ -24,18 +24,9 @@
     "nuxt-icon": "^0.6.6"
   },
   "devDependencies": {
-    "@antfu/eslint-config": "^1.2.1",
+    "@maninak/eslint-config": "^0.1.0",
     "@nuxt/devtools": "^1.0.2",
-    "eslint": "^8.54.0",
-    "eslint-config-prettier": "^9.0.0",
-    "eslint-plugin-prettier": "^5.0.1",
-    "eslint-plugin-prettier-vue": "^5.0.0",
-    "eslint-plugin-tailwindcss": "^3.13.0",
-    "eslint-plugin-vue-scoped-css": "^2.5.1",
-    "lint-staged": "^15.1.0",
     "nuxt": "^3.8.1",
-    "prettier": "^3.1.0",
-    "simple-git-hooks": "^2.9.0",
     "typescript": "^5.2.2",
     "vue": "^3.3.8",
     "vue-router": "^4.2.5"
