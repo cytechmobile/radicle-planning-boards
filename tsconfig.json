@@ -3,8 +3,8 @@
   "extends": "./.nuxt/tsconfig.json",
   "compilerOptions": {
     "moduleDetection": "force",
-    "noUncheckedIndexedAccess": true,
     "noFallthroughCasesInSwitch": true,
     "noPropertyAccessFromIndexSignature": true,
+    "noUncheckedIndexedAccess": true
   }
 }

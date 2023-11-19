@@ -1,7 +1,6 @@
 import type { Config } from 'tailwindcss'
-import defaultTheme from 'tailwindcss/defaultTheme'
 
-export default <Partial<Config>> {
+export default {
   theme: {
     extend: {
       colors: {
@@ -18,7 +17,7 @@ export default <Partial<Config>> {
           '900': '#352985',
           '950': '#21184e',
         },
-        rad: {
+        'rad': {
           // as defined in assets/css/tailwind.css
           'background-default': 'var(--color-background-default)',
           'background-dip': 'var(--color-background-dip)',
@@ -71,5 +70,4 @@ export default <Partial<Config>> {
       },
     },
   },
-}
-
+} satisfies Partial<Config>

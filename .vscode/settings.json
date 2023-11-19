@@ -1,4 +1,5 @@
 {
+  /* eslint-disable jsonc/sort-keys */
   "git.alwaysSignOff": true,
   "conventionalCommits.scopes": [
     "repo",
