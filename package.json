@@ -14,7 +14,7 @@
     "dev": "npm run verify-deps && nuxt dev",
     "build": "nuxt build",
     "preview": "nuxt preview",
-    "lint": "eslint . --max-warnings 0 --cache --cache-location node_modules/.cache/eslint"
+    "lint": "eslint . --max-warnings 0 --no-warn-ignored --cache --cache-location node_modules/.cache/eslint"
   },
   "dependencies": {
     "@iconify/json": "^2.2.142",
@@ -29,6 +29,9 @@
     "eslint": "^8.54.0",
     "eslint-config-prettier": "^9.0.0",
     "eslint-plugin-prettier": "^5.0.1",
+    "eslint-plugin-prettier-vue": "^5.0.0",
+    "eslint-plugin-tailwindcss": "^3.13.0",
+    "eslint-plugin-vue-scoped-css": "^2.5.1",
     "lint-staged": "^15.1.0",
     "nuxt": "^3.8.1",
     "prettier": "^3.1.0",
@@ -41,6 +44,6 @@
     "pre-commit": "npx lint-staged"
   },
   "lint-staged": {
-    "*": "eslint --fix --max-warnings 0 --cache --cache-location node_modules/.cache/eslint"
+    "*": "eslint --fix --max-warnings 0 --no-warn-ignored --cache --cache-location node_modules/.cache/eslint"
   }
 }
