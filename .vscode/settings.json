@@ -34,9 +34,10 @@
   "vue.inlayHints.missingProps": true,
 
   "eslint.experimental.useFlatConfig": true,
-  // Disable other formatters, use eslint instead
+  // Disable other linters/formatters, use eslint instead
   "prettier.enable": false,
   "editor.formatOnSave": false,
+  "tailwindCSS.validate": false,
   // Auto fix eslint issues on save
   "editor.codeActionsOnSave": {
     "source.fixAll.eslint": "explicit",
