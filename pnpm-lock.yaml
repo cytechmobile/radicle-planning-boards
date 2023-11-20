@@ -23,8 +23,8 @@ dependencies:
 
 devDependencies:
   '@maninak/eslint-config':
-    specifier: ^0.1.1
-    version: 0.1.1(tailwindcss@3.3.5)(vue-eslint-parser@9.3.2)
+    specifier: ^0.1.2
+    version: 0.1.2(tailwindcss@3.3.5)(vue-eslint-parser@9.3.2)
   '@nuxt/devtools':
     specifier: ^1.0.2
     version: 1.0.2(nuxt@3.8.1)(vite@4.5.0)
@@ -58,8 +58,8 @@ packages:
       '@jridgewell/gen-mapping': 0.3.3
       '@jridgewell/trace-mapping': 0.3.20
 
-  /@antfu/eslint-config@1.2.1(eslint@8.54.0)(typescript@5.2.2):
-    resolution: {integrity: sha512-/B7jSc9RARxGNZUoxkB2EL7pL7v5ubt25Ah3QbQaCalcIOC3YF+60mL4/G8Oi9Rtdng7ytNGg3bi50voKfqINQ==}
+  /@antfu/eslint-config@2.0.0(eslint@8.54.0)(typescript@5.2.2):
+    resolution: {integrity: sha512-kAhbg7loDbT7g3rkLkgZ1R7C5v43wzAOjLMAcdT1xFMGEhAtG8MhBMUXrRCwdaV8ebvLYjO+mqUVCdgrHaFPOA==}
     hasBin: true
     peerDependencies:
       eslint: '>=8.0.0'
@@ -1030,12 +1030,13 @@ packages:
   /@kwsites/promise-deferred@1.1.1:
     resolution: {integrity: sha512-GaHYm+c0O9MjZRu0ongGBRbinu8gVAMd2UZjji6jVmqKtZluZnptXGWhz1E8j8D2HJ3f/yMxKAUC0b+57wncIw==}
 
-  /@maninak/eslint-config@0.1.1(tailwindcss@3.3.5)(vue-eslint-parser@9.3.2):
-    resolution: {integrity: sha512-NQ6mlSGq45I2UQ14iX50kANxlgbnbzCh+cJaUyqVI9RVYtR+xnapJucwiXNOlKSic8vfom7qcbNfGLXKRB33SQ==}
+  /@maninak/eslint-config@0.1.2(tailwindcss@3.3.5)(vue-eslint-parser@9.3.2):
+    resolution: {integrity: sha512-Rd/KQklT7EwyDDVwRO2j0ngtXcbL2dxB04Q1fIfL45mxv3xEvazaao6dpsRX27bSb24/3Z+OgM1F5mczGymUDQ==}
     engines: {npm: ^7}
     requiresBuild: true
     dependencies:
-      '@antfu/eslint-config': 1.2.1(eslint@8.54.0)(typescript@5.2.2)
+      '@antfu/eslint-config': 2.0.0(eslint@8.54.0)(typescript@5.2.2)
+      '@eslint/eslintrc': 2.1.3
       eslint: 8.54.0
       eslint-config-prettier: 9.0.0(eslint@8.54.0)
       eslint-plugin-prettier: 5.0.1(eslint-config-prettier@9.0.0)(eslint@8.54.0)(prettier@3.1.0)

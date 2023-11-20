@@ -27,7 +27,7 @@
     "nuxt-icon": "^0.6.6"
   },
   "devDependencies": {
-    "@maninak/eslint-config": "^0.1.1",
+    "@maninak/eslint-config": "^0.1.2",
     "@nuxt/devtools": "^1.0.2",
     "nuxt": "^3.8.1",
     "typescript": "^5.2.2",
