@@ -1,6 +1,8 @@
 {
   /* eslint-disable jsonc/sort-keys */
+
   "git.alwaysSignOff": true,
+  "git.inputValidationSubjectLength": 72,
   "conventionalCommits.scopes": [
     "repo",
     "dev",
