@@ -12,11 +12,11 @@
     "postinstall": "nuxt prepare",
     "verify-deps": "npx pnpm i --frozen-lockfile --prefer-offline",
     "dev": "npm run verify-deps && nuxt dev",
-    "build": "nuxt build",
+    "build": "nuxt generate",
     "preview": "nuxt preview",
     "lint": "eslint . --max-warnings 0 --no-warn-ignored --cache --cache-location node_modules/.cache/eslint",
     "test": "npm run test:typings && npm run test:unit",
-    "test:typings": "nuxi typecheck",
+    "test:typings": "nuxt typecheck",
     "test:unit": "echo \"Unit testing not yet implemented.\""
   },
   "dependencies": {
