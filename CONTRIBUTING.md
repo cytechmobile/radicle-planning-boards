@@ -53,11 +53,22 @@ We have access to tens of thousands of open source icons from the [icones librar
 <Icon name="uil:github" color="black" />
 ```
 
-#### TailwindCss + Nuxt UI + Nuxt Icon
+#### Brand colors
+
+We have all Radicle-themed colors defined in [tailwind.config.ts](tailwind.config.ts) available as TailwindCSS classes e.g. `*-rad-fill-primary`. Those are bit more "special" than the built-in TailwindCSS colors because with one color declaration the white and dark modes are covered automatically. Which means
+
+```vue
+<button class="bg-gray-100 dark:bg-gray-900">-</button> <!-- normally we'd need to do  we only have to do this -->
+<button class="bg-rad-background-default">-</button> <!-- but we only do this instead -->
+```
+
+You can see the actual color values defined in [assets/css/tailwind.css](assets/css/tailwind.css).
+
+Combining all the above libs together we can have:
 
 ```vue
 <UButton
-  class="rounded"
+  class="bg-rad-fill-primary text-rad-foreground-contrast rounded"
   icon="i-simple-line-icons-emotsmile"
   to="https://ui.nuxt.com/elements/button#link"
   target="_blank"
