@@ -1,3 +1,8 @@
 import maninak from '@maninak/eslint-config'
 
-export default maninak({ typescript: { tsconfigPath: 'tsconfig.json' } })
+export default maninak({
+  ignores: ['*.md'],
+  typescript: {
+    tsconfigPath: 'tsconfig.json',
+  },
+})
