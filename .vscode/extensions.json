@@ -3,6 +3,7 @@
   // enabled *for this workspace*
   "recommendations": [
     "DavidAnson.vscode-markdownlint",
+    "wayou.vscode-todo-highlight",
     "webhint.vscode-webhint",
     "dbaeumer.vscode-eslint",
     "mrmlnc.vscode-scss",
