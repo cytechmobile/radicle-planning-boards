@@ -18,7 +18,77 @@ npx pnpm install a-new-pkg # you can achieve it like this
 
 ### Nuxt Modules
 
-See [`nuxt.config.ts`](./nuxt.config.ts) for a list of Nuxt Modules this repo is equipped with to help you along the way. Don't forget to look up online what they actually do and their respective docs too.
+See [`nuxt.config.ts`](./nuxt.config.ts) for a list of Nuxt Modules this repo is equipped with to help you along the way. It's worth looking up what they they have to offer and leverage it to make our lives easier.
+
+### TailwindCSS
+
+The repo is configured with [`TailwindCSS`](https://tailwindcss.com/docs/utility-first) support which we can leverage for atomic styling like so:
+
+```vue
+<button class="rounded border">I'm a custom button</button>
+```
+
+#### Nuxt UI
+
+We have access to plenty of well-defined and accessible vue components from `@nuxt/ui` and [use them like this](https://ui.nuxt.com/elements/button#link):
+
+```vue
+<UButton to="https://ui.nuxt.com/elements/button#link" target="_blank">I'm a button</UButton>
+```
+
+Nuxt UI is has first class support for TailwindCSS by either using the standard `class` prop or leveraging the `ui` prop [like so](https://ui.nuxt.com/getting-started/theming#ui-prop):
+
+```vue
+<UButton class="rounded">I'm a rounded button</UButton>
+<UButton :ui="{ rounded: 'rounded-full' }">I'm a very rounded button</UButton>
+```
+
+_(You may not see TailwindCSS in the nuxt modules because Nuxt UI brings it with it)_
+
+#### Nuxt Icon
+
+We have access to tens of thousands of open source icons from the [icones library](https://icones.js.org) and [use them like this](https://nuxt.com/modules/icon#usage):
+
+```vue
+<Icon name="uil:github" color="black" />
+```
+
+#### TailwindCss + Nuxt UI + Nuxt Icon
+
+```vue
+<UButton
+  class="rounded"
+  icon="i-simple-line-icons-emotsmile"
+  to="https://ui.nuxt.com/elements/button#link"
+  target="_blank"
+>
+  I'm a happy button
+</UButton>
+```
+
+#### VueUse
+
+We have countless [amazing utilities](https://vueuse.org/functions.html) as _reactive_ [composables](https://www.patterns.dev/vue/composables) for most common (and many uncommon) use cases which we can use like this:
+
+```ts
+<script setup lang="ts">
+    const target = ref(null)
+    onClickOutside(target, (event) => console.log('Clicked outside "target"')) // <-- https://vueuse.org/core/onClickOutside/#onclickoutside
+</script>
+
+<template>
+  <div ref="target">Hello world</div>
+  <div>Outside element</div>
+</template>
+```
+
+#### Pinia
+
+The repo is configured with [Pinia](https://pinia.vuejs.org/core-concepts/), enabling usage of reactive global stores.
+
+#### Routing
+
+Routing on Nuxt is handled by [Vue Router](https://router.vuejs.org/) which wrapps it and adds it's own [abstractions on top](https://nuxt.com/docs/getting-started/routing).
 
 ## Launching for local development
 
