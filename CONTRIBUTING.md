@@ -20,7 +20,7 @@ npx pnpm install a-new-pkg # you can achieve it like this
 
 See [`nuxt.config.ts`](./nuxt.config.ts) for a list of Nuxt Modules this repo is equipped with to help you along the way. It's worth looking up what they they have to offer and leverage it to make our lives easier.
 
-### TailwindCSS
+#### TailwindCSS
 
 The repo is configured with [`TailwindCSS`](https://tailwindcss.com/docs/utility-first) support which we can leverage for atomic styling like so:
 
@@ -30,7 +30,7 @@ The repo is configured with [`TailwindCSS`](https://tailwindcss.com/docs/utility
 
 #### Nuxt UI
 
-We have access to plenty of well-defined and accessible vue components from `@nuxt/ui` and [use them like this](https://ui.nuxt.com/elements/button#link):
+We have access to plenty of well-defined and accessible vue components from `@nuxt/ui` and can use them [like this](https://ui.nuxt.com/elements/button#link):
 
 ```vue
 <UButton to="https://ui.nuxt.com/elements/button#link" target="_blank">I'm a button</UButton>
@@ -43,7 +43,7 @@ Nuxt UI is has first class support for TailwindCSS by either using the standard 
 <UButton :ui="{ rounded: 'rounded-full' }">I'm a very rounded button</UButton>
 ```
 
-_(You may not see TailwindCSS in the nuxt modules because Nuxt UI brings it with it)_
+_(You may not see TailwindCSS in the nuxt modules declaration because Nuxt UI brings it with it)_
 
 #### Nuxt Icon
 
