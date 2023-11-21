@@ -45,7 +45,7 @@ The above command will alwats ensure that you have the required dependencies loc
 - Every time you write a "todo" comment always add your name right after it. You're responsible to resolve it, ideally before merging the PR. If not,then create a ticket about it and add a link to it in the comment e.g. `TODO: maninak support decimals https://github.com/cytechmobile/radicle-planning-boards/issues/69`
 - Use CamelCase for .vue files and kebab-case for everything else
 - Follow [Vue](https://v2.vuejs.org/v2/style-guide)/Nuxt community conventions
-- Use Vue [Composition API](https://vuejs.org/guide/extras/composition-api-faq.html#composition-api-faq) only and `<script setup lang="ts">`
+- Use Vue [Composition API](https://vuejs.org/guide/extras/composition-api-faq.html#composition-api-faq) only and [`<script setup lang="ts">`](https://www.patterns.dev/vue/script-setup)
 - Name similar things similarly e.g. `EmployeeCard.vue` & `EmployeeCardList.vue`
 - Use `*List` suffix for dedicated component containers like shown above (even if they are rendered in a grid or whatever). Avoid doing it if the container is indepedent and could support any child component.
 
