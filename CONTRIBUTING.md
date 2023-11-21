@@ -1,17 +1,13 @@
-# Contribution Guide
+# Contribution guide
 
 ## Dependencies
 
-We use [`pnpm`](https://pnpm.io/motivation) for node package management (but don't worry, if you use an npm or yarn command by mistake there are fail-safes in place to save you from messing up).
-
-```shell
-npx pnpm install some-dep
-```
+We use [`pnpm`](https://pnpm.io/motivation) for node package management (f you use npm or yarn by mistake, no worries, there are fail-safes in place to save you from breaking something).
 
 > [!Tip]
 > Check out [`ni`](https://github.com/antfu/ni) to never think again about which package manager to use in which repo.
 
-### Usage without pnpm globally installed
+### Without pnpm globally installed
 
 If you _don't_ already have `pnpm` globally installed and don't want to do that, you can always prefix each pnpm command with `npx`.
 
@@ -32,7 +28,7 @@ After cloning the repo, all you have to do is run:
 pnpm run dev
 ```
 
-The above command will alwats ensure that you have the required dependencies locally when launching for development.
+The above command will always ensure that you have the required dependencies locally when launching for development.
 
 ## Conventions
 
