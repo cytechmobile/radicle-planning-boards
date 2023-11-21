@@ -18,7 +18,7 @@ npx pnpm install a-new-pkg # you can achieve it like this
 
 ### Nuxt Modules
 
-See [`nuxt.config.ts`](./nuxt.config.ts) for a list of Nuxt Modules this repo is equipped with to help you along the way. It's worth looking up what they they have to offer and leverage it to make our lives easier.
+See [`nuxt.config.ts`](./nuxt.config.ts) for a list of Nuxt Modules this repo is equipped with to help you along the way. It's worth looking up what they have to offer and leverage it to make our lives easier.
 
 #### TailwindCSS
 
@@ -55,11 +55,11 @@ We have access to tens of thousands of open source icons from the [icones librar
 
 #### Brand colors
 
-We have all Radicle-themed colors defined in [tailwind.config.ts](tailwind.config.ts) available as TailwindCSS classes e.g. `*-rad-fill-primary`. Those are bit more "special" than the built-in TailwindCSS colors because with one color declaration the white and dark modes are covered automatically. Which means
+We have all Radicle-themed colors defined in [tailwind.config.ts](tailwind.config.ts) available as TailwindCSS classes e.g. `*-rad-fill-primary`. Those are a bit more "special" than the built-in TailwindCSS colors because with one color declaration the white and dark modes are covered automatically. Which means
 
 ```vue
-<button class="bg-gray-100 dark:bg-gray-900">-</button> <!-- normally we'd need to do  we only have to do this -->
-<button class="bg-rad-background-default">-</button> <!-- but we only do this instead -->
+<button class="bg-gray-100 dark:bg-gray-900">-</button> <!-- normally we'd need to do this -->
+<button class="bg-rad-background-default">-</button> <!-- but we  instead only do this -->
 ```
 
 You can see the actual color values defined in [assets/css/tailwind.css](assets/css/tailwind.css).
