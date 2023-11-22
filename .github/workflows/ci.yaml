@@ -6,7 +6,7 @@ on:
     branches: [ main ]
 
 jobs:
-  lint-build-test:
+  audit:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout
