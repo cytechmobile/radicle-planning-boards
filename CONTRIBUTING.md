@@ -1,8 +1,18 @@
 # Contribution guide
 
+## Launching for local development
+
+After cloning the repo, all you have to do is run:
+
+```shell
+npm run dev
+```
+
+The above command will always ensure that you have the required dependencies locally when launching for development.
+
 ## Dependencies
 
-We use [`pnpm`](https://pnpm.io/motivation) for node package management (f you use npm or yarn by mistake, no worries, there are fail-safes in place to save you from breaking something).
+We use [`pnpm`](https://pnpm.io/motivation) for node package management (f you use npm or yarn by mistake when un-/installing a package, no worries, there are fail-safes in place to save you from breaking something).
 
 > [!Tip]
 > Check out [`ni`](https://github.com/antfu/ni) to never think again about which package manager to use in which repo.
@@ -79,7 +89,7 @@ Combining all the above libs together we can have:
 
 #### VueUse
 
-We have countless [amazing utilities](https://vueuse.org/functions.html) as _reactive_ [composables](https://www.patterns.dev/vue/composables) for most common (and many uncommon) use cases which we can use like this:
+We have countless [utilities](https://vueuse.org/functions.html) as _reactive_ [composables](https://www.patterns.dev/vue/composables) for most common (and many uncommon) use cases which we can use like this:
 
 ```ts
 <script setup lang="ts">
@@ -99,17 +109,7 @@ The repo is configured with [Pinia](https://pinia.vuejs.org/core-concepts/), ena
 
 #### Routing
 
-Routing on Nuxt is handled by [Vue Router](https://router.vuejs.org/) which wrapps it and adds it's own [abstractions on top](https://nuxt.com/docs/getting-started/routing).
-
-## Launching for local development
-
-After cloning the repo, all you have to do is run:
-
-```shell
-pnpm run dev
-```
-
-The above command will always ensure that you have the required dependencies locally when launching for development.
+Routing on Nuxt is handled by [Vue Router](https://router.vuejs.org/) which s it and adds it's own [abstractions on top](https://nuxt.com/docs/getting-started/routing).
 
 ## Conventions
 
