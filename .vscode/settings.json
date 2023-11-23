@@ -1,5 +1,8 @@
 {
+  /* eslint-disable jsonc/sort-keys */
+
   "git.alwaysSignOff": true,
+  "git.inputValidationSubjectLength": 72,
   "conventionalCommits.scopes": [
     "repo",
     "dev",
@@ -11,6 +14,49 @@
     "changelog",
     "readme",
     "contributing",
+    "package",
+    "app",
+    "ts"
   ],
   "conventionalCommits.gitmoji": false,
+
+  // tailwindcss
+  "files.associations": {
+    "*.css": "tailwindcss"
+  },
+  "editor.quickSuggestions": {
+    "strings": true
+  },
+  "tailwindCSS.experimental.configFile": "tailwind.config.ts",
+  "tailwindCSS.experimental.classRegex": [
+    ["ui:\\s*{([^)]*)\\s*}", "[\"'`]([^\"'`]*).*?[\"'`]"],
+    ["/\\*ui\\*/\\s*{([^;]*)}", ":\\s*[\"'`]([^\"'`]*).*?[\"'`]"]
+  ],
+  "tailwindCSS.classAttributes": ["class", "className", "ngClass", "ui"],
+
+  "vue.inlayHints.missingProps": true,
+
+  "eslint.experimental.useFlatConfig": true,
+  // Disable other linters/formatters, use eslint instead
+  "prettier.enable": false,
+  "editor.formatOnSave": false,
+  "tailwindCSS.validate": false,
+  // Auto fix eslint issues on save
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit",
+    "source.organizeImports": "never"
+  },
+  // Enable eslint for all supported languages
+  "eslint.validate": [
+    "javascript",
+    "javascriptreact",
+    "typescript",
+    "typescriptreact",
+    "vue",
+    "html",
+    "markdown",
+    "json",
+    "jsonc",
+    "yaml"
+  ]
 }

@@ -1,0 +1,113 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/*
+ * Radicle theme colors copied over from `radicle-interface`
+ * https://app.radicle.xyz/nodes/seed.radicle.xyz/rad:z4V1sjrXqjvFdnCUbxPFqd5p4DtH5/tree/public/colors.css
+ * then sorted alphabetically
+ */
+
+html {
+  --color-background-default: #fafaff;
+  --color-background-dip: #f5f5ff;
+  --color-background-float: #ffffff;
+  --color-border-contrast: #24252d;
+  --color-border-default: #e5e5ff;
+  --color-border-error: #aa5078;
+  --color-border-focus: #7070ff;
+  --color-border-hint: #e5e5ff;
+  --color-border-match-background: #fafaff;
+  --color-border-merged: #ffe5ff;
+  --color-border-primary-hover: #ff55ff;
+  --color-border-primary: #ff1aff;
+  --color-border-selected: #e5e5ff;
+  --color-border-warning: #ffe609;
+  --color-fill-danger: #be7495;
+  --color-fill-diff-green-light: #dcefe5;
+  --color-fill-diff-green: #badeca;
+  --color-fill-diff-red-light: #f7eef2;
+  --color-fill-diff-red: #efdce4;
+  --color-fill-float-hover: #ffffff;
+  --color-fill-float: #ffffff;
+  --color-fill-ghost-hover: #ebebff;
+  --color-fill-ghost: #ebebff;
+  --color-fill-gray: #9494b8;
+  --color-fill-merged: #ffeeff;
+  --color-fill-primary-hover: #ff80ff;
+  --color-fill-primary: #ff70ff;
+  --color-fill-secondary-hover: #8585ff;
+  --color-fill-secondary: #7070ff;
+  --color-fill-selected: #ebebff;
+  --color-fill-separator: #eaeaf1;
+  --color-fill-success: #4fa877;
+  --color-fill-warning: #ffffe5;
+  --color-fill-yellow-iconic: #ffff55;
+  --color-fill-yellow: #ffe609;
+  --color-foreground-black: #000000;
+  --color-foreground-contrast: #232563;
+  --color-foreground-dim: #70718f;
+  --color-foreground-disabled: #b2b2cc;
+  --color-foreground-emphasized-hover: #8585ff;
+  --color-foreground-emphasized: #7070ff;
+  --color-foreground-gray: #9494b8;
+  --color-foreground-match-background: #fafaff;
+  --color-foreground-primary-hover: #ff80ff;
+  --color-foreground-primary: #ff55ff;
+  --color-foreground-red: #aa5078;
+  --color-foreground-success: #4fa877;
+  --color-foreground-white: #ffffff;
+  --color-foreground-yellow: #e5c001;
+}
+
+html.dark {
+  --color-background-default: #0a0d10;
+  --color-background-dip: #000000;
+  --color-background-float: #14151a;
+  --color-border-contrast: #ebebff;
+  --color-border-default: #2e2f38;
+  --color-border-error: #aa5078;
+  --color-border-focus: #7070ff;
+  --color-border-hint: #24252d;
+  --color-border-match-background: #0a0d10;
+  --color-border-merged: #6b006b;
+  --color-border-primary-hover: #ff55ff;
+  --color-border-primary: #ff1aff;
+  --color-border-selected: #232563;
+  --color-border-warning: #4c4000;
+  --color-fill-danger: #6b2b42;
+  --color-fill-diff-green-light: #142a1d;
+  --color-fill-diff-green: #183425;
+  --color-fill-diff-red-light: #2d060d;
+  --color-fill-diff-red: #4d1929;
+  --color-fill-float-hover: #1b1c22;
+  --color-fill-float: #14151a;
+  --color-fill-ghost-hover: #2e2f38;
+  --color-fill-ghost: #24252d;
+  --color-fill-gray: #9494b8;
+  --color-fill-merged: #1a001a;
+  --color-fill-primary-hover: #ff80ff;
+  --color-fill-primary: #ff55ff;
+  --color-fill-secondary-hover: #8585ff;
+  --color-fill-secondary: #7070ff;
+  --color-fill-selected: #070814;
+  --color-fill-separator: #24252d;
+  --color-fill-success: #4fa877;
+  --color-fill-warning: #191500;
+  --color-fill-yellow-iconic: #ffff55;
+  --color-fill-yellow: #ffe609;
+  --color-foreground-black: #000000;
+  --color-foreground-contrast: #f9f9fb;
+  --color-foreground-dim: #9494b8;
+  --color-foreground-disabled: #494a5a;
+  --color-foreground-emphasized-hover: #8585ff;
+  --color-foreground-emphasized: #7070ff;
+  --color-foreground-gray: #9494b8;
+  --color-foreground-match-background: #0a0d10;
+  --color-foreground-primary-hover: #ff80ff;
+  --color-foreground-primary: #ff55ff;
+  --color-foreground-red: #aa5078;
+  --color-foreground-success: #4fa877;
+  --color-foreground-white: #ffffff;
+  --color-foreground-yellow: #e5c001;
+}

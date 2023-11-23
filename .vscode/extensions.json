@@ -1,0 +1,25 @@
+{
+  // Please make sure you have the following extensions installed and
+  // enabled *for this workspace*
+  "recommendations": [
+    "DavidAnson.vscode-markdownlint",
+    "wayou.vscode-todo-highlight",
+    "webhint.vscode-webhint",
+    "dbaeumer.vscode-eslint",
+    "mrmlnc.vscode-scss",
+    "bradlc.vscode-tailwindcss",
+    "vivaxy.vscode-conventional-commits",
+    "TeamHub.teamhub",
+    "Vue.volar",
+    "Vue.vscode-typescript-vue-plugin",
+    "Nuxtr.nuxtr-vscode",
+    "antfu.iconify",
+  ],
+  // Please make sure you disable the following extensions *for this workspace*
+  "unwantedRecommendations": [
+    "esbenp.prettier-vscode",
+    "octref.vetur",
+    "voorjaar.windicss-intellisense",
+    "vscode.typescript-language-features", // Manually search for `@builtin TypeScript`
+  ]
+}

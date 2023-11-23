@@ -1,75 +1,9 @@
-# Nuxt 3 Minimal Starter
+[![Netlify Status](https://api.netlify.com/api/v1/badges/c075cf10-4d89-44d1-bd53-44a58f9ef06f/deploy-status)](https://app.netlify.com/sites/chipper-wisp-c7553e/deploys)
 
-Look at the [Nuxt 3 documentation](https://nuxt.com/docs/getting-started/introduction) to learn more.
+# Radicle Planning Boards
 
-## Setup
+A project management web app leveraging [Radicle](https://radicle.xyz/) Issues and Patches.
 
-Make sure to install the dependencies:
+## Contributing
 
-```bash
-# npm
-npm install
-
-# pnpm
-pnpm install
-
-# yarn
-yarn install
-
-# bun
-bun install
-```
-
-## Development Server
-
-Start the development server on `http://localhost:3000`:
-
-```bash
-# npm
-npm run dev
-
-# pnpm
-pnpm run dev
-
-# yarn
-yarn dev
-
-# bun
-bun run dev
-```
-
-## Production
-
-Build the application for production:
-
-```bash
-# npm
-npm run build
-
-# pnpm
-pnpm run build
-
-# yarn
-yarn build
-
-# bun
-bun run build
-```
-
-Locally preview production build:
-
-```bash
-# npm
-npm run preview
-
-# pnpm
-pnpm run preview
-
-# yarn
-yarn preview
-
-# bun
-bun run preview
-```
-
-Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.
+Please refer to the [contribution guide](CONTRIBUTING.md).

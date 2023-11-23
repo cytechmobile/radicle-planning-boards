@@ -1,0 +1,30 @@
+name: CI
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+    - uses: pnpm/action-setup@v2
+      with:
+        version: 8
+    - name: Install Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: 20.x
+        cache: 'pnpm'
+    - name: Install Dependencies
+      run: pnpm run verify-deps
+    - name: Lint Code
+      run: pnpm run lint
+    - name: Test Typings
+      run: pnpm run test:typings
+      continue-on-error: true # temporarily allowed to fail because script fails due to a 3rd party lib bug
+    - name: Test Unit
+      run: pnpm run test:unit

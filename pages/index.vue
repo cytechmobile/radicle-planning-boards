@@ -1,0 +1,4 @@
+<template>
+  <TestComponent />
+  <NuxtWelcome />
+</template>
