@@ -44,14 +44,14 @@ const issues = [
 <template>
   <main class="flex min-h-screen flex-col">
     <div class="flex flex-1 gap-4 overflow-x-auto px-2 py-6">
-      <Column v-for="status in statuses" :key="status" :title="status">
+      <IssueCardColumn v-for="status in statuses" :key="status" :title="status">
         <IssueCard
           v-for="issue in issues.filter((issue) => issue.status === status)"
           :id="issue.id"
           :key="issue.id"
           :title="issue.title"
         />
-      </Column>
+      </IssueCardColumn>
     </div>
   </main>
 </template>
