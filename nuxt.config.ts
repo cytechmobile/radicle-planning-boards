@@ -2,7 +2,7 @@
 export default defineNuxtConfig({
   ssr: false,
   modules: ['@pinia/nuxt', '@vueuse/nuxt', '@nuxt/ui', 'nuxt-icon'],
-  experimental: { typedPages: false },
+  experimental: { typedPages: true },
   devtools: { enabled: true },
   ui: { global: true, icons: 'all' },
 })

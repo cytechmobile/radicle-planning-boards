@@ -15,7 +15,8 @@
     "readme",
     "contributing",
     "package",
-    "app"
+    "app",
+    "ts"
   ],
   "conventionalCommits.gitmoji": false,
 
