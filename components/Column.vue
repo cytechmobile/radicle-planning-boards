@@ -3,8 +3,10 @@ defineProps<{ title: string }>()
 </script>
 
 <template>
-  <div class="min-w-[350px] max-w-[350px] flex-1 rounded-[4px] border border-rad-border-hint">
-    <h3 class="p-2 text-lg font-medium capitalize">{{ title }}</h3>
+  <div
+    class="min-w-[350px] max-w-[350px] flex-1 rounded-[4px] border border-rad-border-hint bg-rad-background-dip"
+  >
+    <h3 class="p-2 text-xl font-semibold capitalize">{{ title }}</h3>
 
     <ul class="flex flex-col gap-2 p-2">
       <slot></slot>

@@ -111,3 +111,8 @@ html.dark {
   --color-foreground-white: #ffffff;
   --color-foreground-yellow: #e5c001;
 }
+
+body {
+  background-color: var(--color-background-default);
+  color: var(--color-foreground-contrast);
+}
