@@ -1,13 +1,13 @@
 <script lang="ts" setup>
-const { title } = defineProps<{ title: string }>()
+defineProps<{ title: string }>()
 </script>
 
 <template>
-  <div class="border-rad-border-hint border flex-1 max-w-[350px] min-w-[350px] rounded-[4px]">
-    <h3 class="p-2 font-medium text-lg capitalize">{{ title }}</h3>
+  <div class="min-w-[350px] max-w-[350px] flex-1 rounded-[4px] border border-rad-border-hint">
+    <h3 class="p-2 text-lg font-medium capitalize">{{ title }}</h3>
 
-    <ul class="p-2 flex flex-col gap-2">
-      <slot />
+    <ul class="flex flex-col gap-2 p-2">
+      <slot></slot>
     </ul>
   </div>
 </template>

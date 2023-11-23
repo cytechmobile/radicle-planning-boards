@@ -42,8 +42,8 @@ const issues = [
 </script>
 
 <template>
-  <main class="min-h-screen flex flex-col">
-    <div class="flex-1 flex gap-2 px-2 py-6 overflow-x-auto">
+  <main class="flex min-h-screen flex-col">
+    <div class="flex flex-1 gap-2 overflow-x-auto px-2 py-6">
       <Column v-for="status in statuses" :key="status" :title="status">
         <IssueCard
           v-for="issue in issues.filter((issue) => issue.status === status)"
