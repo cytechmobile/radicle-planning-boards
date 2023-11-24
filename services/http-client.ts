@@ -12,7 +12,7 @@ interface Params {
 interface HttpClient {
   delete: (url: string, params: Params) => Promise<any>;
   get: (url: string, params: Params) => Promise<any>;
-  post: (url: string, data: Params) => Promise<any>;
+  post: (url: string, params: Params) => Promise<any>;
   put: (url: string, params: Params) => Promise<any>;
 }
 
