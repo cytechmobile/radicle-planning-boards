@@ -6,8 +6,21 @@
 const TOKEN = '';
 
 interface Params {
-  [key: string]: string;
+  [key: string]: any;
 }
+
+interface HttpClient {
+  delete: (url: string, params: Params) => Promise<any>;
+  get: (url: string, params: Params) => Promise<any>;
+  post: (url: string, data: Params) => Promise<any>;
+  put: (url: string, params: Params) => Promise<any>;
+}
+
+const Method = {
+  DELETE: 'DELETE',
+  POST: 'POST',
+  PUT: 'PUT',
+} as const;
 
 const getHeaders = () => ({
   headers: {
@@ -20,7 +33,7 @@ const onError = (error: unknown) => {
   throw new Error(`Error: ${error}`);
 };
 
-export const httpClient = {
+export const httpClient: HttpClient = {
   async get(url: string, params: Params = {}) {
     try {
       const queryString = new URLSearchParams(params).toString();
@@ -37,12 +50,12 @@ export const httpClient = {
     }
   },
 
-  async post(url: string, data: Params = {}) {
+  async post(url: string, params: Params = {}) {
     try {
       const response = await fetch(url, {
-        method: 'POST',
+        method: Method.POST,
         ...getHeaders(),
-        body: JSON.stringify(data),
+        body: JSON.stringify(params),
       });
 
       if (!response.ok) onError(response.status);
@@ -53,12 +66,12 @@ export const httpClient = {
     }
   },
 
-  async put(url: string, data: Params = {}) {
+  async put(url: string, params: Params = {}) {
     try {
       const response = await fetch(url, {
-        method: 'PUT',
+        method: Method.PUT,
         ...getHeaders(),
-        body: JSON.stringify(data),
+        body: JSON.stringify(params),
       });
 
       if (!response.ok) onError(response.status);
@@ -76,7 +89,7 @@ export const httpClient = {
       const requestUrl = queryString ? `${url}?${queryString}` : url;
 
       const response = await fetch(requestUrl, {
-        method: 'DELETE',
+        method: Method.DELETE,
         ...getHeaders(),
       });
 
