@@ -6,14 +6,14 @@
 const TOKEN = ''
 
 interface Params {
-  [key: string]: any
+  [key: string]: unknown
 }
 
 interface HttpClient {
-  delete: (url: string, params: Params) => Promise<any>
-  get: (url: string, params: Params) => Promise<any>
-  post: (url: string, params: Params) => Promise<any>
-  put: (url: string, params: Params) => Promise<any>
+  delete: (url: string, params: Params) => Promise<Object>
+  get: (url: string, params: Params) => Promise<Object>
+  post: (url: string, params: Params) => Promise<Object>
+  put: (url: string, params: Params) => Promise<Object>
 }
 
 const Method = {
@@ -36,7 +36,7 @@ const onError = (error: unknown) => {
 export const httpClient: HttpClient = {
   async get(url: string, params: Params = {}) {
     try {
-      const queryString = new URLSearchParams(params).toString()
+      const queryString = new URLSearchParams(params as {}).toString()
 
       const requestUrl = queryString ? `${url}?${queryString}` : url
 
@@ -84,7 +84,7 @@ export const httpClient: HttpClient = {
 
   async delete(url: string, params: Params = {}) {
     try {
-      const queryString = new URLSearchParams(params).toString()
+      const queryString = new URLSearchParams(params as {}).toString()
 
       const requestUrl = queryString ? `${url}?${queryString}` : url
 
