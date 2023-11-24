@@ -5,4 +5,10 @@ export default defineNuxtConfig({
   experimental: { typedPages: true },
   devtools: { enabled: true },
   ui: { global: true, icons: 'all' },
-})
+  runtimeConfig: {
+    apiSecret: '',
+    public: {
+      apiBase: '/server-url',
+    },
+  },
+});
