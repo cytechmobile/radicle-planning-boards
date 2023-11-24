@@ -1,15 +1,21 @@
 <script setup lang="ts">
-defineProps<{ title: string }>()
+import { VueDraggable } from 'vue-draggable-plus'
+
+defineProps<{ title: string; modelValue: unknown[] }>()
 </script>
 
 <template>
   <div
-    class="min-w-[350px] max-w-[350px] flex-1 rounded border border-rad-border-hint bg-rad-background-dip"
+    class="flex min-w-[350px] max-w-[350px] flex-1 flex-col rounded border border-rad-border-hint bg-rad-background-dip"
   >
     <h3 class="p-2 text-xl font-semibold capitalize">{{ title }}</h3>
 
-    <ul class="flex flex-col gap-2 p-2">
+    <VueDraggable
+      class="flex flex-1 flex-col gap-2 p-2"
+      v-bind="$attrs"
+      :model-value="modelValue"
+    >
       <slot></slot>
-    </ul>
+    </VueDraggable>
   </div>
 </template>
