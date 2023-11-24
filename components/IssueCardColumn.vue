@@ -11,9 +11,12 @@ defineProps<{ title: string; modelValue: unknown[] }>()
     <h3 class="p-2 text-xl font-semibold capitalize">{{ title }}</h3>
 
     <VueDraggable
+      tag="ul"
       class="flex flex-1 flex-col gap-2 p-2"
       v-bind="$attrs"
       :model-value="modelValue"
+      ghost-class="opacity-50"
+      :animation="150"
     >
       <slot></slot>
     </VueDraggable>
