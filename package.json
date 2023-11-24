@@ -24,7 +24,8 @@
     "@nuxt/ui": "^2.11.0",
     "@pinia/nuxt": "^0.5.1",
     "@vueuse/nuxt": "^10.6.1",
-    "nuxt-icon": "^0.6.6"
+    "nuxt-icon": "^0.6.6",
+    "vue-draggable-plus": "^0.2.7"
   },
   "devDependencies": {
     "@maninak/eslint-config": "^0.1.2",
