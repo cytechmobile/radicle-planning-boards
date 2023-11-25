@@ -1,22 +1,22 @@
 <script setup lang="ts">
 import { type Issue, type IssueStatus, mockIssues } from '../constants/issues'
 
-function filterIssuesWithStatus(issues: Issue[], status: IssueStatus): Issue[] {
-  const foundIssues = issues.filter((issue) => issue.state.status === status)
+function filterIssuesWithLabel(issues: Issue[], label: IssueStatus): Issue[] {
+  const issuesWithLabel = issues.filter((issue) => issue.labels.includes(label))
 
-  return foundIssues
+  return issuesWithLabel
 }
 
-const statuses = [...new Set(mockIssues.map((issue) => issue.state.status))]
+const uniqueLabels = [...new Set(mockIssues.flatMap((issue) => issue.labels))]
 </script>
 
 <template>
   <div class="flex flex-1 gap-4 overflow-x-auto px-2 py-6">
     <Column
-      v-for="status in statuses"
-      :key="status"
-      :title="status"
-      :issues="filterIssuesWithStatus(mockIssues, status)"
+      v-for="label in uniqueLabels"
+      :key="label"
+      :title="label"
+      :issues="filterIssuesWithLabel(mockIssues, label)"
     />
   </div>
 </template>
