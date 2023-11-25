@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { VueDraggable } from 'vue-draggable-plus'
 
-defineProps<{ title: string; modelValue: unknown[] }>()
+import { type IssueStatus, mockIssues } from '../fixtures/issues'
+defineProps<{ title: IssueStatus }>()
 </script>
 
 <template>
@@ -11,12 +12,12 @@ defineProps<{ title: string; modelValue: unknown[] }>()
     <h3 class="p-2 text-xl font-semibold capitalize">{{ title }}</h3>
 
     <VueDraggable
+      v-model="mockIssues[title]"
       tag="ul"
       class="flex flex-1 flex-col gap-2 p-2"
-      v-bind="$attrs"
-      :model-value="modelValue"
       ghost-class="opacity-50"
       :animation="150"
+      group="issues"
     >
       <slot></slot>
     </VueDraggable>
