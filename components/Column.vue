@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { VueDraggable } from 'vue-draggable-plus'
+import type { Issue, IssueStatus } from '../constants/issues'
 
-import { type IssueStatus, mockIssues } from '../fixtures/issues'
-defineProps<{ title: IssueStatus }>()
+const props = defineProps<{ title: IssueStatus; issues: Issue[] }>()
+const issuesModel = ref(unref(toRefs(props).issues)) // create new ref with the same contents
 </script>
 
 <template>
@@ -12,14 +13,19 @@ defineProps<{ title: IssueStatus }>()
     <h3 class="p-2 text-xl font-semibold capitalize">{{ title }}</h3>
 
     <VueDraggable
-      v-model="mockIssues[title]"
+      v-model="issuesModel"
       tag="ul"
       class="flex flex-1 flex-col gap-2 p-2"
       ghost-class="opacity-50"
       :animation="150"
       group="issues"
     >
-      <slot></slot>
+      <ColumnIssueCard
+        v-for="issue in issuesModel"
+        :id="issue.id"
+        :key="issue.id"
+        :title="issue.title"
+      />
     </VueDraggable>
   </div>
 </template>
