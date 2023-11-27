@@ -1,4 +1,4 @@
-<script lang="ts" setup>
+<script setup lang="ts">
 // Mock data, to be replaced with real data from the API
 const statuses = ['todo', 'doing', 'done']
 
