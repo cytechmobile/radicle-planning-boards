@@ -20,12 +20,9 @@ const issuesModel = ref(unref(toRefs(props).issues)) // create new ref with the 
       :animation="150"
       group="issues"
     >
-      <ColumnIssueCard
-        v-for="issue in issuesModel"
-        :id="issue.id"
-        :key="issue.id"
-        :title="issue.title"
-      />
+      <li v-for="issue in issuesModel" :key="issue.id">
+        <ColumnIssueCard v-bind="issue" />
+      </li>
     </VueDraggable>
   </div>
 </template>
