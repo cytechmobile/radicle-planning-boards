@@ -42,13 +42,11 @@ const issues = [
 </script>
 
 <template>
-  <main class="flex min-h-screen flex-col">
-    <div class="flex flex-1 gap-4 overflow-x-auto px-2 py-6">
-      <IssueCardColumn v-for="status in statuses" :key="status" :title="status">
-        <li v-for="issue in issues.filter((issue) => issue.status === status)" :key="issue.id">
-          <IssueCard v-bind="issue" />
-        </li>
-      </IssueCardColumn>
-    </div>
-  </main>
+  <div class="flex flex-1 gap-4 overflow-x-auto px-2 py-6">
+    <IssueCardColumn v-for="status in statuses" :key="status" :title="status">
+      <li v-for="issue in issues.filter((issue) => issue.status === status)" :key="issue.id">
+        <IssueCard v-bind="issue" />
+      </li>
+    </IssueCardColumn>
+  </div>
 </template>
