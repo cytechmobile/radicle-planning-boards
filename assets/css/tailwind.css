@@ -9,19 +9,20 @@
  */
 
 html {
-  --color-background-default: #fafaff;
+  --color-background-default: #f5f5ff;
   --color-background-dip: #f5f5ff;
-  --color-background-float: #ffffff;
+  --color-background-float: #fafaff;
   --color-border-contrast: #24252d;
-  --color-border-default: #e5e5ff;
-  --color-border-error: #aa5078;
+  --color-border-default: #dbdbff;
+  --color-border-error: #ce97af;
   --color-border-focus: #7070ff;
-  --color-border-hint: #e5e5ff;
-  --color-border-match-background: #fafaff;
+  --color-border-hint: #dbdbff;
+  --color-border-match-background: #f5f5ff;
   --color-border-merged: #ffe5ff;
   --color-border-primary-hover: #ff55ff;
   --color-border-primary: #ff1aff;
-  --color-border-selected: #e5e5ff;
+  --color-border-selected: #dbdbff;
+  --color-border-success: #97ceb0;
   --color-border-warning: #ffe609;
   --color-fill-danger: #be7495;
   --color-fill-diff-green-light: #dcefe5;
@@ -29,7 +30,7 @@ html {
   --color-fill-diff-red-light: #f7eef2;
   --color-fill-diff-red: #efdce4;
   --color-fill-float-hover: #ffffff;
-  --color-fill-float: #ffffff;
+  --color-fill-float: #fafaff;
   --color-fill-ghost-hover: #ebebff;
   --color-fill-ghost: #ebebff;
   --color-fill-gray: #9494b8;
@@ -51,7 +52,7 @@ html {
   --color-foreground-emphasized-hover: #8585ff;
   --color-foreground-emphasized: #7070ff;
   --color-foreground-gray: #9494b8;
-  --color-foreground-match-background: #fafaff;
+  --color-foreground-match-background: #f5f5ff;
   --color-foreground-primary-hover: #ff80ff;
   --color-foreground-primary: #ff55ff;
   --color-foreground-red: #aa5078;
@@ -66,7 +67,7 @@ html.dark {
   --color-background-float: #14151a;
   --color-border-contrast: #ebebff;
   --color-border-default: #2e2f38;
-  --color-border-error: #aa5078;
+  --color-border-error: #6b2b42;
   --color-border-focus: #7070ff;
   --color-border-hint: #24252d;
   --color-border-match-background: #0a0d10;
@@ -74,8 +75,9 @@ html.dark {
   --color-border-primary-hover: #ff55ff;
   --color-border-primary: #ff1aff;
   --color-border-selected: #232563;
+  --color-border-success: #2a5a40;
   --color-border-warning: #4c4000;
-  --color-fill-danger: #6b2b42;
+  --color-fill-danger: #4d1929;
   --color-fill-diff-green-light: #142a1d;
   --color-fill-diff-green: #183425;
   --color-fill-diff-red-light: #2d060d;
@@ -90,7 +92,7 @@ html.dark {
   --color-fill-primary: #ff55ff;
   --color-fill-secondary-hover: #8585ff;
   --color-fill-secondary: #7070ff;
-  --color-fill-selected: #070814;
+  --color-fill-selected: #16173d;
   --color-fill-separator: #24252d;
   --color-fill-success: #4fa877;
   --color-fill-warning: #191500;
