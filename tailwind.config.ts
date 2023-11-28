@@ -32,6 +32,7 @@ export default {
           'border-primary-hover': 'var(--color-border-primary-hover)',
           'border-primary': 'var(--color-border-primary)',
           'border-selected': 'var(--color-border-selected)',
+          'border-success': 'var(--color-border-success)',
           'border-warning': 'var(--color-border-warning)',
           'fill-danger': 'var(--color-fill-danger)',
           'fill-diff-green-light': 'var(--color-fill-diff-green-light)',
