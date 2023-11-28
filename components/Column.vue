@@ -10,7 +10,7 @@ const issuesModel = ref(unref(toRefs(props).issues)) // create new ref with the 
   <div
     class="flex min-w-[350px] max-w-[350px] flex-1 flex-col rounded border border-rad-border-hint bg-rad-background-dip"
   >
-    <h3 class="p-2 text-xl font-semibold capitalize">{{ title }}</h3>
+    <h3 class="px-5 py-2 text-xl font-semibold capitalize">{{ title }}</h3>
 
     <VueDraggable
       v-model="issuesModel"

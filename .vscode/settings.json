@@ -16,7 +16,8 @@
     "contributing",
     "package",
     "app",
-    "ts"
+    "ts",
+    "column"
   ],
   "conventionalCommits.gitmoji": false,
 
