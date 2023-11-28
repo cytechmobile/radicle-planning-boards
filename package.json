@@ -20,18 +20,18 @@
     "test:unit": "echo \"Unit testing not yet implemented.\""
   },
   "dependencies": {
-    "@iconify/json": "^2.2.142",
-    "@nuxt/ui": "^2.10.0",
+    "@iconify/json": "^2.2.149",
+    "@nuxt/ui": "^2.11.0",
     "@pinia/nuxt": "^0.5.1",
     "@vueuse/nuxt": "^10.6.1",
     "nuxt-icon": "^0.6.6"
   },
   "devDependencies": {
     "@maninak/eslint-config": "^0.1.2",
-    "@nuxt/devtools": "^1.0.2",
-    "nuxt": "^3.8.1",
-    "typescript": "^5.2.2",
-    "vue": "^3.3.8",
+    "@nuxt/devtools": "^1.0.4",
+    "nuxt": "^3.8.2",
+    "typescript": "^5.3.2",
+    "vue": "^3.3.9",
     "vue-router": "^4.2.5"
   },
   "simple-git-hooks": {
