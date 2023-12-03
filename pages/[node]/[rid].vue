@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import type { Issue, IssueStatus } from '../types/issues'
+import type { Issue, IssueStatus } from '~/types/issues'
 
-import createDataLabel from '../utils/create-data-label' // typescript complains when this is auto imported
+const route = useRoute('node-rid')
 
 async function fetchIssues(): Promise<Issue[]> {
   const res = await fetch(
-    'https://seed.radicle.xyz/api/v1/projects/rad:z4V1sjrXqjvFdnCUbxPFqd5p4DtH5/issues',
+    `https://${route.params.node}/api/v1/projects/${route.params.rid}/issues`,
   )
 
   return (await res.json()) as Issue[]
