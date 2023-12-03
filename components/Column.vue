@@ -3,7 +3,7 @@ import { VueDraggable } from 'vue-draggable-plus'
 import type { Issue, IssueStatus } from '../constants/issues'
 
 const props = defineProps<{ title: IssueStatus; issues: Issue[] }>()
-const issuesModel = ref(unref(toRefs(props).issues)) // create new ref with the same contents
+const issuesModel = ref(structuredClone(toRaw(props)).issues) // create new ref with the same contents
 
 const STATUS_TO_ICON_MAP = {
   todo: { name: 'bx:circle', class: 'text-rad-foreground-contrast' },

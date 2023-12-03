@@ -17,7 +17,8 @@
     "package",
     "app",
     "ts",
-    "column"
+    "column",
+    "board"
   ],
   "conventionalCommits.gitmoji": false,
 
