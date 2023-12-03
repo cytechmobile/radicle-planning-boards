@@ -4,6 +4,8 @@ import type { Issue, IssueStatus } from '~/types/issues'
 
 const route = useRoute('node-rid')
 
+const statusDataLabels = ISSUE_STATUSES.map((status) => createDataLabel('status', status))
+
 async function fetchIssues(): Promise<Issue[]> {
   const res = await fetch(
     `https://${route.params.node}/api/v1/projects/${route.params.rid}/issues`,
@@ -14,13 +16,7 @@ async function fetchIssues(): Promise<Issue[]> {
 
 function initializeIssuesStatuses(issues: Issue[]): Issue[] {
   return issues.map((issue) => {
-    const hasStatus = issue.labels.some((label) => {
-      const statusDataLabels = ISSUE_STATUSES.map((status) =>
-        createDataLabel('status', status),
-      )
-
-      return statusDataLabels.includes(label)
-    })
+    const hasStatus = issue.labels.some((label) => statusDataLabels.includes(label))
 
     if (!hasStatus) {
       issue.labels.push(createDataLabel('status', 'todo'))
@@ -46,6 +42,22 @@ onMounted(async () => {
   issues.value = initializeIssuesStatuses(fetchedIssues)
 })
 
+function updateIssueStatus(id: string, status: IssueStatus) {
+  const issue = issues.value.find((issue) => issue.id === id)
+
+  if (!issue) {
+    return
+  }
+
+  const labelIndex = issue.labels.findIndex((label) => statusDataLabels.includes(label))
+
+  if (labelIndex === -1) {
+    return
+  }
+
+  issue.labels[labelIndex] = createDataLabel('status', status)
+}
+
 const isInIFrame = globalThis.window !== globalThis.window.parent
 </script>
 
@@ -56,6 +68,7 @@ const isInIFrame = globalThis.window !== globalThis.window.parent
       :key="status"
       :title="status"
       :issues="filterIssuesByStatus(issues, status)"
+      @add="(id) => updateIssueStatus(id, status)"
     />
   </div>
 </template>

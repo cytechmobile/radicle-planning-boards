@@ -20,7 +20,8 @@
     "column",
     "board",
     "httpd",
-    "iframe"
+    "iframe",
+    "issues"
   ],
   "conventionalCommits.gitmoji": false,
 

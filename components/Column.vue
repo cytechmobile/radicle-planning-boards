@@ -2,7 +2,12 @@
 import { VueDraggable } from 'vue-draggable-plus'
 import type { Issue, IssueStatus } from '../types/issues'
 
+interface VueDraggableAddEvent {
+  item: HTMLElement
+}
+
 const props = defineProps<{ title: IssueStatus; issues: Issue[] }>()
+const emit = defineEmits<(e: 'add', id: string) => void>()
 
 const issuesModel = ref<Issue[]>([])
 
@@ -15,6 +20,15 @@ const STATUS_TO_ICON_MAP = {
   doing: { name: 'bx:adjust', class: 'text-rad-foreground-yellow' },
   done: { name: 'bx:bxs-circle', class: 'text-rad-foreground-success' },
 } satisfies Record<IssueStatus, { name: string; class: string }>
+
+function handleAdd(event: VueDraggableAddEvent) {
+  const id = event.item.dataset['id']
+  if (!id) {
+    return
+  }
+
+  emit('add', id)
+}
 </script>
 
 <template>
@@ -41,8 +55,9 @@ const STATUS_TO_ICON_MAP = {
       ghost-class="opacity-50"
       :animation="150"
       group="issues"
+      @add="handleAdd"
     >
-      <li v-for="issue in issuesModel" :key="issue.id">
+      <li v-for="issue in issuesModel" :key="issue.id" :data-id="issue.id">
         <ColumnIssueCard v-bind="issue" />
       </li>
     </VueDraggable>
