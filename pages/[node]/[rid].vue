@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { ISSUE_STATUSES } from '~/constants/issues'
 import type { Issue, IssueStatus } from '~/types/issues'
 
 const route = useRoute('node-rid')
@@ -13,7 +14,13 @@ async function fetchIssues(): Promise<Issue[]> {
 
 function initializeIssuesStatuses(issues: Issue[]): Issue[] {
   return issues.map((issue) => {
-    const hasStatus = issue.labels.some((label) => label.startsWith('RBP:status:'))
+    const hasStatus = issue.labels.some((label) => {
+      const statusDataLabels = ISSUE_STATUSES.map((status) =>
+        createDataLabel('status', status),
+      )
+
+      return statusDataLabels.includes(label)
+    })
 
     if (!hasStatus) {
       issue.labels.push(createDataLabel('status', 'todo'))
@@ -24,11 +31,11 @@ function initializeIssuesStatuses(issues: Issue[]): Issue[] {
 }
 
 function filterIssuesByStatus(issues: Issue[], status: IssueStatus): Issue[] {
-  const issuesWithLabel = issues.filter((issue) =>
+  const issuesWithStatus = issues.filter((issue) =>
     issue.labels.includes(createDataLabel('status', status)),
   )
 
-  return issuesWithLabel
+  return issuesWithStatus
 }
 
 const issues = ref<Issue[]>([])
@@ -45,7 +52,7 @@ const isInIFrame = globalThis.window !== globalThis.window.parent
 <template>
   <div class="flex flex-1 gap-4 overflow-x-auto" :class="{ 'px-2 py-6': !isInIFrame }">
     <Column
-      v-for="status in (['todo', 'doing', 'done'] satisfies IssueStatus[])"
+      v-for="status in ISSUE_STATUSES"
       :key="status"
       :title="status"
       :issues="filterIssuesByStatus(issues, status)"

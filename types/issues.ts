@@ -1,4 +1,7 @@
-export type IssueStatus = 'todo' | 'doing' | 'done'
+import type { DataLabel } from '~/constants/data-labels'
+import type { ISSUE_STATUSES } from '~/constants/issues'
+
+export type IssueStatus = (typeof ISSUE_STATUSES)[number]
 
 type IssueState = { status: 'open' } | { status: 'closed'; reason: 'other' | 'solved' }
 
@@ -16,12 +19,13 @@ interface Comment {
   timestamp: number
   replyTo?: string
 }
+
 export interface Issue {
   id: string
   author: Author
   title: string
   state: IssueState
   discussion: Comment[]
-  labels: string[]
+  labels: (Omit<string, DataLabel> & DataLabel)[] // allow comparing with DataLabel string literals
   assignees: string[]
 }
