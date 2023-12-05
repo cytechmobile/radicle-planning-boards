@@ -34,6 +34,9 @@ devDependencies:
   nuxt:
     specifier: ^3.8.2
     version: 3.8.2(eslint@8.54.0)(typescript@5.3.2)(vite@4.5.0)
+  nuxt-open-fetch:
+    specifier: ^0.3.0
+    version: 0.3.0
   typescript:
     specifier: ^5.3.2
     version: 5.3.2
@@ -5814,6 +5817,19 @@ packages:
       - vue
     dev: false
 
+  /nuxt-open-fetch@0.3.0:
+    resolution: {integrity: sha512-YBX0KMbhWp9y8CdQ6TpXUgs4xW0ixp/Sef57jiDP/VYRLHjEZsAXkvz2z90oLrmjGqKbZW8ISMUTJ/np0q5URg==}
+    dependencies:
+      '@nuxt/kit': 3.8.2
+      defu: 6.1.3
+      openapi-typescript: 6.7.1
+      openapi-typescript-helpers: 0.0.4
+      scule: 1.1.0
+    transitivePeerDependencies:
+      - rollup
+      - supports-color
+    dev: true
+
   /nuxt@3.8.2(eslint@8.54.0)(typescript@5.3.2)(vite@4.5.0):
     resolution: {integrity: sha512-HUAyifmqTs2zcQBGvcby3KNs2pBAk+l7ZbLjD1oCNqQQ+wBuZ1qgLC4Ebu++y4g3o3Y8WAWSvpafbKRLQZziPw==}
     engines: {node: ^14.18.0 || >=16.10.0}
@@ -5997,6 +6013,10 @@ packages:
       define-lazy-prop: 3.0.0
       is-inside-container: 1.0.0
       is-wsl: 2.2.0
+
+  /openapi-typescript-helpers@0.0.4:
+    resolution: {integrity: sha512-Q0MTapapFAG993+dx8lNw33X6P/6EbFr31yNymJHq56fNc6dODyRm8tWyRnGxuC74lyl1iCRMV6nQCGQsfVNKg==}
+    dev: true
 
   /openapi-typescript@6.7.1:
     resolution: {integrity: sha512-Q3Ltt0KUm2smcPrsaR8qKmSwQ1KM4yGDJVoQdpYa0yvKPeN8huDx5utMT7DvwvJastHHzUxajjivK3WN2+fobg==}
