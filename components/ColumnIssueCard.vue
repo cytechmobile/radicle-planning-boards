@@ -4,7 +4,7 @@ defineProps<{ id: string; title: string }>()
 
 <template>
   <article
-    class="flex flex-col gap-1 rounded bg-rad-background-float p-2 hover:bg-rad-fill-float-hover"
+    class="flex flex-col gap-1 rounded bg-rad-background-float p-3 transition-opacity hover:cursor-grab hover:bg-rad-fill-float-hover"
   >
     <small>
       <pre class="text-xs font-medium text-rad-foreground-dim">{{ id.slice(0, 7) }}</pre>
