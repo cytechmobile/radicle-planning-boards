@@ -12,7 +12,7 @@ const emit = defineEmits<(e: 'add', id: string) => void>()
 const issuesModel = ref<Issue[]>([])
 
 watchEffect(() => {
-  issuesModel.value = structuredClone(toRaw(props)).issues // create new ref with the same contents
+  issuesModel.value = [...unref(toRef(props, 'issues'))] // "clone" issues prop
 })
 
 const STATUS_TO_ICON_MAP = {
