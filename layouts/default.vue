@@ -6,26 +6,25 @@ interface Message {
   theme: Theme
 }
 
+const isDark = useDark()
+const toggleDark = useToggle(isDark)
+
 function setTheme(theme: Theme) {
-  document.documentElement.classList.remove('light', 'dark')
-  document.documentElement.classList.add(theme)
+  toggleDark(theme === 'dark')
 }
 
 const { initialTheme } = useRoute().query
 
 onMounted(() => {
-  if (initialTheme && (initialTheme === 'light' || initialTheme === 'dark')) {
+  if (initialTheme === 'light' || initialTheme === 'dark') {
     setTheme(initialTheme)
   }
+})
 
-  window.addEventListener('message', (event: MessageEvent<Message>) => {
-    switch (event.data.type) {
-      case 'theme':
-        setTheme(event.data.theme)
-        break
-      default:
-    }
-  })
+useEventListener(window, 'message', (event: MessageEvent<Message>) => {
+  if (event.data.type === 'theme') {
+    setTheme(event.data.theme)
+  }
 })
 </script>
 

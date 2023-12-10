@@ -19,7 +19,8 @@
     "ts",
     "column",
     "board",
-    "httpd"
+    "httpd",
+    "iframe"
   ],
   "conventionalCommits.gitmoji": false,
 
