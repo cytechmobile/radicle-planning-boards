@@ -18,7 +18,8 @@
     "app",
     "ts",
     "column",
-    "board"
+    "board",
+    "httpd"
   ],
   "conventionalCommits.gitmoji": false,
 
