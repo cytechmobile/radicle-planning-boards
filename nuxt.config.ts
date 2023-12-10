@@ -11,7 +11,10 @@ export default defineNuxtConfig({
       httpd: {
         schema:
           'https://seed.rhizoma.dev/raw/rad:z3yQUb9HDAC7TQrUDGkQsXDsYFj9G/b12552cf6803ecb9ddab58714b571684465dfe6d/api/radicle-httpd.yaml',
-        baseURL: 'https://seed.radicle.xyz/api/v1',
+        baseURL: 'http://127.0.0.1:8080/api/v1',
+        query: {
+          perPage: 1000,
+        },
       },
     },
   },

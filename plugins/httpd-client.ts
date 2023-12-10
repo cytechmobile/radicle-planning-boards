@@ -10,9 +10,6 @@ export default defineNuxtPlugin(() => {
         createOpenFetch((options) => ({
           ...clients.httpd,
           ...options,
-          async onRequest(ctx) {
-            return await options.onRequest?.(ctx)
-          },
         })),
       ]),
     ),
