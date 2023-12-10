@@ -7,12 +7,17 @@ interface Message {
 }
 
 function setTheme(theme: Theme) {
-  document.documentElement.classList.remove('dark')
-  document.documentElement.classList.remove('light')
+  document.documentElement.classList.remove('light', 'dark')
   document.documentElement.classList.add(theme)
 }
 
+const { initialTheme } = useRoute().query
+
 onMounted(() => {
+  if (initialTheme && (initialTheme === 'light' || initialTheme === 'dark')) {
+    setTheme(initialTheme)
+  }
+
   window.addEventListener('message', (event: MessageEvent<Message>) => {
     switch (event.data.type) {
       case 'theme':
