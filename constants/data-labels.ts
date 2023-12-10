@@ -1,6 +1,6 @@
 import type { IssueStatus } from '~/types/issues'
 
-export const DATA_LABEL_PREFIX = 'RBP' as const
+export const DATA_LABEL_PREFIX = 'RPB' as const
 
 export type DataLabelType = 'status'
 
