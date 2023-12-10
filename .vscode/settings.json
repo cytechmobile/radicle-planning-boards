@@ -21,7 +21,8 @@
     "board",
     "httpd",
     "iframe",
-    "issues"
+    "issues",
+    "cards"
   ],
   "conventionalCommits.gitmoji": false,
 
