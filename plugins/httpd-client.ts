@@ -11,9 +11,6 @@ export default defineNuxtPlugin(() => {
           ...clients.httpd,
           ...options,
           async onRequest(ctx) {
-            // TODO: delete, only for demo purposes
-            console.log('My logging', ctx.request) // eslint-disable-line no-console
-
             return await options.onRequest?.(ctx)
           },
         })),
