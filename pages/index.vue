@@ -9,7 +9,7 @@ function filterIssuesWithLabel(issues: Issue[], label: IssueStatus): Issue[] {
 
 const uniqueLabels = [...new Set(mockIssues.flatMap((issue) => issue.labels))]
 
-const isInIFrame = window !== window.parent
+const isInIFrame = globalThis.window !== globalThis.window.parent
 </script>
 
 <template>
