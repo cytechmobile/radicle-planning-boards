@@ -39,7 +39,7 @@ const COLUMN_LABEL_TO_ICON_MAP = {
     <VueDraggable
       v-model="issuesModel"
       tag="ul"
-      class="flex flex-1 flex-col gap-2 overflow-y-auto p-2"
+      class="flex flex-1 flex-col gap-2 overflow-y-auto overflow-x-hidden p-2"
       ghost-class="opacity-50"
       :animation="150"
       group="issues"
