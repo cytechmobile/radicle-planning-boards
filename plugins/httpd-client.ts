@@ -2,6 +2,7 @@ export default defineNuxtPlugin(() => {
   const {
     public: { openFetch: clients },
   } = useRuntimeConfig()
+  const baseUrl = useHttpdBaseUrl()
 
   return {
     provide: Object.fromEntries(
@@ -9,6 +10,7 @@ export default defineNuxtPlugin(() => {
         `${name}Fetch`,
         createOpenFetch((options) => ({
           ...clients.httpd,
+          baseURL: baseUrl,
           ...options,
         })),
       ]),

@@ -3,7 +3,7 @@ export default defineNuxtRouteMiddleware(
   // eslint-disable-next-line consistent-return
   async (to) => {
     if (!to.path.match(/^\/[^\/]+\/[^\/]+/)) {
-      return await navigateTo('/seed.radicle.xyz/rad:z4V1sjrXqjvFdnCUbxPFqd5p4DtH5')
+      return await navigateTo('/seed.radicle.xyz:443/rad:z4V1sjrXqjvFdnCUbxPFqd5p4DtH5')
     }
   },
 )
