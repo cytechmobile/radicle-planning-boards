@@ -51,7 +51,7 @@ function handleAdd(event: VueDraggableAddEvent) {
     <VueDraggable
       v-model="issuesModel"
       tag="ul"
-      class="flex flex-1 flex-col gap-2 p-2"
+      class="flex flex-1 flex-col gap-2 overflow-y-auto p-2"
       ghost-class="opacity-50"
       :animation="150"
       group="issues"
