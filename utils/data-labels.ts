@@ -1,4 +1,4 @@
-import type { IssueStatus } from '~/types/issues'
+import type { IssueStatus } from '~/constants/issues'
 
 export const DATA_LABEL_PREFIX = 'RPB' as const
 
