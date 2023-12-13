@@ -37,6 +37,9 @@ devDependencies:
   nuxt-open-fetch:
     specifier: ^0.3.0
     version: 0.3.0
+  ts-essentials:
+    specifier: ^9.4.1
+    version: 9.4.1(typescript@5.3.2)
   typescript:
     specifier: ^5.3.2
     version: 5.3.2
@@ -7490,6 +7493,17 @@ packages:
   /ts-deepmerge@6.2.0:
     resolution: {integrity: sha512-2qxI/FZVDPbzh63GwWIZYE7daWKtwXZYuyc8YNq0iTmMUwn4mL0jRLsp6hfFlgbdRSR4x2ppe+E86FnvEpN7Nw==}
     engines: {node: '>=14.13.1'}
+    dev: true
+
+  /ts-essentials@9.4.1(typescript@5.3.2):
+    resolution: {integrity: sha512-oke0rI2EN9pzHsesdmrOrnqv1eQODmJpd/noJjwj2ZPC3Z4N2wbjrOEqnsEgmvlO2+4fBb0a794DCna2elEVIQ==}
+    peerDependencies:
+      typescript: '>=4.1.0'
+    peerDependenciesMeta:
+      typescript:
+        optional: true
+    dependencies:
+      typescript: 5.3.2
     dev: true
 
   /ts-interface-checker@0.1.13:

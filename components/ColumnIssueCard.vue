@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { useStorage } from '@vueuse/core'
-import { DATA_LABEL_PREFIX } from '~/constants/data-labels'
 
 const props = defineProps<{ id: string; title: string; labels: string[] }>()
 

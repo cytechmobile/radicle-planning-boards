@@ -2,12 +2,9 @@
 import { VueDraggable } from 'vue-draggable-plus'
 import type { Issue, IssueStatus } from '../types/issues'
 
-interface VueDraggableAddEvent {
-  item: HTMLElement
-}
+type ColumnTitle = IssueStatus | 'not-planned'
 
-const props = defineProps<{ title: IssueStatus; issues: Issue[] }>()
-const emit = defineEmits<(e: 'add', id: string) => void>()
+const props = defineProps<{ title: ColumnTitle; issues: Issue[] }>()
 
 const issuesModel = ref<Issue[]>([])
 
@@ -16,19 +13,11 @@ watchEffect(() => {
 })
 
 const STATUS_TO_ICON_MAP = {
-  todo: { name: 'bx:circle', class: 'text-rad-foreground-contrast' },
-  doing: { name: 'bx:adjust', class: 'text-rad-foreground-yellow' },
-  done: { name: 'bx:bxs-circle', class: 'text-rad-foreground-success' },
-} satisfies Record<IssueStatus, { name: string; class: string }>
-
-function handleAdd(event: VueDraggableAddEvent) {
-  const id = event.item.dataset['id']
-  if (!id) {
-    return
-  }
-
-  emit('add', id)
-}
+  'not-planned': { name: 'bx:loader-circle', class: 'text-rad-foreground-dim' },
+  'todo': { name: 'bx:circle', class: 'text-rad-foreground-contrast' },
+  'doing': { name: 'bx:adjust', class: 'text-rad-foreground-yellow' },
+  'done': { name: 'bx:bxs-circle', class: 'text-rad-foreground-success' },
+} satisfies Record<ColumnTitle, { name: string; class: string }>
 </script>
 
 <template>
@@ -55,7 +44,6 @@ function handleAdd(event: VueDraggableAddEvent) {
       ghost-class="opacity-50"
       :animation="150"
       group="issues"
-      @add="handleAdd"
     >
       <li v-for="issue in issuesModel" :key="issue.id" :data-id="issue.id">
         <ColumnIssueCard v-bind="issue" />

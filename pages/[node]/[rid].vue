@@ -4,27 +4,13 @@ import type { Issue, IssueStatus } from '~/types/issues'
 
 const route = useRoute('node-rid')
 
-const statusDataLabels = ISSUE_STATUSES.map((status) => createDataLabel('status', status))
+const response = useHttpdFetch('/projects/{rid}/issues', {
+  path: {
+    rid: route.params.rid,
+  },
+})
 
-async function fetchIssues(): Promise<Issue[]> {
-  const res = await fetch(
-    `https://${route.params.node}/api/v1/projects/${route.params.rid}/issues`,
-  )
-
-  return (await res.json()) as Issue[]
-}
-
-function initializeIssuesStatuses(issues: Issue[]): Issue[] {
-  return issues.map((issue) => {
-    const hasStatus = issue.labels.some((label) => statusDataLabels.includes(label))
-
-    if (!hasStatus) {
-      issue.labels.push(createDataLabel('status', 'todo'))
-    }
-
-    return issue
-  })
-}
+const issues = response.data as Ref<Issue[] | undefined>
 
 function filterIssuesByStatus(issues: Issue[], status: IssueStatus): Issue[] {
   const issuesWithStatus = issues.filter((issue) =>
@@ -34,41 +20,24 @@ function filterIssuesByStatus(issues: Issue[], status: IssueStatus): Issue[] {
   return issuesWithStatus
 }
 
-const issues = ref<Issue[]>([])
-
-onMounted(async () => {
-  const fetchedIssues = await fetchIssues()
-
-  issues.value = initializeIssuesStatuses(fetchedIssues)
-})
-
-function updateIssueStatus(id: string, status: IssueStatus) {
-  const issue = issues.value.find((issue) => issue.id === id)
-
-  if (!issue) {
-    return
-  }
-
-  const labelIndex = issue.labels.findIndex((label) => statusDataLabels.includes(label))
-
-  if (labelIndex === -1) {
-    return
-  }
-
-  issue.labels[labelIndex] = createDataLabel('status', status)
-}
+const issuesWithoutStatus = computed(() =>
+  (issues.value ?? []).filter(
+    (issue) =>
+      !issue.labels.some((label) => label.startsWith(createPartialDataLabel('status'))),
+  ),
+)
 
 const isInIFrame = globalThis.window !== globalThis.window.parent
 </script>
 
 <template>
   <div class="flex flex-1 gap-4 overflow-x-auto" :class="{ 'px-2 py-6': !isInIFrame }">
+    <Column title="not-planned" :issues="issuesWithoutStatus" />
     <Column
       v-for="status in ISSUE_STATUSES"
       :key="status"
       :title="status"
-      :issues="filterIssuesByStatus(issues, status)"
-      @add="(id) => updateIssueStatus(id, status)"
+      :issues="filterIssuesByStatus(issues ?? [], status)"
     />
   </div>
 </template>
