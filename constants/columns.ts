@@ -1,5 +1,5 @@
-import { ISSUE_STATUSES } from './issues'
+import { issueStatuses } from './issues'
 
-export const COLUMN_TITLES = ['not-planned', ...ISSUE_STATUSES] as const
+export const columnTitles = ['non-planned', ...issueStatuses] as const
 
-export type ColumnTitle = (typeof COLUMN_TITLES)[number]
+export type ColumnTitle = (typeof columnTitles)[number]

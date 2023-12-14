@@ -1,15 +1,15 @@
-const DEFAULT_HTTPD_BASE_URL = 'http://127.0.0.1:8080'
+const defaultHttpdBaseUrl = 'http://127.0.0.1:8080'
 
-function useHttpdBaseUrl() {
+export function useHttpdBaseUrl() {
   const route = useRoute()
 
   if (!route.params.node) {
-    return DEFAULT_HTTPD_BASE_URL
+    return defaultHttpdBaseUrl
   }
 
   const [hostname, port] = route.params.node.split(':')
   if (!hostname || !port) {
-    return DEFAULT_HTTPD_BASE_URL
+    return defaultHttpdBaseUrl
   }
 
   const scheme = port === '443' ? 'https' : 'http'
@@ -21,5 +21,3 @@ function useHttpdBaseUrl() {
 
   return baseUrl.toString()
 }
-
-export default useHttpdBaseUrl

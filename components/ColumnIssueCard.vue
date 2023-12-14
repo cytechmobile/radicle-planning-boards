@@ -4,7 +4,7 @@ import { useStorage } from '@vueuse/core'
 const props = defineProps<{ id: string; title: string; labels: string[] }>()
 
 const dataLabels = computed(() =>
-  props.labels.filter((label) => label.startsWith(DATA_LABEL_PREFIX)),
+  props.labels.filter((label) => label.startsWith(dataLabelNamespace)),
 )
 
 const showConfigDataLabels = useStorage('RPB_config-show-data-labels', false)

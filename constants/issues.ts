@@ -1,3 +1,3 @@
-export const ISSUE_STATUSES = ['todo', 'doing', 'done'] as const
+export const issueStatuses = ['todo', 'doing', 'done'] as const
 
-export type IssueStatus = (typeof ISSUE_STATUSES)[number]
+export type IssueStatus = (typeof issueStatuses)[number]

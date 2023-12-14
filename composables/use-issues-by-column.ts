@@ -1,6 +1,6 @@
 import type { ColumnTitle } from '~/constants/columns'
 import type { IssueStatus } from '~/constants/issues'
-import type { Issue } from '~/types/issues'
+import type { Issue } from '~/types/httpd'
 
 function filterIssuesWithoutStatus(issues: Issue[]): Issue[] {
   const issuesWithoutStatus = issues.filter(
@@ -19,7 +19,7 @@ function filterIssuesByStatus(issues: Issue[], status: IssueStatus): Issue[] {
   return issuesWithStatus
 }
 
-function useIssuesByColumn(): Record<ColumnTitle, ComputedRef<Issue[]>> {
+export function useIssuesByColumn(): Record<ColumnTitle, ComputedRef<Issue[]>> {
   const route = useRoute('node-rid')
   const response = useHttpdFetch('/projects/{rid}/issues', {
     path: {
@@ -29,12 +29,12 @@ function useIssuesByColumn(): Record<ColumnTitle, ComputedRef<Issue[]>> {
 
   const issues = response.data as Ref<Issue[] | undefined>
 
-  return {
-    'not-planned': computed(() => filterIssuesWithoutStatus(issues.value ?? [])),
+  const issuesByColumn = {
+    'non-planned': computed(() => filterIssuesWithoutStatus(issues.value ?? [])),
     'todo': computed(() => filterIssuesByStatus(issues.value ?? [], 'todo')),
     'doing': computed(() => filterIssuesByStatus(issues.value ?? [], 'doing')),
     'done': computed(() => filterIssuesByStatus(issues.value ?? [], 'done')),
   }
-}
 
-export default useIssuesByColumn
+  return issuesByColumn
+}

@@ -3,7 +3,7 @@ useTheme()
 </script>
 
 <template>
-  <main class="flex h-screen flex-col">
+  <main class="flex h-[100dvh] flex-col">
     <slot></slot>
   </main>
 </template>

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { VueDraggable } from 'vue-draggable-plus'
-import type { Issue } from '../types/issues'
+import type { Issue } from '../types/httpd'
 import type { ColumnTitle } from '~/constants/columns'
 
 const props = defineProps<{ title: ColumnTitle; issues: Issue[] }>()
@@ -11,8 +11,8 @@ watchEffect(() => {
   issuesModel.value = [...unref(props.issues)] // "clone" issues prop
 })
 
-const COLUMN_LABEL_TO_ICON_MAP = {
-  'not-planned': { name: 'bx:loader-circle', class: 'text-rad-foreground-dim' },
+const columnLabelToIconMap = {
+  'non-planned': { name: 'bx:loader-circle', class: 'text-rad-foreground-dim' },
   'todo': { name: 'bx:circle', class: 'text-rad-foreground-contrast' },
   'doing': { name: 'bx:adjust', class: 'text-rad-foreground-yellow' },
   'done': { name: 'bx:bxs-circle', class: 'text-rad-foreground-success' },
@@ -25,11 +25,11 @@ const COLUMN_LABEL_TO_ICON_MAP = {
   >
     <div class="flex items-baseline gap-2 p-2">
       <Icon
-        :name="COLUMN_LABEL_TO_ICON_MAP[title].name"
+        :name="columnLabelToIconMap[title].name"
         size="20"
-        :class="`translate-y-1 ${COLUMN_LABEL_TO_ICON_MAP[title].class}`"
+        :class="`translate-y-1 ${columnLabelToIconMap[title].class}`"
       />
-      <h3 class="font-semibold capitalize">{{ title }}</h3>
+      <h3 class="font-semibold">{{ title }}</h3>
 
       <small class="text-sm font-semibold text-rad-foreground-gray">
         {{ issuesModel.length }}

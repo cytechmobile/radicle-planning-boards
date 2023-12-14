@@ -1,4 +1,4 @@
-function useTheme() {
+export function useTheme() {
   type Theme = 'light' | 'dark'
 
   interface Message {
@@ -27,5 +27,3 @@ function useTheme() {
     }
   })
 }
-
-export default useTheme
