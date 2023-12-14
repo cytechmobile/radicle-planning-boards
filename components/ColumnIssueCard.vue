@@ -2,12 +2,21 @@
 import { useStorage } from '@vueuse/core'
 
 const props = defineProps<{ id: string; title: string; labels: string[] }>()
+const route = useRoute()
 
 const dataLabels = computed(() =>
   props.labels.filter((label) => label.startsWith(dataLabelNamespace)),
 )
 
+const radicleInterfaceBaseUrl = useRadicleInterfaceBaseUrl()
 const showConfigDataLabels = useStorage('RPB_config-show-data-labels', false)
+
+const href = computed(() =>
+  new URL(
+    `/nodes/${route.params.node}/${route.params.rid}/issues/${props.id}`,
+    radicleInterfaceBaseUrl,
+  ).toString(),
+)
 </script>
 
 <template>
@@ -19,7 +28,9 @@ const showConfigDataLabels = useStorage('RPB_config-show-data-labels', false)
     </small>
 
     <h4>
-      <NuxtLink href="#" class="w-fit text-sm hover:underline">{{ title }}</NuxtLink>
+      <a :href="href" target="_blank" class="w-fit text-sm hover:underline">
+        {{ title }}
+      </a>
     </h4>
 
     <ul v-if="showConfigDataLabels">
