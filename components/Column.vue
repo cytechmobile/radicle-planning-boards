@@ -8,7 +8,7 @@ const props = defineProps<{ title: ColumnTitle; issues: Issue[] }>()
 const issuesModel = ref<Issue[]>([])
 
 watchEffect(() => {
-  issuesModel.value = [...unref(toRef(props, 'issues'))] // "clone" issues prop
+  issuesModel.value = [...unref(props.issues)] // "clone" issues prop
 })
 
 const COLUMN_LABEL_TO_ICON_MAP = {
