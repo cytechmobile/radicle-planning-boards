@@ -14,7 +14,12 @@ function useHttpdBaseUrl() {
 
   const scheme = port === '443' ? 'https' : 'http'
 
-  return new URL('/api/v1', `${scheme}://${hostname}:${port}`).toString()
+  const baseUrl = new URL(`${scheme}://127.0.0.1:8080`)
+  baseUrl.hostname = hostname
+  baseUrl.port = port
+  baseUrl.pathname = '/api/v1'
+
+  return baseUrl.toString()
 }
 
 export default useHttpdBaseUrl
