@@ -1,22 +1,22 @@
-import type { ColumnTitle } from '~/constants/columns'
+import type { Column } from '~/constants/columns'
 import type { Issue } from '~/types/httpd'
 
-export function groupIssuesByColumn(issues: Issue[]): Record<ColumnTitle, Issue[]> {
-  const partialStatusLabel = createPartialDataLabel('status')
+export function groupIssuesByColumn(issues: Issue[]): Record<Column, Issue[]> {
+  const partialColumnDataLabel = createPartialDataLabel('column')
 
-  const issuesByColumn = issues.reduce<Record<ColumnTitle, Issue[]>>(
+  const issuesByColumn = issues.reduce<Record<Column, Issue[]>>(
     (issuesByColumn, issue) => {
-      let issueStatus: string | undefined
+      let issueColumn: string | undefined
 
       for (const label of issue.labels) {
-        if (label.startsWith(partialStatusLabel)) {
-          issueStatus = label.split(':')[2]
+        if (label.startsWith(partialColumnDataLabel)) {
+          issueColumn = label.split(':')[2]
           break
         }
       }
 
-      if (issueStatus === 'todo' || issueStatus === 'doing' || issueStatus === 'done') {
-        issuesByColumn[issueStatus].push(issue)
+      if (issueColumn === 'todo' || issueColumn === 'doing' || issueColumn === 'done') {
+        issuesByColumn[issueColumn].push(issue)
       } else {
         issuesByColumn['non-planned'].push(issue)
       }

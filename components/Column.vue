@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { VueDraggable } from 'vue-draggable-plus'
 import type { Issue } from '../types/httpd'
-import type { ColumnTitle } from '~/constants/columns'
+import type { Column } from '~/constants/columns'
 
-const props = defineProps<{ title: ColumnTitle; issues: Issue[] }>()
+const props = defineProps<{ title: Column; issues: Issue[] }>()
 
 const issuesModel = ref<Issue[]>([])
 
@@ -16,7 +16,7 @@ const columnLabelToIconMap = {
   'todo': { name: 'bx:circle', class: 'text-rad-foreground-contrast' },
   'doing': { name: 'bx:adjust', class: 'text-rad-foreground-yellow' },
   'done': { name: 'bx:bxs-circle', class: 'text-rad-foreground-success' },
-} satisfies Record<ColumnTitle, { name: string; class: string }>
+} satisfies Record<Column, { name: string; class: string }>
 </script>
 
 <template>

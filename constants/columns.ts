@@ -1,5 +1,5 @@
-import { issueStatuses } from './issues'
+export const columns = ['non-planned', 'todo', 'doing', 'done'] as const
 
-export const columnTitles = ['non-planned', ...issueStatuses] as const
+export type Column = (typeof columns)[number]
 
-export type ColumnTitle = (typeof columnTitles)[number]
+export type PlannedColumn = Exclude<Column, 'non-planned'>
