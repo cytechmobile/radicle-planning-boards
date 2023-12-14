@@ -1,7 +1,14 @@
 <script setup lang="ts">
+import type { Issue } from '~/types/httpd'
 import { columnTitles } from '~/constants/columns'
 
-const issuesByColumn = useIssuesByColumn()
+const route = useRoute()
+const { data: issuesByColumn } = useHttpdFetch('/projects/{rid}/issues', {
+  path: {
+    rid: route.params.rid,
+  },
+  transform: (data) => groupIssuesByColumn(data as Issue[]),
+})
 
 const isInIFrame = globalThis.window !== globalThis.window.parent
 </script>
@@ -12,7 +19,7 @@ const isInIFrame = globalThis.window !== globalThis.window.parent
       v-for="columnTitle in columnTitles"
       :key="columnTitle"
       :title="columnTitle"
-      :issues="issuesByColumn[columnTitle].value"
+      :issues="issuesByColumn ? issuesByColumn[columnTitle] : []"
     />
   </div>
 </template>
