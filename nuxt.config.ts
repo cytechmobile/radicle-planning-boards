@@ -5,6 +5,9 @@ export default defineNuxtConfig({
   experimental: { typedPages: true },
   devtools: { enabled: true },
   ui: { global: true, icons: 'all' },
+  routeRules: {
+    '/': { redirect: '/seed.radicle.xyz:443/rad:z4V1sjrXqjvFdnCUbxPFqd5p4DtH5' },
+  },
   openFetch: {
     disablePlugin: true,
     clients: {

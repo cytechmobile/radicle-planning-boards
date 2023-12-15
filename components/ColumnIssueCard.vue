@@ -1,5 +1,13 @@
 <script setup lang="ts">
-defineProps<{ id: string; title: string }>()
+import { useStorage } from '@vueuse/core'
+
+const props = defineProps<{ id: string; title: string; labels: string[] }>()
+
+const dataLabels = computed(() =>
+  props.labels.filter((label) => label.startsWith(dataLabelNamespace)),
+)
+
+const showConfigDataLabels = useStorage('RPB_config-show-data-labels', false)
 </script>
 
 <template>
@@ -13,5 +21,15 @@ defineProps<{ id: string; title: string }>()
     <h4>
       <NuxtLink href="#" class="w-fit text-sm hover:underline">{{ title }}</NuxtLink>
     </h4>
+
+    <ul v-if="showConfigDataLabels">
+      <li
+        v-for="label in dataLabels"
+        :key="label"
+        class="mt-2 text-xs font-bold text-rad-foreground-emphasized"
+      >
+        {{ label }}
+      </li>
+    </ul>
   </article>
 </template>
