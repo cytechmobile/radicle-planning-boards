@@ -1,15 +1,10 @@
+import { useRadicleInterfaceMessage } from './use-radicle-interface-message'
+
 export function useTheme() {
-  type Theme = 'light' | 'dark'
-
-  interface Message {
-    type: 'theme'
-    theme: Theme
-  }
-
   const isDark = useDark()
   const toggleDark = useToggle(isDark)
 
-  function setTheme(theme: Theme) {
+  function setTheme(theme: 'light' | 'dark') {
     toggleDark(theme === 'dark')
   }
 
@@ -21,9 +16,7 @@ export function useTheme() {
     }
   })
 
-  useEventListener(globalThis.window, 'message', (event: MessageEvent<Message>) => {
-    if (event.data.type === 'theme') {
-      setTheme(event.data.theme)
-    }
+  useRadicleInterfaceMessage('theme', (message) => {
+    setTheme(message.theme)
   })
 }
