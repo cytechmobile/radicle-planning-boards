@@ -3,6 +3,7 @@ export default defineNuxtPlugin(() => {
     public: { openFetch: clients },
   } = useRuntimeConfig()
   const baseUrl = useHttpdBaseUrl()
+  const authToken = useAuthToken()
 
   return {
     provide: Object.fromEntries(
@@ -11,6 +12,9 @@ export default defineNuxtPlugin(() => {
         createOpenFetch((options) => ({
           ...clients.httpd,
           baseURL: baseUrl,
+          headers: {
+            ...(authToken.value ? { Authorization: `Bearer ${authToken.value}` } : {}),
+          },
           ...options,
         })),
       ]),

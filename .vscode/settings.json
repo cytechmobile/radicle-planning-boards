@@ -23,7 +23,8 @@
     "iframe",
     "issues",
     "cards",
-    "messages"
+    "messages",
+    "auth"
   ],
   "conventionalCommits.gitmoji": false,
 
