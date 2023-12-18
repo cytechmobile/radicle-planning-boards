@@ -15,10 +15,10 @@ export function groupIssuesByColumn(issues: Issue[]): Record<Column, Issue[]> {
         }
       }
 
-      if (issueColumn === 'todo' || issueColumn === 'doing' || issueColumn === 'done') {
-        issuesByColumn[issueColumn].push(issue)
-      } else if (issue.state.status === 'closed') {
+      if (issue.state.status === 'closed') {
         issuesByColumn.done.push(issue)
+      } else if (issueColumn === 'todo' || issueColumn === 'doing' || issueColumn === 'done') {
+        issuesByColumn[issueColumn].push(issue)
       } else {
         issuesByColumn['non-planned'].push(issue)
       }
