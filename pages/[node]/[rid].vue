@@ -1,14 +1,33 @@
 <script setup lang="ts">
 import type { Issue } from '~/types/httpd'
 import { columns } from '~/constants/columns'
+const { $httpdFetch } = useNuxtApp()
 
 const route = useRoute()
-const { data: issuesByColumn } = useHttpdFetch('/projects/{rid}/issues', {
-  path: {
-    rid: route.params.rid,
+
+const { data: issuesByColumn } = useAsyncData(
+  'all-issues',
+  async () => {
+    function createFetchIssuesOptions(state: 'open' | 'closed') {
+      return {
+        path: {
+          rid: route.params.rid,
+        },
+        query: { perPage: 1000, state },
+      }
+    }
+
+    const [openIssues, closedIssues] = await Promise.all([
+      $httpdFetch('/projects/{rid}/issues', createFetchIssuesOptions('open')),
+      $httpdFetch('/projects/{rid}/issues', createFetchIssuesOptions('closed')),
+    ])
+
+    return [...openIssues, ...closedIssues]
   },
-  transform: (data) => groupIssuesByColumn(data as Issue[]),
-})
+  {
+    transform: (data) => groupIssuesByColumn(data as Issue[]),
+  },
+)
 
 const isInIFrame = globalThis.window !== globalThis.window.parent
 </script>
