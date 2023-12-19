@@ -24,7 +24,8 @@
     "issues",
     "cards",
     "messages",
-    "auth"
+    "auth",
+    "config"
   ],
   "conventionalCommits.gitmoji": false,
 
