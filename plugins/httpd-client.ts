@@ -5,6 +5,14 @@ export default defineNuxtPlugin(() => {
   const baseUrl = useHttpdBaseUrl()
   const authToken = useAuthToken()
 
+  // TODO: zac placeholder, remove once mutations have been added
+  watchEffect(() => {
+    if (authToken.value) {
+      // eslint-disable-next-line no-console
+      console.log(`Authenticated with token "${authToken.value}"`)
+    }
+  })
+
   return {
     provide: Object.fromEntries(
       Object.entries(clients).map(([name, _client]) => [
