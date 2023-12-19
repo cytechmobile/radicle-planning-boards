@@ -10,6 +10,9 @@ export default defineNuxtPlugin(() => {
     if (authToken.value) {
       // eslint-disable-next-line no-console
       console.log(`Authenticated with token "${authToken.value}"`)
+    } else {
+      // eslint-disable-next-line no-console
+      console.log(`Unauthenticated`)
     }
   })
 

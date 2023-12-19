@@ -6,13 +6,16 @@ export const incomingMessageSchema = z.union([
     theme: z.enum(['light', 'dark']),
   }),
   z.object({
-    type: z.literal('auth-token'),
+    type: z.literal('set-auth-token'),
     authToken: z.string(),
+  }),
+  z.object({
+    type: z.literal('remove-auth-token'),
   }),
 ])
 
 export type IncomingMessage = z.infer<typeof incomingMessageSchema>
 
 export interface OutgoingMessage {
-  type: 'auth-token'
+  type: 'request-auth-token'
 }

@@ -3,16 +3,19 @@ import { useRadicleInterfaceMessage } from './use-radicle-interface-message'
 export function useAuthToken() {
   const authToken = ref<string | null>(null)
 
-  useRadicleInterfaceMessage('auth-token', (message) => {
+  if (!authToken.value) {
+    postMessageToRadicleInterface({ type: 'request-auth-token' })
+  }
+
+  useRadicleInterfaceMessage('set-auth-token', (message) => {
     if (message.authToken) {
       authToken.value = message.authToken
     }
   })
 
-  if (!authToken.value) {
-    // Request an auth token from the Radicle Interface
-    postMessageToRadicleInterface({ type: 'auth-token' })
-  }
+  useRadicleInterfaceMessage('remove-auth-token', () => {
+    authToken.value = null
+  })
 
   return authToken
 }
