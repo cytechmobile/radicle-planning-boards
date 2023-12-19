@@ -3,13 +3,13 @@ export default defineNuxtPlugin(() => {
     public: { openFetch: clients },
   } = useRuntimeConfig()
   const baseUrl = useHttpdBaseUrl()
-  const authToken = useAuthToken()
+  const auth = useAuthStore()
 
   // TODO: zac placeholder, remove once mutations have been added
   watchEffect(() => {
-    if (authToken.value) {
+    if (auth.token) {
       // eslint-disable-next-line no-console
-      console.log(`Authenticated with token "${authToken.value}"`)
+      console.log(`Authenticated with token "${auth.token}"`)
     } else {
       // eslint-disable-next-line no-console
       console.log(`Unauthenticated`)
@@ -24,7 +24,7 @@ export default defineNuxtPlugin(() => {
           ...clients.httpd,
           baseURL: baseUrl,
           headers: {
-            ...(authToken.value ? { Authorization: `Bearer ${authToken.value}` } : {}),
+            ...(auth.token ? { Authorization: `Bearer ${auth.token}` } : {}),
           },
           ...options,
         })),
