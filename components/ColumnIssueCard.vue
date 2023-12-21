@@ -38,11 +38,13 @@ const statusToIconMap = {
   >
     <small class="flex items-center gap-2">
       <span class="sr-only">{{ state.status }}</span>
-      <Icon
-        :name="statusToIconMap[state.status].name"
-        size="16"
-        :class="statusToIconMap[state.status].class"
-      />
+      <UTooltip :text="state.status" :popper="{ placement: 'top' }">
+        <Icon
+          :name="statusToIconMap[state.status].name"
+          size="16"
+          :class="statusToIconMap[state.status].class"
+        />
+      </UTooltip>
       <pre class="text-xs font-medium text-rad-foreground-dim">{{ id.slice(0, 7) }}</pre>
     </small>
 
