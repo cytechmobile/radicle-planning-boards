@@ -1,7 +1,15 @@
 <script setup lang="ts">
 import { useStorage } from '@vueuse/core'
+import type { Issue } from '~/types/httpd'
 
-const props = defineProps<{ id: string; title: string; labels: string[] }>()
+interface Props {
+  id: Issue['id']
+  title: Issue['title']
+  labels: Issue['labels']
+  state: Issue['state']
+}
+
+const props = defineProps<Props>()
 const route = useRoute()
 
 const dataLabels = computed(() =>
@@ -17,13 +25,26 @@ const href = computed(() =>
     radicleInterfaceBaseUrl,
   ).toString(),
 )
+
+const statusToIconMap = {
+  open: { name: 'octicon:issue-opened-16', class: 'text-rad-foreground-success' },
+  closed: { name: 'octicon:issue-closed-16', class: 'text-rad-foreground-red' },
+} satisfies Record<Props['state']['status'], { name: string; class: string }>
 </script>
 
 <template>
   <article
     class="flex flex-col gap-1 rounded bg-rad-background-float p-3 transition-opacity hover:cursor-grab hover:bg-rad-fill-float-hover"
   >
-    <small>
+    <small class="flex items-center gap-2">
+      <span class="sr-only">{{ state.status }}</span>
+      <UTooltip :text="state.status" :popper="{ placement: 'top' }">
+        <Icon
+          :name="statusToIconMap[state.status].name"
+          size="16"
+          :class="statusToIconMap[state.status].class"
+        />
+      </UTooltip>
       <pre class="text-xs font-medium text-rad-foreground-dim">{{ id.slice(0, 7) }}</pre>
     </small>
 
