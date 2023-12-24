@@ -1,9 +1,26 @@
+import { radicleInterfaceOrigin } from './constants/config'
+
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   ssr: false,
-  modules: ['@pinia/nuxt', '@vueuse/nuxt', '@nuxt/ui', 'nuxt-icon', 'nuxt-open-fetch'],
+  modules: [
+    'nuxt-security',
+    '@pinia/nuxt',
+    '@vueuse/nuxt',
+    '@nuxt/ui',
+    'nuxt-icon',
+    'nuxt-open-fetch',
+  ],
   experimental: { typedPages: true },
   devtools: { enabled: true },
+  security: {
+    headers: {
+      contentSecurityPolicy: {
+        'frame-ancestors': ["'self'", radicleInterfaceOrigin],
+      },
+      xFrameOptions: false,
+    },
+  },
   ui: { global: true, icons: 'all' },
   routeRules: {
     '/': { redirect: '/seed.radicle.xyz:443/rad:z4V1sjrXqjvFdnCUbxPFqd5p4DtH5' },
