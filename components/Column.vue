@@ -5,11 +5,24 @@ import type { Column } from '~/constants/columns'
 
 interface VueDraggableAddEvent {
   item: HTMLElement
+  from: HTMLElement
   to: HTMLElement
+  oldIndex: number
+  newIndex: number
+}
+
+interface VueDraggableUpdateEvent {
+  item: HTMLElement
+  from: HTMLElement
+  oldIndex: number
+  newIndex: number
 }
 
 const props = defineProps<{ title: Column; issues: Issue[] }>()
-const emit = defineEmits<(e: 'add', data: { id: string; to: string }) => void>()
+const emit = defineEmits<{
+  add: [data: { id: string; from: string; to: string; oldIndex: number; newIndex: number }]
+  update: [data: { id: string; from: string; oldIndex: number; newIndex: number }]
+}>()
 
 const issuesModel = ref<Issue[]>([])
 
@@ -19,12 +32,29 @@ watchEffect(() => {
 
 function handleAdd(event: VueDraggableAddEvent) {
   const { id } = event.item.dataset
+  const { column: fromColumn } = event.from.dataset
   const { column: toColumn } = event.to.dataset
-  if (!id || !toColumn) {
+  if (!id || !toColumn || !fromColumn) {
     return
   }
 
-  emit('add', { id, to: toColumn })
+  emit('add', {
+    id,
+    from: fromColumn,
+    to: toColumn,
+    oldIndex: event.oldIndex,
+    newIndex: event.newIndex,
+  })
+}
+
+function handleUpdate(event: VueDraggableUpdateEvent) {
+  const { id } = event.item.dataset
+  const { column: fromColumn } = event.from.dataset
+  if (!id || !fromColumn) {
+    return
+  }
+
+  emit('update', { id, from: fromColumn, oldIndex: event.oldIndex, newIndex: event.newIndex })
 }
 
 const columnLabelToIconMap = {
@@ -61,6 +91,7 @@ const columnLabelToIconMap = {
       group="issues"
       :data-column="title"
       @add="handleAdd($event)"
+      @update="handleUpdate($event)"
     >
       <li v-for="issue in issuesModel" :key="issue.id" :data-id="issue.id">
         <ColumnIssueCard v-bind="issue" />
