@@ -90,10 +90,16 @@ const columnLabelToIconMap = {
       :animation="150"
       group="issues"
       :data-column="title"
+      filter="[data-status='closed']"
       @add="handleAdd($event)"
       @update="handleUpdate($event)"
     >
-      <li v-for="issue in issuesModel" :key="issue.id" :data-id="issue.id">
+      <li
+        v-for="issue in issuesModel"
+        :key="issue.id"
+        :data-id="issue.id"
+        :data-status="issue.state.status"
+      >
         <ColumnIssueCard v-bind="issue" />
       </li>
     </VueDraggable>
