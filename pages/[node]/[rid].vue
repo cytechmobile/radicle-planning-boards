@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import type { Issue } from '~/types/httpd'
-import { columns } from '~/constants/columns'
+import { columnSchema, columns } from '~/constants/columns'
 const { $httpdFetch } = useNuxtApp()
 
 const route = useRoute()
 
-const { data: issuesByColumn } = useAsyncData(
+const { data: issueData, refresh: refreshIssues } = useAsyncData(
   'all-issues',
   async () => {
     function createFetchIssuesOptions(state: 'open' | 'closed') {
@@ -25,9 +25,44 @@ const { data: issuesByColumn } = useAsyncData(
     return [...openIssues, ...closedIssues]
   },
   {
-    transform: (data) => groupIssuesByColumn(data as Issue[]),
+    transform: (data) => ({
+      issues: data as Issue[],
+      issuesByColumn: groupIssuesByColumn(data as Issue[]),
+    }),
   },
 )
+
+async function updateIssueColumn({ id, to }: { id: string; to: string }) {
+  if (!issueData.value) {
+    return
+  }
+
+  const issue = issueData.value.issues.find((issue) => issue.id === id)
+  if (!issue) {
+    return
+  }
+
+  let updatedLabels: string[] = []
+
+  try {
+    const toColumn = columnSchema.parse(to)
+    updatedLabels = createUpdatedIssueLabels(issue, toColumn)
+  } catch {
+    return
+  }
+
+  await $httpdFetch(`/projects/{rid}/issues/{issue}`, {
+    path: { rid: route.params.rid, issue: id },
+    method: 'PATCH',
+    body: {
+      type: 'label',
+      labels: updatedLabels,
+    },
+    onResponse: () => {
+      refreshIssues()
+    },
+  })
+}
 
 const isInIFrame = globalThis.window !== globalThis.window.parent
 </script>
@@ -38,7 +73,8 @@ const isInIFrame = globalThis.window !== globalThis.window.parent
       v-for="column in columns"
       :key="column"
       :title="column"
-      :issues="issuesByColumn ? issuesByColumn[column] : []"
+      :issues="issueData ? issueData.issuesByColumn[column] : []"
+      @add="updateIssueColumn"
     />
   </div>
 </template>

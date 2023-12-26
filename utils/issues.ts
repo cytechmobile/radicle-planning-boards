@@ -35,3 +35,21 @@ export function groupIssuesByColumn(issues: Issue[]): Record<Column, Issue[]> {
 
   return issuesByColumn
 }
+
+export function createUpdatedIssueLabels(issue: Issue, column: Column): string[] {
+  const partialColumnLabel = createPartialDataLabel('column')
+
+  const columnDataLabelIndex = issue.labels.findIndex((label) =>
+    label.startsWith(partialColumnLabel),
+  )
+
+  if (column === 'non-planned') {
+    return columnDataLabelIndex === -1
+      ? issue.labels
+      : issue.labels.toSpliced(columnDataLabelIndex, 1)
+  }
+
+  return columnDataLabelIndex === -1
+    ? issue.labels.concat(createDataLabel('column', column))
+    : issue.labels.with(columnDataLabelIndex, createDataLabel('column', column))
+}

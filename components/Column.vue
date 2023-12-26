@@ -3,13 +3,29 @@ import { VueDraggable } from 'vue-draggable-plus'
 import type { Issue } from '../types/httpd'
 import type { Column } from '~/constants/columns'
 
+interface VueDraggableAddEvent {
+  item: HTMLElement
+  to: HTMLElement
+}
+
 const props = defineProps<{ title: Column; issues: Issue[] }>()
+const emit = defineEmits<(e: 'add', data: { id: string; to: string }) => void>()
 
 const issuesModel = ref<Issue[]>([])
 
 watchEffect(() => {
   issuesModel.value = [...unref(props.issues)] // "clone" issues prop
 })
+
+function handleAdd(event: VueDraggableAddEvent) {
+  const { id } = event.item.dataset
+  const { column: toColumn } = event.to.dataset
+  if (!id || !toColumn) {
+    return
+  }
+
+  emit('add', { id, to: toColumn })
+}
 
 const columnLabelToIconMap = {
   'non-planned': { name: 'bx:loader-circle', class: 'text-rad-foreground-dim' },
@@ -43,6 +59,8 @@ const columnLabelToIconMap = {
       ghost-class="opacity-50"
       :animation="150"
       group="issues"
+      :data-column="title"
+      @add="handleAdd($event)"
     >
       <li v-for="issue in issuesModel" :key="issue.id" :data-id="issue.id">
         <ColumnIssueCard v-bind="issue" />
