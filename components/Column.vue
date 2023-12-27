@@ -20,6 +20,7 @@ interface VueDraggableUpdateEvent {
 
 const props = defineProps<{ title: Column; issues: Issue[] }>()
 const emit = defineEmits<{
+  create: [title: string]
   add: [data: { id: string; from: string; to: string; oldIndex: number; newIndex: number }]
   update: [data: { id: string; from: string; oldIndex: number; newIndex: number }]
 }>()
@@ -123,7 +124,11 @@ const columnLabelToIconMap = {
       >
         <ColumnIssueCard v-bind="issue" />
       </li>
-      <NewColumnIssueCard v-if="isCreatingNewIssue" @close="isCreatingNewIssue = false" />
+      <NewColumnIssueCard
+        v-if="isCreatingNewIssue"
+        @submit="($event) => emit('create', $event)"
+        @close="isCreatingNewIssue = false"
+      />
     </VueDraggable>
   </div>
 </template>

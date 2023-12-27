@@ -1,9 +1,9 @@
 <script setup lang="ts">
 const emit = defineEmits<{
+  submit: [title: string]
   close: []
 }>()
 
-const { $httpdFetch } = useNuxtApp()
 const formRef = ref<HTMLFormElement | null>(null)
 const titleInputRef = ref<HTMLInputElement | null>(null)
 const title = ref('')
@@ -13,24 +13,8 @@ onClickOutside(formRef, () => {
 })
 useFocus(titleInputRef, { initialValue: true })
 
-const route = useRoute()
-
-async function handleSubmit() {
-  await $httpdFetch('/projects/{rid}/issues', {
-    method: 'POST',
-    path: {
-      rid: route.params.rid,
-    },
-    body: {
-      title: title.value,
-      description: '',
-      labels: [],
-      assignees: [],
-      // @ts-expect-error - type definition is wrong
-      embeds: [],
-    },
-  })
-
+function handleSubmit() {
+  emit('submit', title.value.trim())
   emit('close')
 }
 </script>
