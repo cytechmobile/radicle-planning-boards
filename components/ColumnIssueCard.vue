@@ -35,9 +35,6 @@ const statusToIconMap = {
 <template>
   <article
     class="flex flex-col gap-1 rounded bg-rad-background-float p-3 transition-opacity hover:bg-rad-fill-float-hover"
-    :class="{
-      'hover:cursor-grab': state.status === 'open',
-    }"
   >
     <small class="flex items-center gap-2">
       <span class="sr-only">{{ state.status }}</span>
