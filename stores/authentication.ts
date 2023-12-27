@@ -1,7 +1,6 @@
-/* eslint-disable prettier/prettier */
-
 export const useAuthStore = defineStore('auth', () => {
   const token = ref<string | null>(null)
+  const isAuthenticated = computed(() => !!token.value)
 
   if (!token.value) {
     postMessageToRadicleInterface({ type: 'request-auth-token' })
@@ -17,7 +16,10 @@ export const useAuthStore = defineStore('auth', () => {
     token.value = null
   })
 
-  const store = {token}
+  const store = {
+    token,
+    isAuthenticated,
+  }
 
   return store
 })
