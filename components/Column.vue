@@ -27,6 +27,7 @@ const emit = defineEmits<{
 const issuesModel = ref<Issue[]>([])
 
 const auth = useAuthStore()
+const { canEditLabels } = usePermissions()
 
 watchEffect(() => {
   issuesModel.value = [...unref(props.issues)] // "clone" issues prop
@@ -92,7 +93,7 @@ const columnLabelToIconMap = {
       :animation="150"
       group="issues"
       :data-column="title"
-      :disabled="!auth.isAuthenticated"
+      :disabled="!auth.isAuthenticated || !canEditLabels"
       filter="[data-status='closed']"
       @add="handleAdd($event)"
       @update="handleUpdate($event)"
@@ -103,7 +104,8 @@ const columnLabelToIconMap = {
         :data-id="issue.id"
         :data-status="issue.state.status"
         :class="{
-          'hover:cursor-grab': auth.isAuthenticated && issue.state.status === 'open',
+          'hover:cursor-grab':
+            auth.isAuthenticated && canEditLabels && issue.state.status === 'open',
         }"
       >
         <ColumnIssueCard v-bind="issue" />
