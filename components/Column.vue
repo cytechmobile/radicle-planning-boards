@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { VueDraggable } from 'vue-draggable-plus'
 import type { Issue } from '../types/httpd'
+import { requiredColumns } from '~/constants/columns'
 
 interface VueDraggableAddEvent {
   item: HTMLElement
@@ -28,6 +29,7 @@ const issuesModel = ref<Issue[]>([])
 const isCreatingNewIssue = ref(false)
 
 const auth = useAuthStore()
+const board = useBoardStore()
 const { canEditLabels } = usePermissions()
 
 watchEffect(() => {
@@ -83,6 +85,8 @@ const columnIcon = computed(() => {
 
   return defaultIcon
 })
+
+const canBeDeleted = computed(() => props.issues.length === 0)
 </script>
 
 <template>
@@ -99,9 +103,22 @@ const columnIcon = computed(() => {
         </small>
       </div>
 
-      <UTooltip v-if="auth.isAuthenticated" text="New issue">
-        <IconButton label="New issue" icon="bx:plus" @click="isCreatingNewIssue = true" />
-      </UTooltip>
+      <div v-if="auth.isAuthenticated" class="flex items-center gap-2">
+        <UTooltip
+          v-if="!requiredColumns.includes(title)"
+          :text="canBeDeleted ? 'Delete column' : 'The column must be empty to be deleted'"
+        >
+          <IconButton
+            label="Delete column"
+            icon="bx:trash"
+            :disabled="!canBeDeleted"
+            @click="board.removeColumn(title)"
+          />
+        </UTooltip>
+        <UTooltip text="New issue">
+          <IconButton label="New issue" icon="bx:plus" @click="isCreatingNewIssue = true" />
+        </UTooltip>
+      </div>
     </div>
 
     <VueDraggable
