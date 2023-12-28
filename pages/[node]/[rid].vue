@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import type { Issue } from '~/types/httpd'
-import { initialColumns } from '~/constants/columns'
 
 const { $httpdFetch } = useNuxtApp()
 const route = useRoute()
 
+const board = useBoardStore()
 const issuesOrder = ref<Record<string, string[]> | null>(null)
 
 const { data: issuesData, refresh: refreshIssues } = useAsyncData(
@@ -33,6 +33,13 @@ const { data: issuesData, refresh: refreshIssues } = useAsyncData(
     }),
   },
 )
+
+// Merge issue-derived columns with existing columns
+watchEffect(() => {
+  if (issuesData.value?.issuesByColumn) {
+    board.mergeColumns(Object.keys(issuesData.value.issuesByColumn))
+  }
+})
 
 const orderedIssuesByColumn = computed(() => {
   if (!issuesData.value || !issuesOrder.value) {
@@ -155,17 +162,13 @@ async function handleCreateIssue({ title, column }: { title: string; column: str
   }
 }
 
-const columns = computed(() =>
-  orderedIssuesByColumn.value ? Object.keys(orderedIssuesByColumn.value) : initialColumns,
-)
-
 const isInIFrame = globalThis.window !== globalThis.window.parent
 </script>
 
 <template>
   <div class="flex flex-1 gap-4 overflow-x-auto" :class="{ 'px-2 py-6': !isInIFrame }">
     <Column
-      v-for="column in columns"
+      v-for="column in board.columns"
       :key="column"
       :title="column"
       :issues="orderedIssuesByColumn?.[column] ?? []"
