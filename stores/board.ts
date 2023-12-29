@@ -7,6 +7,14 @@ export const useBoardStore = defineStore('board', () => {
     columns.value = [...new Set([...columns.value, ...parsedColumns])]
   }
 
+  function addColumn(column: string) {
+    if (columns.value.includes(column)) {
+      return
+    }
+
+    columns.value.push(column)
+  }
+
   function removeColumn(column: string) {
     const columnIndex = columns.value.indexOf(column)
     if (columnIndex !== -1) {
@@ -17,6 +25,7 @@ export const useBoardStore = defineStore('board', () => {
   const store = {
     columns,
     mergeColumns,
+    addColumn,
     removeColumn,
   }
 

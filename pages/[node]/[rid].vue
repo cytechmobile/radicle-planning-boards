@@ -4,6 +4,7 @@ import type { Issue } from '~/types/httpd'
 const { $httpdFetch } = useNuxtApp()
 const route = useRoute()
 
+const auth = useAuthStore()
 const board = useBoardStore()
 const issuesOrder = ref<Record<string, string[]> | null>(null)
 
@@ -176,5 +177,6 @@ const isInIFrame = globalThis.window !== globalThis.window.parent
       @add="handleUpdateIssueColumn"
       @update="handleUpdateIssue"
     />
+    <NewColumn v-if="auth.isAuthenticated" />
   </div>
 </template>
