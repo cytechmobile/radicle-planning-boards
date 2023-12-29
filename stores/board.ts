@@ -1,24 +1,28 @@
+import { useStorage } from '@vueuse/core'
 import { initialColumns } from '~/constants/columns'
 
 export const useBoardStore = defineStore('board', () => {
-  const columns = ref(initialColumns)
+  const state = useStorage('RPB_board-state', {
+    columns: initialColumns,
+  })
+  const columns = computed(() => state.value.columns)
 
   function mergeColumns(parsedColumns: string[]) {
-    columns.value = [...new Set([...columns.value, ...parsedColumns])]
+    state.value.columns = [...new Set([...state.value.columns, ...parsedColumns])]
   }
 
   function addColumn(column: string) {
-    if (columns.value.includes(column)) {
+    if (state.value.columns.includes(column)) {
       return
     }
 
-    columns.value.push(column)
+    state.value.columns.push(column)
   }
 
   function removeColumn(column: string) {
-    const columnIndex = columns.value.indexOf(column)
+    const columnIndex = state.value.columns.indexOf(column)
     if (columnIndex !== -1) {
-      columns.value.splice(columnIndex, 1)
+      state.value.columns.splice(columnIndex, 1)
     }
   }
 
