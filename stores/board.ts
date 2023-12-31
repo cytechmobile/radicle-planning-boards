@@ -1,10 +1,19 @@
 import { useStorage } from '@vueuse/core'
+import z from 'zod'
 import { initialColumns } from '~/constants/columns'
 
+const boardStateSchema = z.object({
+  columns: z.array(z.string()),
+})
+
+type BoardState = z.infer<typeof boardStateSchema>
+
+const initialBoardState = {
+  columns: initialColumns,
+} satisfies BoardState
+
 export const useBoardStore = defineStore('board', () => {
-  const state = useStorage('RPB_board-state', {
-    columns: initialColumns,
-  })
+  const state = useStorage('RPB_board-state', initialBoardState)
   const columns = computed(() => state.value.columns)
 
   function mergeColumns(parsedColumns: string[]) {
@@ -26,11 +35,25 @@ export const useBoardStore = defineStore('board', () => {
     }
   }
 
+  function importState(stateString: string) {
+    try {
+      state.value = boardStateSchema.parse(JSON.parse(stateString))
+    } catch (error) {
+      throw new Error('Invalid state', { cause: error })
+    }
+  }
+
+  function exportState() {
+    return JSON.stringify(state.value)
+  }
+
   const store = {
     columns,
     mergeColumns,
     addColumn,
     removeColumn,
+    importState,
+    exportState,
   }
 
   return store
