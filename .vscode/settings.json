@@ -22,7 +22,10 @@
     "httpd",
     "iframe",
     "issues",
-    "cards"
+    "cards",
+    "messages",
+    "auth",
+    "config"
   ],
   "conventionalCommits.gitmoji": false,
 
