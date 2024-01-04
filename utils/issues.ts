@@ -1,4 +1,4 @@
-import type { Column } from '~/constants/columns'
+import { type Column, columns } from '~/constants/columns'
 import type { Issue } from '~/types/httpd'
 
 export function groupIssuesByColumn(issues: Issue[]): Record<Column, Issue[]> {
@@ -34,4 +34,62 @@ export function groupIssuesByColumn(issues: Issue[]): Record<Column, Issue[]> {
   )
 
   return issuesByColumn
+}
+
+export function createUpdatedIssueLabels(issue: Issue, column: Column): string[] {
+  const partialColumnLabel = createPartialDataLabel('column')
+
+  const columnDataLabelIndex = issue.labels.findIndex((label) =>
+    label.startsWith(partialColumnLabel),
+  )
+
+  if (column === 'non-planned') {
+    return columnDataLabelIndex === -1
+      ? issue.labels
+      : issue.labels.toSpliced(columnDataLabelIndex, 1)
+  }
+
+  return columnDataLabelIndex === -1
+    ? issue.labels.concat(createDataLabel('column', column))
+    : issue.labels.with(columnDataLabelIndex, createDataLabel('column', column))
+}
+
+export function orderIssuesByColumn(
+  issuesByColumn: Record<Column, Issue[]>,
+  issuesOrderByColumn: Record<Column, string[]>,
+): Record<Column, Issue[]> {
+  function sortIssues(issues: Issue[], order: string[]): Issue[] {
+    return issues.toSorted((issueA, issueB) => {
+      const aIndex = order.indexOf(issueA.id)
+      const bIndex = order.indexOf(issueB.id)
+
+      if (aIndex === undefined && bIndex === undefined) {
+        return 0
+      }
+      if (aIndex === undefined) {
+        return 1
+      }
+      if (bIndex === undefined) {
+        return -1
+      }
+
+      return aIndex - bIndex
+    })
+  }
+
+  const sortedIssuesByColumn: Record<Column, Issue[]> = {
+    'non-planned': [],
+    'todo': [],
+    'doing': [],
+    'done': [],
+  }
+
+  for (const column of columns) {
+    sortedIssuesByColumn[column] = sortIssues(
+      issuesByColumn[column],
+      issuesOrderByColumn[column],
+    )
+  }
+
+  return sortedIssuesByColumn
 }

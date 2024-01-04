@@ -3,13 +3,62 @@ import { VueDraggable } from 'vue-draggable-plus'
 import type { Issue } from '../types/httpd'
 import type { Column } from '~/constants/columns'
 
+interface VueDraggableAddEvent {
+  item: HTMLElement
+  from: HTMLElement
+  to: HTMLElement
+  oldIndex: number
+  newIndex: number
+}
+
+interface VueDraggableUpdateEvent {
+  item: HTMLElement
+  from: HTMLElement
+  oldIndex: number
+  newIndex: number
+}
+
 const props = defineProps<{ title: Column; issues: Issue[] }>()
+const emit = defineEmits<{
+  add: [data: { id: string; from: string; to: string; oldIndex: number; newIndex: number }]
+  update: [data: { id: string; from: string; oldIndex: number; newIndex: number }]
+}>()
 
 const issuesModel = ref<Issue[]>([])
+
+const auth = useAuthStore()
+const { canEditLabels } = usePermissions()
 
 watchEffect(() => {
   issuesModel.value = [...unref(props.issues)] // "clone" issues prop
 })
+
+function handleAdd(event: VueDraggableAddEvent) {
+  const { id } = event.item.dataset
+  const { column: fromColumn } = event.from.dataset
+  const { column: toColumn } = event.to.dataset
+  if (!id || !toColumn || !fromColumn) {
+    return
+  }
+
+  emit('add', {
+    id,
+    from: fromColumn,
+    to: toColumn,
+    oldIndex: event.oldIndex,
+    newIndex: event.newIndex,
+  })
+}
+
+function handleUpdate(event: VueDraggableUpdateEvent) {
+  const { id } = event.item.dataset
+  const { column: fromColumn } = event.from.dataset
+  if (!id || !fromColumn) {
+    return
+  }
+
+  emit('update', { id, from: fromColumn, oldIndex: event.oldIndex, newIndex: event.newIndex })
+}
 
 const columnLabelToIconMap = {
   'non-planned': { name: 'bx:loader-circle', class: 'text-rad-foreground-dim' },
@@ -43,8 +92,22 @@ const columnLabelToIconMap = {
       ghost-class="opacity-50"
       :animation="150"
       group="issues"
+      :data-column="title"
+      :disabled="!auth.isAuthenticated || !canEditLabels"
+      filter="[data-status='closed']"
+      @add="handleAdd($event)"
+      @update="handleUpdate($event)"
     >
-      <li v-for="issue in issuesModel" :key="issue.id" :data-id="issue.id">
+      <li
+        v-for="issue in issuesModel"
+        :key="issue.id"
+        :data-id="issue.id"
+        :data-status="issue.state.status"
+        :class="{
+          'hover:cursor-grab':
+            auth.isAuthenticated && canEditLabels && issue.state.status === 'open',
+        }"
+      >
         <ColumnIssueCard v-bind="issue" />
       </li>
     </VueDraggable>
