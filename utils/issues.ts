@@ -1,46 +1,44 @@
-import { type Column, columns } from '~/constants/columns'
+import { initialColumns } from '~/constants/columns'
 import type { Issue } from '~/types/httpd'
 
-export function groupIssuesByColumn(issues: Issue[]): Record<Column, Issue[]> {
-  const partialColumnDataLabel = createPartialDataLabel('column')
+const partialColumnDataLabel = createPartialDataLabel('column')
 
-  const issuesByColumn = issues.reduce<Record<Column, Issue[]>>(
-    (issuesByColumn, issue) => {
-      let issueColumn: string | undefined
-
-      for (const label of issue.labels) {
-        if (label.startsWith(partialColumnDataLabel)) {
-          issueColumn = label.split(':')[2]
-          break
-        }
-      }
-
-      if (issue.state.status === 'closed') {
-        issuesByColumn.done.push(issue)
-      } else if (issueColumn === 'todo' || issueColumn === 'doing' || issueColumn === 'done') {
-        issuesByColumn[issueColumn].push(issue)
-      } else {
-        issuesByColumn['non-planned'].push(issue)
-      }
-
-      return issuesByColumn
-    },
-    {
-      'non-planned': [],
-      'todo': [],
-      'doing': [],
-      'done': [],
-    },
+export function groupIssuesByColumn(issues: Issue[]): Record<string, Issue[]> {
+  const initialIssuesByColumn: Record<string, Issue[]> = initialColumns.reduce(
+    (columns, column) => ({
+      ...columns,
+      [column]: [],
+    }),
+    {},
   )
+
+  const issuesByColumn = issues.reduce<Record<string, Issue[]>>((issuesByColumn, issue) => {
+    let parsedIssueColumn: string | undefined
+
+    for (const label of issue.labels) {
+      if (label.startsWith(partialColumnDataLabel)) {
+        parsedIssueColumn = label.split(':')[2]
+        break
+      }
+    }
+
+    if (issue.state.status === 'closed') {
+      initializeArrayForKey(issuesByColumn, 'done').push(issue)
+    } else if (parsedIssueColumn === undefined || parsedIssueColumn === '') {
+      initializeArrayForKey(issuesByColumn, 'non-planned').push(issue)
+    } else {
+      initializeArrayForKey(issuesByColumn, parsedIssueColumn).push(issue)
+    }
+
+    return issuesByColumn
+  }, initialIssuesByColumn)
 
   return issuesByColumn
 }
 
-export function createUpdatedIssueLabels(issue: Issue, column: Column): string[] {
-  const partialColumnLabel = createPartialDataLabel('column')
-
+export function createUpdatedIssueLabels(issue: Issue, column: string): string[] {
   const columnDataLabelIndex = issue.labels.findIndex((label) =>
-    label.startsWith(partialColumnLabel),
+    label.startsWith(partialColumnDataLabel),
   )
 
   if (column === 'non-planned') {
@@ -55,9 +53,9 @@ export function createUpdatedIssueLabels(issue: Issue, column: Column): string[]
 }
 
 export function orderIssuesByColumn(
-  issuesByColumn: Record<Column, Issue[]>,
-  issuesOrderByColumn: Record<Column, string[]>,
-): Record<Column, Issue[]> {
+  issuesByColumn: Record<string, Issue[]>,
+  issuesOrderByColumn: Record<string, string[]>,
+): Record<string, Issue[]> {
   function sortIssues(issues: Issue[], order: string[]): Issue[] {
     return issues.toSorted((issueA, issueB) => {
       const aIndex = order.indexOf(issueA.id)
@@ -77,19 +75,12 @@ export function orderIssuesByColumn(
     })
   }
 
-  const sortedIssuesByColumn: Record<Column, Issue[]> = {
-    'non-planned': [],
-    'todo': [],
-    'doing': [],
-    'done': [],
-  }
-
-  for (const column of columns) {
-    sortedIssuesByColumn[column] = sortIssues(
-      issuesByColumn[column],
-      issuesOrderByColumn[column],
-    )
-  }
+  const sortedIssuesByColumn = Object.fromEntries(
+    Object.entries(issuesByColumn).map(([column, issues]) => [
+      column,
+      sortIssues(issues, issuesOrderByColumn[column] ?? []),
+    ]),
+  )
 
   return sortedIssuesByColumn
 }

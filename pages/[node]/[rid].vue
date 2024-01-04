@@ -1,11 +1,12 @@
 <script setup lang="ts">
-import { type Column as ColumnType, columnSchema, columns } from '~/constants/columns'
 import type { Issue } from '~/types/httpd'
-const { $httpdFetch } = useNuxtApp()
 
+const { $httpdFetch } = useNuxtApp()
 const route = useRoute()
 
-const issuesOrder = ref<Record<ColumnType, string[]> | null>(null)
+const auth = useAuthStore()
+const board = useBoardStore()
+const issuesOrder = ref<Record<string, string[]> | null>(null)
 
 const { data: issuesData, refresh: refreshIssues } = useAsyncData(
   'all-issues',
@@ -34,6 +35,13 @@ const { data: issuesData, refresh: refreshIssues } = useAsyncData(
   },
 )
 
+// Merge issue-derived columns with existing columns
+watchEffect(() => {
+  if (issuesData.value?.issuesByColumn) {
+    board.mergeColumns(Object.keys(issuesData.value.issuesByColumn))
+  }
+})
+
 const orderedIssuesByColumn = computed(() => {
   if (!issuesData.value || !issuesOrder.value) {
     return null
@@ -43,27 +51,20 @@ const orderedIssuesByColumn = computed(() => {
 })
 
 watchEffect(() => {
-  if (!issuesData.value?.issuesByColumn || issuesOrder.value) {
-    return
-  }
-
-  const updatedIssuesOrder: Record<ColumnType, string[]> = {
-    'non-planned': [],
-    'todo': [],
-    'doing': [],
-    'done': [],
-  }
-
-  for (const column of columns) {
-    const columnIssues = issuesData.value?.issuesByColumn[column]
-    if (!columnIssues) {
-      continue
+  function initializeIssuesOrder() {
+    if (!issuesData.value?.issuesByColumn || issuesOrder.value) {
+      return
     }
 
-    updatedIssuesOrder[column] = columnIssues.map((issue) => issue.id)
+    issuesOrder.value = Object.fromEntries(
+      Object.entries(issuesData.value.issuesByColumn).map(([column, issues]) => [
+        column,
+        issues.map((issue) => issue.id),
+      ]),
+    )
   }
 
-  issuesOrder.value = updatedIssuesOrder
+  initializeIssuesOrder()
 })
 
 function updateIssueOrder({
@@ -83,13 +84,8 @@ function updateIssueOrder({
     return
   }
 
-  try {
-    const fromColumn = columnSchema.parse(from)
-    const toColumn = columnSchema.parse(to)
-
-    issuesOrder.value[fromColumn].splice(oldIndex, 1)
-    issuesOrder.value[toColumn].splice(newIndex, 0, id)
-  } catch {}
+  initializeArrayForKey(issuesOrder.value, from).splice(oldIndex, 1)
+  initializeArrayForKey(issuesOrder.value, to).splice(newIndex, 0, id)
 }
 
 async function handleUpdateIssueColumn({
@@ -114,21 +110,14 @@ async function handleUpdateIssueColumn({
     return
   }
 
-  let updatedLabels: string[] = []
-
-  try {
-    const toColumn = columnSchema.parse(to)
-    updatedLabels = createUpdatedIssueLabels(issue, toColumn)
-  } catch {
-    return
-  }
+  const labels = createUpdatedIssueLabels(issue, to)
 
   await $httpdFetch(`/projects/{rid}/issues/{issue}`, {
     path: { rid: route.params.rid, issue: id },
     method: 'PATCH',
     body: {
       type: 'label',
-      labels: updatedLabels,
+      labels,
     },
   })
 
@@ -151,7 +140,7 @@ function handleUpdateIssue({
   updateIssueOrder({ id, from, to: from, oldIndex, newIndex })
 }
 
-async function handleCreateIssue({ title, column }: { title: string; column: ColumnType }) {
+async function handleCreateIssue({ title, column }: { title: string; column: string }) {
   const { id } = await $httpdFetch('/projects/{rid}/issues', {
     method: 'POST',
     path: {
@@ -170,7 +159,7 @@ async function handleCreateIssue({ title, column }: { title: string; column: Col
   await refreshIssues()
 
   if (issuesOrder.value && id) {
-    issuesOrder.value[column].push(id)
+    initializeArrayForKey(issuesOrder.value, column).push(id)
   }
 }
 
@@ -180,13 +169,14 @@ const isInIFrame = globalThis.window !== globalThis.window.parent
 <template>
   <div class="flex flex-1 gap-4 overflow-x-auto" :class="{ 'px-2 py-6': !isInIFrame }">
     <Column
-      v-for="column in columns"
+      v-for="column in board.columns"
       :key="column"
       :title="column"
-      :issues="orderedIssuesByColumn ? orderedIssuesByColumn[column] : []"
+      :issues="orderedIssuesByColumn?.[column] ?? []"
       @create="(title) => handleCreateIssue({ title, column })"
       @add="handleUpdateIssueColumn"
       @update="handleUpdateIssue"
     />
+    <NewColumn v-if="auth.isAuthenticated" />
   </div>
 </template>
