@@ -20,17 +20,25 @@ interface VueDraggableUpdateEvent {
 
 const props = defineProps<{ title: Column; issues: Issue[] }>()
 const emit = defineEmits<{
+  create: [title: string]
   add: [data: { id: string; from: string; to: string; oldIndex: number; newIndex: number }]
   update: [data: { id: string; from: string; oldIndex: number; newIndex: number }]
 }>()
 
 const issuesModel = ref<Issue[]>([])
+const isCreatingNewIssue = ref(false)
 
 const auth = useAuthStore()
 const { canEditLabels } = usePermissions()
 
 watchEffect(() => {
   issuesModel.value = [...unref(props.issues)] // "clone" issues prop
+})
+
+watchEffect(() => {
+  if (!auth.isAuthenticated && isCreatingNewIssue.value) {
+    isCreatingNewIssue.value = false
+  }
 })
 
 function handleAdd(event: VueDraggableAddEvent) {
@@ -72,17 +80,23 @@ const columnLabelToIconMap = {
   <div
     class="flex min-w-[350px] max-w-[350px] flex-1 flex-col rounded border border-rad-border-hint bg-rad-background-dip"
   >
-    <div class="flex items-baseline gap-2 p-2">
-      <Icon
-        :name="columnLabelToIconMap[title].name"
-        size="20"
-        :class="`translate-y-1 ${columnLabelToIconMap[title].class}`"
-      />
-      <h3 class="font-semibold">{{ title }}</h3>
+    <div class="flex items-center justify-between gap-2 p-2">
+      <div class="flex items-baseline gap-2">
+        <Icon
+          :name="columnLabelToIconMap[title].name"
+          size="20"
+          :class="`translate-y-1 ${columnLabelToIconMap[title].class}`"
+        />
+        <h3 class="font-semibold">{{ title }}</h3>
 
-      <small class="text-sm font-semibold text-rad-foreground-gray">
-        {{ issuesModel.length }}
-      </small>
+        <small class="text-sm font-semibold text-rad-foreground-gray">
+          {{ issuesModel.length }}
+        </small>
+      </div>
+
+      <UTooltip v-if="auth.isAuthenticated" text="New issue">
+        <IconButton label="New issue" icon="bx:plus" @click="isCreatingNewIssue = true" />
+      </UTooltip>
     </div>
 
     <VueDraggable
@@ -110,6 +124,11 @@ const columnLabelToIconMap = {
       >
         <ColumnIssueCard v-bind="issue" />
       </li>
+      <NewColumnIssueCard
+        v-if="isCreatingNewIssue"
+        @submit="($event) => emit('create', $event)"
+        @close="isCreatingNewIssue = false"
+      />
     </VueDraggable>
   </div>
 </template>

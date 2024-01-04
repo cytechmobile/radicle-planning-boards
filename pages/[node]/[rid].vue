@@ -1,10 +1,5 @@
 <script setup lang="ts">
-import {
-  type Column,
-  type Column as ColumnType,
-  columnSchema,
-  columns,
-} from '~/constants/columns'
+import { type Column as ColumnType, columnSchema, columns } from '~/constants/columns'
 import type { Issue } from '~/types/httpd'
 const { $httpdFetch } = useNuxtApp()
 
@@ -52,7 +47,7 @@ watchEffect(() => {
     return
   }
 
-  const updatedIssuesOrder: Record<Column, string[]> = {
+  const updatedIssuesOrder: Record<ColumnType, string[]> = {
     'non-planned': [],
     'todo': [],
     'doing': [],
@@ -97,7 +92,7 @@ function updateIssueOrder({
   } catch {}
 }
 
-async function updateIssueColumn({
+async function handleUpdateIssueColumn({
   id,
   from,
   to,
@@ -156,6 +151,29 @@ function handleUpdateIssue({
   updateIssueOrder({ id, from, to: from, oldIndex, newIndex })
 }
 
+async function handleCreateIssue({ title, column }: { title: string; column: ColumnType }) {
+  const { id } = await $httpdFetch('/projects/{rid}/issues', {
+    method: 'POST',
+    path: {
+      rid: route.params.rid,
+    },
+    body: {
+      title,
+      description: '',
+      labels: column !== 'non-planned' ? [createDataLabel('column', column)] : [],
+      assignees: [],
+      // @ts-expect-error - wrong type definition
+      embeds: [],
+    },
+  })
+
+  await refreshIssues()
+
+  if (issuesOrder.value && id) {
+    issuesOrder.value[column].push(id)
+  }
+}
+
 const isInIFrame = globalThis.window !== globalThis.window.parent
 </script>
 
@@ -166,7 +184,8 @@ const isInIFrame = globalThis.window !== globalThis.window.parent
       :key="column"
       :title="column"
       :issues="orderedIssuesByColumn ? orderedIssuesByColumn[column] : []"
-      @add="updateIssueColumn"
+      @create="(title) => handleCreateIssue({ title, column })"
+      @add="handleUpdateIssueColumn"
       @update="handleUpdateIssue"
     />
   </div>
