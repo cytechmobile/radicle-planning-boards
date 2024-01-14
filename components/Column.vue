@@ -10,10 +10,8 @@ interface VueDraggableEndEvent {
 }
 
 const props = defineProps<{ title: string; issues: Issue[] }>()
-const emit = defineEmits<{
-  create: [title: string]
-  move: [data: { id: string; column: string; newIndex: number }]
-}>()
+
+const issues = useIssuesStore()
 
 const issuesModel = ref<Issue[]>([])
 const isCreatingNewIssue = ref(false)
@@ -35,11 +33,20 @@ watchEffect(() => {
 function handleMove(event: VueDraggableEndEvent) {
   const { id } = event.item.dataset
   const { column } = event.to.dataset
-  if (!id || !column) {
+  const issue = props.issues.find((issue) => issue.id === id)
+  if (!issue || !column) {
     return
   }
 
-  emit('move', { id, column, newIndex: event.newIndex })
+  void issues.moveIssue({
+    issue,
+    column,
+    index: event.newIndex,
+  })
+}
+
+function handleCreate(title: string) {
+  void issues.createIssue({ title, column: props.title })
 }
 
 const columnIcon = computed(() => {
@@ -120,7 +127,7 @@ const canBeDeleted = computed(() => props.issues.length === 0)
       </li>
       <NewColumnIssueCard
         v-if="isCreatingNewIssue"
-        @submit="($event) => emit('create', $event)"
+        @submit="handleCreate"
         @close="isCreatingNewIssue = false"
       />
     </VueDraggable>

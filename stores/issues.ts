@@ -1,4 +1,3 @@
-/* eslint-disable prettier/prettier */
 import { issuePriorityIncrement } from '~/constants/issues'
 import type { Issue } from '~/types/httpd'
 
@@ -30,22 +29,17 @@ export const useIssuesStore = defineStore('issues', () => {
     {
       transform: (data) => ({
         issues: data as Issue[],
-        issuesByColumn: groupIssuesByColumn(data as Issue[]),
+        issuesByColumn: orderIssuesByColumn(groupIssuesByColumn(data as Issue[])),
       }),
     },
   )
 
-  // TODO: Check if this can be done in the transform function
-  const orderedIssuesByColumn = computed(() =>
-    (issuesData.value?.issuesByColumn
-      ? orderIssuesByColumn(issuesData.value.issuesByColumn)
-      : null),
-  )
+  const issuesByColumn = computed(() => issuesData.value?.issuesByColumn)
 
   // Merge issue-derived columns with existing columns
   watchEffect(() => {
-    if (issuesData.value?.issuesByColumn) {
-      board.mergeColumns(Object.keys(issuesData.value.issuesByColumn))
+    if (issuesByColumn.value) {
+      board.mergeColumns(Object.keys(issuesByColumn.value))
     }
   })
 
@@ -53,13 +47,13 @@ export const useIssuesStore = defineStore('issues', () => {
   watchEffect(() => {
     // TODO: Revisit
     async function initializeIssuesOrder() {
-      if (!issuesData.value?.issuesByColumn) {
+      if (!issuesByColumn.value) {
         return
       }
 
       const partialPriorityDataLabel = createPartialDataLabel('priority')
 
-      for (const issues of Object.values(issuesData.value.issuesByColumn)) {
+      for (const issues of Object.values(issuesByColumn.value)) {
         for (const [index, issue] of issues.entries()) {
           if (issue.labels.some((label) => label.startsWith(partialPriorityDataLabel))) {
             return
@@ -88,29 +82,28 @@ export const useIssuesStore = defineStore('issues', () => {
     initializeIssuesOrder()
   })
 
-  async function handleMoveIssue({
-    id,
+  async function moveIssue({
+    issue,
     column,
-    newIndex,
+    index,
   }: {
-    id: string
+    issue: Issue
     column: string
-    newIndex: number
+    index: number
   }) {
-    if (!issuesData.value) {
+    if (!issuesByColumn.value) {
       return
     }
 
-    const columnIssues = issuesData.value.issuesByColumn[column]
-    const issue = issuesData.value.issues.find((issue) => issue.id === id)
+    const columnIssues = issuesByColumn.value[column]
     if (!issue || !columnIssues) {
       return
     }
 
     const priority = calculateUpdatedIssuePriority({
       issues: columnIssues,
-      id,
-      newIndex,
+      id: issue.id,
+      index,
     })
 
     const labels = createUpdatedIssueLabels(issue, {
@@ -119,7 +112,7 @@ export const useIssuesStore = defineStore('issues', () => {
     })
 
     await $httpdFetch(`/projects/{rid}/issues/{issue}`, {
-      path: { rid: route.params.rid, issue: id },
+      path: { rid: route.params.rid, issue: issue.id },
       method: 'PATCH',
       body: {
         type: 'label',
@@ -130,7 +123,7 @@ export const useIssuesStore = defineStore('issues', () => {
     await refreshIssues()
   }
 
-  async function handleCreateIssue({ title, column }: { title: string; column: string }) {
+  async function createIssue({ title, column }: { title: string; column: string }) {
     // TODO: Add issue priority to be the last one
 
     await $httpdFetch('/projects/{rid}/issues', {
@@ -153,35 +146,38 @@ export const useIssuesStore = defineStore('issues', () => {
 
   // TODO: remove
   async function deletePriorityLabels() {
-    if (!issuesData.value?.issues) {
+    if (!issuesByColumn.value) {
       return
     }
 
-    for (const issue of issuesData.value.issues) {
-      const newLabels = issue.labels.filter(
-        (label) => !label.startsWith(createPartialDataLabel('priority')),
-      )
+    for (const columnIssues of Object.values(issuesByColumn.value)) {
+      for (const issue of columnIssues) {
+        const newLabels = issue.labels.filter(
+          (label) => !label.startsWith(createPartialDataLabel('priority')),
+        )
 
-      if (newLabels.length === issue.labels.length) {
-        continue
+        if (newLabels.length === issue.labels.length) {
+          continue
+        }
+
+        await $httpdFetch(`/projects/{rid}/issues/{issue}`, {
+          path: { rid: route.params.rid, issue: issue.id },
+          method: 'PATCH',
+          body: {
+            type: 'label',
+            labels: newLabels,
+          },
+        })
       }
-
-      await $httpdFetch(`/projects/{rid}/issues/{issue}`, {
-        path: { rid: route.params.rid, issue: issue.id },
-        method: 'PATCH',
-        body: {
-          type: 'label',
-          labels: newLabels,
-        },
-      })
     }
+
     await refreshIssues()
   }
 
   const store = {
-    issuesByColumn: orderedIssuesByColumn,
-    handleMoveIssue,
-    handleCreateIssue,
+    issuesByColumn,
+    moveIssue,
+    createIssue,
     deletePriorityLabels,
   }
 

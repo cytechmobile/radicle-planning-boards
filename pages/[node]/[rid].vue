@@ -14,8 +14,6 @@ const isInIFrame = globalThis.window !== globalThis.window.parent
       :key="column"
       :title="column"
       :issues="issues.issuesByColumn?.[column] ?? []"
-      @create="(title) => issues.handleCreateIssue({ title, column })"
-      @move="issues.handleMoveIssue"
     />
     <NewColumn v-if="auth.isAuthenticated" />
   </div>

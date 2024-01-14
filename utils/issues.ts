@@ -131,11 +131,11 @@ export function orderIssuesByColumn(
 export function calculateUpdatedIssuePriority({
   issues,
   id,
-  newIndex,
+  index,
 }: {
   issues: Issue[]
   id: string
-  newIndex: number
+  index: number
 }): number {
   let priority: number | undefined
 
@@ -144,13 +144,13 @@ export function calculateUpdatedIssuePriority({
     .map((issue) => getIssuePriority(issue) ?? 0)
     .toSorted((priorityA, priorityB) => priorityA - priorityB)
 
-  if (newIndex >= priorities.length) {
+  if (index >= priorities.length) {
     priority = (priorities.at(-1) ?? 0) + issuePriorityIncrement
-  } else if (newIndex === 0) {
+  } else if (index === 0) {
     priority = Math.floor((priorities[0] ?? 0) / 2)
   } else {
-    const prevPriority = priorities[newIndex - 1]
-    const nextPriority = priorities[newIndex]
+    const prevPriority = priorities[index - 1]
+    const nextPriority = priorities[index]
 
     if (prevPriority === undefined || nextPriority === undefined) {
       throw new Error('prevPriority or nextPriority is undefined')
