@@ -3,26 +3,16 @@ import { VueDraggable } from 'vue-draggable-plus'
 import type { Issue } from '../types/httpd'
 import { requiredColumns } from '~/constants/columns'
 
-interface VueDraggableAddEvent {
+interface VueDraggableEndEvent {
   item: HTMLElement
-  from: HTMLElement
   to: HTMLElement
-  oldIndex: number
-  newIndex: number
-}
-
-interface VueDraggableUpdateEvent {
-  item: HTMLElement
-  from: HTMLElement
-  oldIndex: number
   newIndex: number
 }
 
 const props = defineProps<{ title: string; issues: Issue[] }>()
 const emit = defineEmits<{
   create: [title: string]
-  add: [data: { id: string; from: string; to: string; oldIndex: number; newIndex: number }]
-  update: [data: { id: string; from: string; oldIndex: number; newIndex: number }]
+  move: [data: { id: string; column: string; newIndex: number }]
 }>()
 
 const issuesModel = ref<Issue[]>([])
@@ -42,31 +32,14 @@ watchEffect(() => {
   }
 })
 
-function handleAdd(event: VueDraggableAddEvent) {
+function handleMove(event: VueDraggableEndEvent) {
   const { id } = event.item.dataset
-  const { column: fromColumn } = event.from.dataset
-  const { column: toColumn } = event.to.dataset
-  if (!id || !toColumn || !fromColumn) {
+  const { column } = event.to.dataset
+  if (!id || !column) {
     return
   }
 
-  emit('add', {
-    id,
-    from: fromColumn,
-    to: toColumn,
-    oldIndex: event.oldIndex,
-    newIndex: event.newIndex,
-  })
-}
-
-function handleUpdate(event: VueDraggableUpdateEvent) {
-  const { id } = event.item.dataset
-  const { column: fromColumn } = event.from.dataset
-  if (!id || !fromColumn) {
-    return
-  }
-
-  emit('update', { id, from: fromColumn, oldIndex: event.oldIndex, newIndex: event.newIndex })
+  emit('move', { id, column, newIndex: event.newIndex })
 }
 
 const columnIcon = computed(() => {
@@ -131,8 +104,7 @@ const canBeDeleted = computed(() => props.issues.length === 0)
       :data-column="title"
       :disabled="!auth.isAuthenticated || !canEditLabels"
       filter="[data-status='closed']"
-      @add="handleAdd($event)"
-      @update="handleUpdate($event)"
+      @end="handleMove($event)"
     >
       <li
         v-for="issue in issuesModel"

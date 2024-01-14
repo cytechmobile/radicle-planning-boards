@@ -1,7 +1,22 @@
 import { initialColumns } from '~/constants/columns'
+import { issuePriorityIncrement } from '~/constants/issues'
 import type { Issue } from '~/types/httpd'
 
 const partialColumnDataLabel = createPartialDataLabel('column')
+const partialPriorityDataLabel = createPartialDataLabel('priority')
+
+function getIssuePriority(issue: Issue): number | null {
+  const priorityLabel = issue.labels.find((label) => label.startsWith('RPB:priority:'))
+  if (!priorityLabel) {
+    return null
+  }
+  const priority = Number(priorityLabel.split(':')[2])
+  if (Number.isNaN(priority)) {
+    return null
+  }
+
+  return priority
+}
 
 export function groupIssuesByColumn(issues: Issue[]): Record<string, Issue[]> {
   const initialIssuesByColumn: Record<string, Issue[]> = initialColumns.reduce(
@@ -36,51 +51,113 @@ export function groupIssuesByColumn(issues: Issue[]): Record<string, Issue[]> {
   return issuesByColumn
 }
 
-export function createUpdatedIssueLabels(issue: Issue, column: string): string[] {
-  const columnDataLabelIndex = issue.labels.findIndex((label) =>
-    label.startsWith(partialColumnDataLabel),
-  )
+interface CreateUpdatedIssueLabelsOptions {
+  column?: string
+  priority?: number
+}
 
-  if (column === 'non-planned') {
-    return columnDataLabelIndex === -1
-      ? issue.labels
-      : issue.labels.toSpliced(columnDataLabelIndex, 1)
+export function createUpdatedIssueLabels(
+  issue: Issue,
+  { column, priority }: CreateUpdatedIssueLabelsOptions,
+): string[] {
+  const labels = [...issue.labels]
+
+  if (column) {
+    const columnDataLabelIndex = labels.findIndex((label) =>
+      label.startsWith(partialColumnDataLabel),
+    )
+
+    const newColumnDataLabel = createDataLabel('column', column)
+    const hasColumnLabel = columnDataLabelIndex !== -1
+    const hasCorrectColumnLabel =
+      (!hasColumnLabel && column === 'non-planned') ||
+      (hasColumnLabel && labels[columnDataLabelIndex] === newColumnDataLabel)
+
+    if (!hasCorrectColumnLabel) {
+      if (column === 'non-planned') {
+        labels.splice(columnDataLabelIndex, 1)
+      } else if (!hasColumnLabel) {
+        labels.push(newColumnDataLabel)
+      } else {
+        labels[columnDataLabelIndex] = newColumnDataLabel
+      }
+    }
   }
 
-  return columnDataLabelIndex === -1
-    ? issue.labels.concat(createDataLabel('column', column))
-    : issue.labels.with(columnDataLabelIndex, createDataLabel('column', column))
+  if (priority !== undefined) {
+    const priorityLabelIndex = labels.findIndex((label) =>
+      label.startsWith(partialPriorityDataLabel),
+    )
+
+    const newPriorityLabel = createDataLabel('priority', priority)
+    const hasPriorityLabel = priorityLabelIndex !== -1
+    const hasCorrectPriorityLabel =
+      hasPriorityLabel && labels[priorityLabelIndex] === newPriorityLabel
+
+    if (!hasCorrectPriorityLabel) {
+      if (!hasPriorityLabel) {
+        labels.push(newPriorityLabel)
+      } else {
+        labels[priorityLabelIndex] = newPriorityLabel
+      }
+    }
+  }
+
+  return labels
 }
 
 export function orderIssuesByColumn(
   issuesByColumn: Record<string, Issue[]>,
-  issuesOrderByColumn: Record<string, string[]>,
 ): Record<string, Issue[]> {
-  function sortIssues(issues: Issue[], order: string[]): Issue[] {
+  function sortIssuesByPriority(issues: Issue[]): Issue[] {
     return issues.toSorted((issueA, issueB) => {
-      const aIndex = order.indexOf(issueA.id)
-      const bIndex = order.indexOf(issueB.id)
+      const aPriority = getIssuePriority(issueA) ?? 0
+      const bPriority = getIssuePriority(issueB) ?? 0
 
-      if (aIndex === undefined && bIndex === undefined) {
-        return 0
-      }
-      if (aIndex === undefined) {
-        return 1
-      }
-      if (bIndex === undefined) {
-        return -1
-      }
-
-      return aIndex - bIndex
+      return aPriority - bPriority
     })
   }
 
   const sortedIssuesByColumn = Object.fromEntries(
     Object.entries(issuesByColumn).map(([column, issues]) => [
       column,
-      sortIssues(issues, issuesOrderByColumn[column] ?? []),
+      sortIssuesByPriority(issues),
     ]),
   )
 
   return sortedIssuesByColumn
+}
+
+export function calculateUpdatedIssuePriority({
+  issues,
+  id,
+  newIndex,
+}: {
+  issues: Issue[]
+  id: string
+  newIndex: number
+}): number {
+  let priority: number | undefined
+
+  const filteredIssues = issues.filter((issue) => issue.id !== id)
+  const priorities = filteredIssues
+    .map((issue) => getIssuePriority(issue) ?? 0)
+    .toSorted((priorityA, priorityB) => priorityA - priorityB)
+
+  if (newIndex >= priorities.length) {
+    priority = (priorities.at(-1) ?? 0) + issuePriorityIncrement
+  } else if (newIndex === 0) {
+    priority = Math.floor((priorities[0] ?? 0) / 2)
+  } else {
+    const prevPriority = priorities[newIndex - 1]
+    const nextPriority = priorities[newIndex]
+
+    if (prevPriority === undefined || nextPriority === undefined) {
+      throw new Error('prevPriority or nextPriority is undefined')
+    }
+
+    priority = Math.floor((prevPriority + nextPriority) / 2)
+  }
+
+  return priority
 }

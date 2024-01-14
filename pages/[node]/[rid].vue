@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { issuePriorityIncrement } from '~/constants/issues'
 import type { Issue } from '~/types/httpd'
 
 const { $httpdFetch } = useNuxtApp()
@@ -6,7 +7,6 @@ const route = useRoute()
 
 const auth = useAuthStore()
 const board = useBoardStore()
-const issuesOrder = ref<Record<string, string[]> | null>(null)
 
 const { data: issuesData, refresh: refreshIssues } = useAsyncData(
   'all-issues',
@@ -42,75 +42,80 @@ watchEffect(() => {
   }
 })
 
-const orderedIssuesByColumn = computed(() => {
-  if (!issuesData.value || !issuesOrder.value) {
-    return null
-  }
+const orderedIssuesByColumn = computed(() =>
+  issuesData.value?.issuesByColumn
+    ? orderIssuesByColumn(issuesData.value.issuesByColumn)
+    : null,
+)
 
-  return orderIssuesByColumn(issuesData.value.issuesByColumn, issuesOrder.value)
-})
-
+// Initialize issues order
 watchEffect(() => {
-  function initializeIssuesOrder() {
-    if (!issuesData.value?.issuesByColumn || issuesOrder.value) {
+  // TODO: Revisit
+  async function initializeIssuesOrder() {
+    if (!issuesData.value?.issuesByColumn) {
       return
     }
 
-    issuesOrder.value = Object.fromEntries(
-      Object.entries(issuesData.value.issuesByColumn).map(([column, issues]) => [
-        column,
-        issues.map((issue) => issue.id),
-      ]),
-    )
+    const partialPriorityDataLabel = createPartialDataLabel('priority')
+
+    for (const issues of Object.values(issuesData.value.issuesByColumn)) {
+      for (const [index, issue] of issues.entries()) {
+        if (issue.labels.some((label) => label.startsWith(partialPriorityDataLabel))) {
+          return
+        }
+
+        // If the issue doesn't have a priority label, add it
+        const newLabels = [...issue.labels]
+
+        if (!newLabels.some((label) => label.startsWith(partialPriorityDataLabel))) {
+          newLabels.push(createDataLabel('priority', (index + 1) * issuePriorityIncrement))
+        }
+
+        await $httpdFetch(`/projects/{rid}/issues/{issue}`, {
+          path: { rid: route.params.rid, issue: issue.id },
+          method: 'PATCH',
+          body: {
+            type: 'label',
+            labels: newLabels,
+          },
+        })
+      }
+    }
+    await refreshIssues()
   }
 
   initializeIssuesOrder()
 })
 
-function updateIssueOrder({
+async function handleMoveIssue({
   id,
-  from,
-  to,
-  oldIndex,
+  column,
   newIndex,
 }: {
   id: string
-  from: string
-  to: string
-  oldIndex: number
+  column: string
   newIndex: number
 }) {
-  if (!issuesData.value || !issuesOrder.value) {
+  if (!issuesData.value) {
     return
   }
 
-  initializeArrayForKey(issuesOrder.value, from).splice(oldIndex, 1)
-  initializeArrayForKey(issuesOrder.value, to).splice(newIndex, 0, id)
-}
-
-async function handleUpdateIssueColumn({
-  id,
-  from,
-  to,
-  oldIndex,
-  newIndex,
-}: {
-  id: string
-  from: string
-  to: string
-  oldIndex: number
-  newIndex: number
-}) {
-  if (!issuesData.value || !issuesOrder.value) {
-    return
-  }
-
+  const columnIssues = issuesData.value.issuesByColumn[column]
   const issue = issuesData.value.issues.find((issue) => issue.id === id)
-  if (!issue) {
+  if (!issue || !columnIssues) {
     return
   }
 
-  const labels = createUpdatedIssueLabels(issue, to)
+  const priority = calculateUpdatedIssuePriority({
+    issues: columnIssues,
+    id,
+    newIndex,
+  })
+
+  const labels = createUpdatedIssueLabels(issue, {
+    column,
+    priority,
+  })
 
   await $httpdFetch(`/projects/{rid}/issues/{issue}`, {
     path: { rid: route.params.rid, issue: id },
@@ -122,26 +127,12 @@ async function handleUpdateIssueColumn({
   })
 
   await refreshIssues()
-
-  updateIssueOrder({ id, from, to, oldIndex, newIndex })
-}
-
-function handleUpdateIssue({
-  id,
-  from,
-  oldIndex,
-  newIndex,
-}: {
-  id: string
-  from: string
-  oldIndex: number
-  newIndex: number
-}) {
-  updateIssueOrder({ id, from, to: from, oldIndex, newIndex })
 }
 
 async function handleCreateIssue({ title, column }: { title: string; column: string }) {
-  const { id } = await $httpdFetch('/projects/{rid}/issues', {
+  // TODO: Add issue priority to be the last one
+
+  await $httpdFetch('/projects/{rid}/issues', {
     method: 'POST',
     path: {
       rid: route.params.rid,
@@ -157,16 +148,40 @@ async function handleCreateIssue({ title, column }: { title: string; column: str
   })
 
   await refreshIssues()
-
-  if (issuesOrder.value && id) {
-    initializeArrayForKey(issuesOrder.value, column).push(id)
-  }
 }
 
 const isInIFrame = globalThis.window !== globalThis.window.parent
+
+// TODO: remove
+async function deletePriorityLabels() {
+  if (!issuesData.value?.issues) {
+    return
+  }
+
+  for (const issue of issuesData.value.issues) {
+    const newLabels = issue.labels.filter(
+      (label) => !label.startsWith(createPartialDataLabel('priority')),
+    )
+
+    if (newLabels.length === issue.labels.length) {
+      continue
+    }
+
+    await $httpdFetch(`/projects/{rid}/issues/{issue}`, {
+      path: { rid: route.params.rid, issue: issue.id },
+      method: 'PATCH',
+      body: {
+        type: 'label',
+        labels: newLabels,
+      },
+    })
+  }
+  await refreshIssues()
+}
 </script>
 
 <template>
+  <UButton class="w-fit" @click="deletePriorityLabels">Delete Priority</UButton>
   <div class="flex flex-1 gap-4 overflow-x-auto" :class="{ 'px-2 py-6': !isInIFrame }">
     <Column
       v-for="column in board.columns"
@@ -174,8 +189,7 @@ const isInIFrame = globalThis.window !== globalThis.window.parent
       :title="column"
       :issues="orderedIssuesByColumn?.[column] ?? []"
       @create="(title) => handleCreateIssue({ title, column })"
-      @add="handleUpdateIssueColumn"
-      @update="handleUpdateIssue"
+      @move="handleMoveIssue"
     />
     <NewColumn v-if="auth.isAuthenticated" />
   </div>
