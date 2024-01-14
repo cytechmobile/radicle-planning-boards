@@ -1,5 +1,6 @@
 import { issuePriorityIncrement } from '~/constants/issues'
 import type { Issue } from '~/types/httpd'
+import { getIssuePriority } from '~/utils/issues'
 
 export const useIssuesStore = defineStore('issues', () => {
   const { $httpdFetch } = useNuxtApp()
@@ -124,7 +125,22 @@ export const useIssuesStore = defineStore('issues', () => {
   }
 
   async function createIssue({ title, column }: { title: string; column: string }) {
-    // TODO: Add issue priority to be the last one
+    const columnIssues = issuesByColumn.value?.[column]
+    if (columnIssues === undefined) {
+      return
+    }
+
+    const labels: string[] = []
+
+    if (column !== 'non-planned') {
+      labels.push(createDataLabel('column', column))
+    }
+
+    const lastIssue = columnIssues.at(-1)
+    const priority = lastIssue
+      ? (getIssuePriority(lastIssue) ?? 0) + issuePriorityIncrement
+      : issuePriorityIncrement
+    labels.push(createDataLabel('priority', priority))
 
     await $httpdFetch('/projects/{rid}/issues', {
       method: 'POST',
@@ -134,7 +150,7 @@ export const useIssuesStore = defineStore('issues', () => {
       body: {
         title,
         description: '',
-        labels: column !== 'non-planned' ? [createDataLabel('column', column)] : [],
+        labels,
         assignees: [],
         // @ts-expect-error - wrong type definition
         embeds: [],

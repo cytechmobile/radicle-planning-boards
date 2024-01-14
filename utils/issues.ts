@@ -5,7 +5,7 @@ import type { Issue } from '~/types/httpd'
 const partialColumnDataLabel = createPartialDataLabel('column')
 const partialPriorityDataLabel = createPartialDataLabel('priority')
 
-function getIssuePriority(issue: Issue): number | null {
+export function getIssuePriority(issue: Issue): number | null {
   const priorityLabel = issue.labels.find((label) => label.startsWith('RPB:priority:'))
   if (!priorityLabel) {
     return null
