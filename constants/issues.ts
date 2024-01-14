@@ -1,1 +1,1 @@
-export const issuePriorityIncrement = 1000
+export const issuePriorityIncrement = 100
