@@ -37,50 +37,65 @@ export const useIssuesStore = defineStore('issues', () => {
 
   const issuesByColumn = computed(() => issuesData.value?.issuesByColumn)
 
+  async function initializeIssuesPriority() {
+    if (!issuesByColumn.value) {
+      return
+    }
+
+    const partialPriorityDataLabel = createPartialDataLabel('priority')
+
+    for (const issues of Object.values(issuesByColumn.value)) {
+      const issuesWithoutPriority: Issue[] = []
+      let highestPriority = 0
+
+      for (const issue of issues) {
+        const hasPriorityLabel = issue.labels.some((label) =>
+          label.startsWith(partialPriorityDataLabel),
+        )
+
+        if (hasPriorityLabel) {
+          const priority = getIssuePriority(issue)
+          if (priority !== null && priority > highestPriority) {
+            highestPriority = priority
+          }
+        } else {
+          issuesWithoutPriority.push(issue)
+        }
+      }
+
+      for (const [index, issue] of issuesWithoutPriority.entries()) {
+        if (issue.labels.some((label) => label.startsWith(partialPriorityDataLabel))) {
+          return
+        }
+
+        const priority = highestPriority + (index + 1) * issuePriorityIncrement
+
+        await $httpdFetch(`/projects/{rid}/issues/{issue}`, {
+          path: { rid: route.params.rid, issue: issue.id },
+          method: 'PATCH',
+          body: {
+            type: 'label',
+            labels: [...issue.labels, createDataLabel('priority', priority)],
+          },
+        })
+      }
+    }
+
+    await refreshIssues()
+  }
+
+  watch(issuesData, (newIssues, oldIssues) => {
+    // Only initialize issues on first fetch
+    if (newIssues && !oldIssues) {
+      initializeIssuesPriority()
+    }
+  })
+
   // Merge issue-derived columns with existing columns
   watchEffect(() => {
     if (issuesByColumn.value) {
       board.mergeColumns(Object.keys(issuesByColumn.value))
     }
-  })
-
-  // Initialize issues order
-  watchEffect(() => {
-    // TODO: Revisit
-    async function initializeIssuesOrder() {
-      if (!issuesByColumn.value) {
-        return
-      }
-
-      const partialPriorityDataLabel = createPartialDataLabel('priority')
-
-      for (const issues of Object.values(issuesByColumn.value)) {
-        for (const [index, issue] of issues.entries()) {
-          if (issue.labels.some((label) => label.startsWith(partialPriorityDataLabel))) {
-            return
-          }
-
-          // If the issue doesn't have a priority label, add it
-          const newLabels = [...issue.labels]
-
-          if (!newLabels.some((label) => label.startsWith(partialPriorityDataLabel))) {
-            newLabels.push(createDataLabel('priority', (index + 1) * issuePriorityIncrement))
-          }
-
-          await $httpdFetch(`/projects/{rid}/issues/{issue}`, {
-            path: { rid: route.params.rid, issue: issue.id },
-            method: 'PATCH',
-            body: {
-              type: 'label',
-              labels: newLabels,
-            },
-          })
-        }
-      }
-      await refreshIssues()
-    }
-
-    initializeIssuesOrder()
   })
 
   async function moveIssue({
