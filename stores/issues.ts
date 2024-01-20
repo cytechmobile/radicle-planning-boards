@@ -1,6 +1,6 @@
 import { issuePriorityIncrement } from '~/constants/issues'
-import type { Issue } from '~/types/httpd'
-import { getIssuePriority } from '~/utils/issues'
+import type { RadicleIssue } from '~/types/httpd'
+import type { Issue } from '~/types/issues'
 
 export const useIssuesStore = defineStore('issues', () => {
   const { $httpdFetch } = useNuxtApp()
@@ -8,7 +8,7 @@ export const useIssuesStore = defineStore('issues', () => {
 
   const board = useBoardStore()
 
-  const { data: issuesData, refresh: refreshIssues } = useAsyncData(
+  const { data: issues, refresh: refreshIssues } = useAsyncData(
     'all-issues',
     async () => {
       function createFetchIssuesOptions(state: 'open' | 'closed') {
@@ -28,46 +28,33 @@ export const useIssuesStore = defineStore('issues', () => {
       return [...openIssues, ...closedIssues]
     },
     {
-      transform: (data) => ({
-        issues: data as Issue[],
-        issuesByColumn: orderIssuesByColumn(groupIssuesByColumn(data as Issue[])),
-      }),
+      transform: (issues) => (issues as RadicleIssue[]).map(transformIssue),
     },
   )
 
-  const issuesByColumn = computed(() => issuesData.value?.issuesByColumn)
+  const issuesByColumn = computed(() =>
+    // eslint-disable-next-line prettier/prettier
+    (issues.value ? orderIssuesByColumn(groupIssuesByColumn(issues.value)) : null),
+  )
 
   async function initializeIssuesPriority() {
     if (!issuesByColumn.value) {
       return
     }
 
-    const partialPriorityDataLabel = createPartialDataLabel('priority')
-
     for (const issues of Object.values(issuesByColumn.value)) {
       const issuesWithoutPriority: Issue[] = []
       let highestPriority = 0
 
       for (const issue of issues) {
-        const hasPriorityLabel = issue.labels.some((label) =>
-          label.startsWith(partialPriorityDataLabel),
-        )
-
-        if (hasPriorityLabel) {
-          const priority = getIssuePriority(issue)
-          if (priority !== null && priority > highestPriority) {
-            highestPriority = priority
-          }
-        } else {
+        if (issue.rpb.priority === null) {
           issuesWithoutPriority.push(issue)
+        } else if (issue.rpb.priority > highestPriority) {
+          highestPriority = issue.rpb.priority
         }
       }
 
       for (const [index, issue] of issuesWithoutPriority.entries()) {
-        if (issue.labels.some((label) => label.startsWith(partialPriorityDataLabel))) {
-          return
-        }
-
         const priority = highestPriority + (index + 1) * issuePriorityIncrement
 
         await $httpdFetch(`/projects/{rid}/issues/{issue}`, {
@@ -84,7 +71,7 @@ export const useIssuesStore = defineStore('issues', () => {
     await refreshIssues()
   }
 
-  watch(issuesData, (newIssues, oldIssues) => {
+  watch(issues, (newIssues, oldIssues) => {
     // Only initialize issues on first fetch
     if (newIssues && !oldIssues) {
       initializeIssuesPriority()
@@ -153,7 +140,7 @@ export const useIssuesStore = defineStore('issues', () => {
 
     const lastIssue = columnIssues.at(-1)
     const priority = lastIssue
-      ? (getIssuePriority(lastIssue) ?? 0) + issuePriorityIncrement
+      ? (lastIssue.rpb.priority ?? 0) + issuePriorityIncrement
       : issuePriorityIncrement
     labels.push(createDataLabel('priority', priority))
 

@@ -1,21 +1,33 @@
 import { initialColumns } from '~/constants/columns'
 import { issuePriorityIncrement } from '~/constants/issues'
-import type { Issue } from '~/types/httpd'
+import type { RadicleIssue } from '~/types/httpd'
+import type { Issue } from '~/types/issues'
 
 const partialColumnDataLabel = createPartialDataLabel('column')
 const partialPriorityDataLabel = createPartialDataLabel('priority')
 
-export function getIssuePriority(issue: Issue): number | null {
-  const priorityLabel = issue.labels.find((label) => label.startsWith('RPB:priority:'))
-  if (!priorityLabel) {
-    return null
-  }
-  const priority = Number(priorityLabel.split(':')[2])
-  if (Number.isNaN(priority)) {
-    return null
+export function transformIssue(issue: RadicleIssue): Issue {
+  let column = 'non-planned'
+  let priority: number | null = null
+
+  for (const label of issue.labels) {
+    if (label.startsWith(partialColumnDataLabel)) {
+      column = getDataLabelValue(label) ?? 'non-planned'
+    } else if (label.startsWith(partialPriorityDataLabel)) {
+      const value = getDataLabelValue(label)
+      priority = value ? Number(value) : null
+    }
   }
 
-  return priority
+  const transformedIssue = {
+    ...issue,
+    rpb: {
+      column,
+      priority,
+    },
+  }
+
+  return transformedIssue
 }
 
 export function groupIssuesByColumn(issues: Issue[]): Record<string, Issue[]> {
@@ -28,21 +40,10 @@ export function groupIssuesByColumn(issues: Issue[]): Record<string, Issue[]> {
   )
 
   const issuesByColumn = issues.reduce<Record<string, Issue[]>>((issuesByColumn, issue) => {
-    let parsedIssueColumn: string | undefined
-
-    for (const label of issue.labels) {
-      if (label.startsWith(partialColumnDataLabel)) {
-        parsedIssueColumn = label.split(':')[2]
-        break
-      }
-    }
-
     if (issue.state.status === 'closed') {
       initializeArrayForKey(issuesByColumn, 'done').push(issue)
-    } else if (parsedIssueColumn === undefined || parsedIssueColumn === '') {
-      initializeArrayForKey(issuesByColumn, 'non-planned').push(issue)
     } else {
-      initializeArrayForKey(issuesByColumn, parsedIssueColumn).push(issue)
+      initializeArrayForKey(issuesByColumn, issue.rpb.column).push(issue)
     }
 
     return issuesByColumn
@@ -110,12 +111,9 @@ export function orderIssuesByColumn(
   issuesByColumn: Record<string, Issue[]>,
 ): Record<string, Issue[]> {
   function sortIssuesByPriority(issues: Issue[]): Issue[] {
-    return issues.toSorted((issueA, issueB) => {
-      const aPriority = getIssuePriority(issueA) ?? 0
-      const bPriority = getIssuePriority(issueB) ?? 0
-
-      return aPriority - bPriority
-    })
+    return issues.toSorted(
+      (issueA, issueB) => (issueA.rpb.priority ?? 0) - (issueB.rpb.priority ?? 0),
+    )
   }
 
   const sortedIssuesByColumn = Object.fromEntries(
@@ -141,7 +139,7 @@ export function calculateUpdatedIssuePriority({
 
   const filteredIssues = issues.filter((issue) => issue.id !== id)
   const priorities = filteredIssues
-    .map((issue) => getIssuePriority(issue) ?? 0)
+    .map((issue) => issue.rpb.priority ?? 0)
     .toSorted((priorityA, priorityB) => priorityA - priorityB)
 
   if (index >= priorities.length) {

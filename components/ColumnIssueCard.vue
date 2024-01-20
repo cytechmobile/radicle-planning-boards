@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useStorage } from '@vueuse/core'
-import type { Issue } from '~/types/httpd'
+import type { Issue } from '~/types/issues'
 
 interface Props {
   id: Issue['id']

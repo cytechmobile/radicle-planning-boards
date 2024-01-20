@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { VueDraggable } from 'vue-draggable-plus'
-import type { Issue } from '../types/httpd'
+import type { Issue } from '../types/issues'
 import { requiredColumns } from '~/constants/columns'
 
 interface VueDraggableEndEvent {
