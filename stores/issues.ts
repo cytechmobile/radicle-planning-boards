@@ -8,7 +8,14 @@ export const useIssuesStore = defineStore('issues', () => {
 
   const board = useBoardStore()
 
-  const { data: issues, refresh: refreshIssues } = useAsyncData(
+  const isMovingIssue = ref(false)
+  const isCreatingIssue = ref(false)
+
+  const {
+    data: issues,
+    pending: areIssuesPending,
+    refresh: refreshIssues,
+  } = useAsyncData(
     'all-issues',
     async () => {
       function createFetchIssuesOptions(state: 'open' | 'closed') {
@@ -30,6 +37,10 @@ export const useIssuesStore = defineStore('issues', () => {
     {
       transform: (issues) => (issues as RadicleIssue[]).map(transformIssue),
     },
+  )
+
+  const isLoading = computed(
+    () => areIssuesPending || isMovingIssue.value || isCreatingIssue.value,
   )
 
   const issuesByColumn = computed(() =>
@@ -109,6 +120,8 @@ export const useIssuesStore = defineStore('issues', () => {
       return
     }
 
+    isMovingIssue.value = true
+
     await $httpdFetch('/projects/{rid}/issues/{issue}', {
       path: { rid: route.params.rid, issue: issue.id },
       method: 'PATCH',
@@ -133,6 +146,8 @@ export const useIssuesStore = defineStore('issues', () => {
     }
 
     await refreshIssues()
+
+    isMovingIssue.value = false
   }
 
   async function createIssue({ title, column }: { title: string; column: string }) {
@@ -153,6 +168,8 @@ export const useIssuesStore = defineStore('issues', () => {
       : issuePriorityIncrement
     labels.push(createDataLabel('priority', priority))
 
+    isCreatingIssue.value = true
+
     await $httpdFetch('/projects/{rid}/issues', {
       method: 'POST',
       path: {
@@ -169,6 +186,8 @@ export const useIssuesStore = defineStore('issues', () => {
     })
 
     await refreshIssues()
+
+    isCreatingIssue.value = false
   }
 
   // TODO: remove
@@ -205,6 +224,7 @@ export const useIssuesStore = defineStore('issues', () => {
 
   const store = {
     issuesByColumn,
+    isLoading: isLoading.value,
     moveIssue,
     createIssue,
     deletePriorityLabels,

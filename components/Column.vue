@@ -11,13 +11,12 @@ interface VueDraggableEndEvent {
 
 const props = defineProps<{ title: string; issues: Issue[] }>()
 
-const issues = useIssuesStore()
-
 const issuesModel = ref<Issue[]>([])
 const isCreatingNewIssue = ref(false)
 
 const auth = useAuthStore()
 const board = useBoardStore()
+const issues = useIssuesStore()
 const { canEditLabels } = usePermissions()
 
 watchEffect(() => {
@@ -67,6 +66,9 @@ const columnIcon = computed(() => {
 })
 
 const canBeDeleted = computed(() => props.issues.length === 0)
+const isDraggingDisabled = computed(
+  () => !auth.isAuthenticated || !canEditLabels || issues.isLoading,
+)
 </script>
 
 <template>
@@ -109,7 +111,7 @@ const canBeDeleted = computed(() => props.issues.length === 0)
       :animation="150"
       group="issues"
       :data-column="title"
-      :disabled="!auth.isAuthenticated || !canEditLabels"
+      :disabled="isDraggingDisabled"
       filter="[data-status='closed']"
       @end="handleMove($event)"
     >
@@ -119,8 +121,7 @@ const canBeDeleted = computed(() => props.issues.length === 0)
         :data-id="issue.id"
         :data-status="issue.state.status"
         :class="{
-          'hover:cursor-grab':
-            auth.isAuthenticated && canEditLabels && issue.state.status === 'open',
+          'hover:cursor-grab': !isDraggingDisabled && issue.state.status === 'open',
         }"
       >
         <ColumnIssueCard v-bind="issue" />
