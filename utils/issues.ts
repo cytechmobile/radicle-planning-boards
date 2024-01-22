@@ -30,8 +30,15 @@ export function transformIssue(issue: RadicleIssue): Issue {
   return transformedIssue
 }
 
-export function groupIssuesByColumn(issues: Issue[]): Record<string, Issue[]> {
-  const initialIssuesByColumn: Record<string, Issue[]> = initialColumns.reduce(
+export function groupIssuesByColumn({
+  issues,
+  columns,
+}: {
+  issues: Issue[]
+  columns: string[]
+}): Record<string, Issue[]> {
+  const persistedColumns = [...new Set([...columns, ...initialColumns])]
+  const persistedIssuesByColumn: Record<string, Issue[]> = persistedColumns.reduce(
     (columns, column) => ({
       ...columns,
       [column]: [],
@@ -47,7 +54,7 @@ export function groupIssuesByColumn(issues: Issue[]): Record<string, Issue[]> {
     }
 
     return issuesByColumn
-  }, initialIssuesByColumn)
+  }, persistedIssuesByColumn)
 
   return issuesByColumn
 }

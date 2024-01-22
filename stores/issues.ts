@@ -43,10 +43,13 @@ export const useIssuesStore = defineStore('issues', () => {
     () => areIssuesPending || isMovingIssue.value || isCreatingIssue.value,
   )
 
-  const issuesByColumn = computed(() =>
-    // eslint-disable-next-line prettier/prettier
-    (issues.value ? orderIssuesByColumn(groupIssuesByColumn(issues.value)) : null),
-  )
+  const issuesByColumn = computed(() => {
+    return issues.value
+      ? orderIssuesByColumn(
+          groupIssuesByColumn({ issues: issues.value, columns: board.columns }),
+        )
+      : null
+  })
 
   async function initializeIssuesPriority() {
     if (!issuesByColumn.value) {
