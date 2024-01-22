@@ -126,7 +126,7 @@ export function orderIssuesByColumn(
   return sortedIssuesByColumn
 }
 
-export function calculateUpdatedIssuePriority({
+function calculateUpdatedIssuePriority({
   issues,
   id,
   index,
@@ -154,8 +154,61 @@ export function calculateUpdatedIssuePriority({
       throw new Error('prevPriority or nextPriority is undefined')
     }
 
-    priority = Math.floor((prevPriority + nextPriority) / 2)
+    if (nextPriority - prevPriority <= 1) {
+      priority = prevPriority + 1
+    } else {
+      priority = Math.floor((prevPriority + nextPriority) / 2)
+    }
   }
 
   return priority
+}
+
+export function calculatePriorityUpdates({
+  issues,
+  issue,
+  index,
+}: {
+  issues: Issue[]
+  issue: Issue
+  index: number
+}): { issue: Issue; priority: number }[] {
+  const newIssues = [...issues]
+  let issueCurrentIndex = newIssues.indexOf(issue)
+  if (issueCurrentIndex === -1) {
+    newIssues.push(issue)
+    issueCurrentIndex = newIssues.length - 1
+  }
+
+  const priorityUpdates: { issue: Issue; priority: number }[] = []
+
+  const newPriority = calculateUpdatedIssuePriority({ issues: newIssues, id: issue.id, index })
+  priorityUpdates.push({ issue, priority: newPriority })
+
+  const issueWithDuplicatePriority = newIssues
+    .toSpliced(issueCurrentIndex, 1)
+    .find((issue) => issue.rpb.priority === newPriority)
+
+  if (issueWithDuplicatePriority) {
+    const issueWithUpdatedPriority = {
+      ...issue,
+      rpb: {
+        ...issue.rpb,
+        priority: newPriority,
+      },
+    }
+    const issuesWithUpdatedPriority = newIssues.with(
+      issueCurrentIndex,
+      issueWithUpdatedPriority,
+    )
+
+    const updates = calculatePriorityUpdates({
+      issues: issuesWithUpdatedPriority,
+      issue: issueWithDuplicatePriority,
+      index: index + 1,
+    })
+    priorityUpdates.push(...updates)
+  }
+
+  return priorityUpdates
 }

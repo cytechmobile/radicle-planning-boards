@@ -94,34 +94,43 @@ export const useIssuesStore = defineStore('issues', () => {
     column: string
     index: number
   }) {
-    if (!issuesByColumn.value) {
-      return
-    }
-
-    const columnIssues = issuesByColumn.value[column]
+    const columnIssues = issuesByColumn.value?.[column]
     if (!issue || !columnIssues) {
       return
     }
 
-    const priority = calculateUpdatedIssuePriority({
+    const [currentIssueUpdate, ...otherIssueUpdates] = calculatePriorityUpdates({
       issues: columnIssues,
-      id: issue.id,
+      issue,
       index,
     })
 
-    const labels = createUpdatedIssueLabels(issue, {
-      column,
-      priority,
-    })
+    if (!currentIssueUpdate) {
+      return
+    }
 
-    await $httpdFetch(`/projects/{rid}/issues/{issue}`, {
+    await $httpdFetch('/projects/{rid}/issues/{issue}', {
       path: { rid: route.params.rid, issue: issue.id },
       method: 'PATCH',
       body: {
         type: 'label',
-        labels,
+        labels: createUpdatedIssueLabels(issue, {
+          column,
+          priority: currentIssueUpdate.priority,
+        }),
       },
     })
+
+    for (const { issue, priority } of otherIssueUpdates) {
+      await $httpdFetch('/projects/{rid}/issues/{issue}', {
+        path: { rid: route.params.rid, issue: issue.id },
+        method: 'PATCH',
+        body: {
+          type: 'label',
+          labels: createUpdatedIssueLabels(issue, { priority }),
+        },
+      })
+    }
 
     await refreshIssues()
   }
@@ -164,32 +173,34 @@ export const useIssuesStore = defineStore('issues', () => {
 
   // TODO: remove
   async function deletePriorityLabels() {
-    if (!issuesByColumn.value) {
+    if (!issues.value) {
       return
     }
 
-    for (const columnIssues of Object.values(issuesByColumn.value)) {
-      for (const issue of columnIssues) {
-        const newLabels = issue.labels.filter(
-          (label) => !label.startsWith(createPartialDataLabel('priority')),
+    const updates = issues.value.reduce<Promise<void>[]>((acc, issue) => {
+      const newLabels = issue.labels.filter(
+        (label) => !label.startsWith(createPartialDataLabel('priority')),
+      )
+
+      if (newLabels.length !== issue.labels.length) {
+        acc.push(
+          $httpdFetch(`/projects/{rid}/issues/{issue}`, {
+            path: { rid: route.params.rid, issue: issue.id },
+            method: 'PATCH',
+            body: {
+              type: 'label',
+              labels: newLabels,
+            },
+          }),
         )
-
-        if (newLabels.length === issue.labels.length) {
-          continue
-        }
-
-        await $httpdFetch(`/projects/{rid}/issues/{issue}`, {
-          path: { rid: route.params.rid, issue: issue.id },
-          method: 'PATCH',
-          body: {
-            type: 'label',
-            labels: newLabels,
-          },
-        })
       }
-    }
 
+      return acc
+    }, [])
+
+    await Promise.all(updates)
     await refreshIssues()
+    await initializeIssuesPriority()
   }
 
   const store = {
