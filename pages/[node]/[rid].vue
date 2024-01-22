@@ -9,7 +9,6 @@ const isInIFrame = globalThis.window !== globalThis.window.parent
 </script>
 
 <template>
-  <UButton class="w-fit" @click="issues.deletePriorityLabels">Delete Priority</UButton>
   <div
     v-if="columns"
     class="flex flex-1 gap-4 overflow-x-auto"

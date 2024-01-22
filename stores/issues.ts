@@ -10,6 +10,7 @@ export const useIssuesStore = defineStore('issues', () => {
 
   const isMovingIssue = ref(false)
   const isCreatingIssue = ref(false)
+  const isResettingPriority = ref(false)
 
   const {
     data: issues,
@@ -51,7 +52,7 @@ export const useIssuesStore = defineStore('issues', () => {
       : null
   })
 
-  async function initializeIssuesPriority() {
+  async function initializePriority() {
     if (!issuesByColumn.value) {
       return
     }
@@ -88,7 +89,7 @@ export const useIssuesStore = defineStore('issues', () => {
   watch(issues, (newIssues, oldIssues) => {
     // Only initialize issues on first fetch
     if (newIssues && !oldIssues) {
-      initializeIssuesPriority()
+      initializePriority()
     }
   })
 
@@ -193,36 +194,34 @@ export const useIssuesStore = defineStore('issues', () => {
     isCreatingIssue.value = false
   }
 
-  // TODO: remove
-  async function deletePriorityLabels() {
+  async function resetPriority() {
     if (!issues.value) {
       return
     }
 
-    const updates = issues.value.reduce<Promise<void>[]>((acc, issue) => {
-      const newLabels = issue.labels.filter(
-        (label) => !label.startsWith(createPartialDataLabel('priority')),
-      )
+    isResettingPriority.value = true
+
+    const partialPriorityLabel = createPartialDataLabel('priority')
+
+    for (const issue of issues.value) {
+      const newLabels = issue.labels.filter((label) => !label.startsWith(partialPriorityLabel))
 
       if (newLabels.length !== issue.labels.length) {
-        acc.push(
-          $httpdFetch(`/projects/{rid}/issues/{issue}`, {
-            path: { rid: route.params.rid, issue: issue.id },
-            method: 'PATCH',
-            body: {
-              type: 'label',
-              labels: newLabels,
-            },
-          }),
-        )
+        await $httpdFetch(`/projects/{rid}/issues/{issue}`, {
+          path: { rid: route.params.rid, issue: issue.id },
+          method: 'PATCH',
+          body: {
+            type: 'label',
+            labels: newLabels,
+          },
+        })
       }
+    }
 
-      return acc
-    }, [])
-
-    await Promise.all(updates)
     await refreshIssues()
-    await initializeIssuesPriority()
+    await initializePriority()
+
+    isResettingPriority.value = false
   }
 
   const store = {
@@ -230,7 +229,8 @@ export const useIssuesStore = defineStore('issues', () => {
     isLoading: isLoading.value,
     moveIssue,
     createIssue,
-    deletePriorityLabels,
+    isResettingPriority: isResettingPriority.value,
+    resetPriority,
   }
 
   return store

@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { useStorage } from '@vueuse/core'
 import type { Issue } from '~/types/issues'
 
 interface Props {
@@ -17,7 +16,7 @@ const dataLabels = computed(() =>
 )
 
 const radicleInterfaceBaseUrl = useRadicleInterfaceBaseUrl()
-const showConfigDataLabels = useStorage('RPB_config-show-data-labels', false)
+const isDebugging = useIsDebugging()
 
 const href = computed(() =>
   new URL(
@@ -54,7 +53,7 @@ const statusToIconMap = {
       </a>
     </h4>
 
-    <ul v-if="showConfigDataLabels">
+    <ul v-if="isDebugging">
       <li
         v-for="label in dataLabels"
         :key="label"
