@@ -1,35 +1,22 @@
 <script setup lang="ts">
 import { VueDraggable } from 'vue-draggable-plus'
-import type { Issue } from '../types/httpd'
+import type { Issue } from '../types/issues'
 import { requiredColumns } from '~/constants/columns'
 
-interface VueDraggableAddEvent {
+interface VueDraggableEndEvent {
   item: HTMLElement
-  from: HTMLElement
   to: HTMLElement
-  oldIndex: number
-  newIndex: number
-}
-
-interface VueDraggableUpdateEvent {
-  item: HTMLElement
-  from: HTMLElement
-  oldIndex: number
   newIndex: number
 }
 
 const props = defineProps<{ title: string; issues: Issue[] }>()
-const emit = defineEmits<{
-  create: [title: string]
-  add: [data: { id: string; from: string; to: string; oldIndex: number; newIndex: number }]
-  update: [data: { id: string; from: string; oldIndex: number; newIndex: number }]
-}>()
 
 const issuesModel = ref<Issue[]>([])
 const isCreatingNewIssue = ref(false)
 
 const auth = useAuthStore()
 const board = useBoardStore()
+const issues = useIssuesStore()
 const { canEditLabels } = usePermissions()
 
 watchEffect(() => {
@@ -42,31 +29,23 @@ watchEffect(() => {
   }
 })
 
-function handleAdd(event: VueDraggableAddEvent) {
+function handleMove(event: VueDraggableEndEvent) {
   const { id } = event.item.dataset
-  const { column: fromColumn } = event.from.dataset
-  const { column: toColumn } = event.to.dataset
-  if (!id || !toColumn || !fromColumn) {
+  const { column } = event.to.dataset
+  const issue = props.issues.find((issue) => issue.id === id)
+  if (!issue || !column) {
     return
   }
 
-  emit('add', {
-    id,
-    from: fromColumn,
-    to: toColumn,
-    oldIndex: event.oldIndex,
-    newIndex: event.newIndex,
+  void issues.moveIssue({
+    issue,
+    column,
+    index: event.newIndex,
   })
 }
 
-function handleUpdate(event: VueDraggableUpdateEvent) {
-  const { id } = event.item.dataset
-  const { column: fromColumn } = event.from.dataset
-  if (!id || !fromColumn) {
-    return
-  }
-
-  emit('update', { id, from: fromColumn, oldIndex: event.oldIndex, newIndex: event.newIndex })
+function handleCreate(title: string) {
+  void issues.createIssue({ title, column: props.title })
 }
 
 const columnIcon = computed(() => {
@@ -87,6 +66,9 @@ const columnIcon = computed(() => {
 })
 
 const canBeDeleted = computed(() => props.issues.length === 0)
+const isDraggingDisabled = computed(
+  () => !auth.isAuthenticated || !canEditLabels || issues.isLoading,
+)
 </script>
 
 <template>
@@ -129,10 +111,9 @@ const canBeDeleted = computed(() => props.issues.length === 0)
       :animation="150"
       group="issues"
       :data-column="title"
-      :disabled="!auth.isAuthenticated || !canEditLabels"
+      :disabled="isDraggingDisabled"
       filter="[data-status='closed']"
-      @add="handleAdd($event)"
-      @update="handleUpdate($event)"
+      @end="handleMove($event)"
     >
       <li
         v-for="issue in issuesModel"
@@ -140,15 +121,14 @@ const canBeDeleted = computed(() => props.issues.length === 0)
         :data-id="issue.id"
         :data-status="issue.state.status"
         :class="{
-          'hover:cursor-grab':
-            auth.isAuthenticated && canEditLabels && issue.state.status === 'open',
+          'hover:cursor-grab': !isDraggingDisabled && issue.state.status === 'open',
         }"
       >
         <ColumnIssueCard v-bind="issue" />
       </li>
       <NewColumnIssueCard
         v-if="isCreatingNewIssue"
-        @submit="($event) => emit('create', $event)"
+        @submit="handleCreate"
         @close="isCreatingNewIssue = false"
       />
     </VueDraggable>
