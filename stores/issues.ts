@@ -41,7 +41,7 @@ export const useIssuesStore = defineStore('issues', () => {
   )
 
   const isLoading = computed(
-    () => areIssuesPending || isMovingIssue.value || isCreatingIssue.value,
+    () => areIssuesPending.value || isMovingIssue.value || isCreatingIssue.value,
   )
 
   const issuesByColumn = computed(() => {
@@ -226,10 +226,10 @@ export const useIssuesStore = defineStore('issues', () => {
 
   const store = {
     issuesByColumn,
-    isLoading: isLoading.value,
+    isLoading,
     moveIssue,
     createIssue,
-    isResettingPriority: isResettingPriority.value,
+    isResettingPriority,
     resetPriority,
   }
 

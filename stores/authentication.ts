@@ -12,7 +12,7 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   useRadicleInterfaceMessage('set-auth-token', (message) => {
-    if (message.authToken && !isDebugging.value) {
+    if (message.authToken && !(isDebugging.value && debuggingAuthToken.value)) {
       token.value = message.authToken
     }
   })
