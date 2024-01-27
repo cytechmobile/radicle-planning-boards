@@ -16,6 +16,13 @@ export default defineNuxtConfig({
   ],
   experimental: { typedPages: true },
   devtools: { enabled: true },
+  app: {
+    head: {
+      bodyAttrs: {
+        class: 'overflow-y-hidden',
+      },
+    },
+  },
   security: {
     headers: {
       contentSecurityPolicy: {
