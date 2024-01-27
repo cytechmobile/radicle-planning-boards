@@ -20,6 +20,16 @@ export const useBoardStore = defineStore('board', () => {
     state.value.columns = [...new Set([...state.value.columns, ...parsedColumns])]
   }
 
+  function moveColumn({ name, newIndex }: { name: string; newIndex: number }) {
+    const oldIndex = state.value.columns.indexOf(name)
+    if (oldIndex === -1) {
+      return
+    }
+
+    state.value.columns.splice(oldIndex, 1)
+    state.value.columns.splice(newIndex, 0, name)
+  }
+
   function addColumn(column: string) {
     if (state.value.columns.includes(column)) {
       return
@@ -50,6 +60,7 @@ export const useBoardStore = defineStore('board', () => {
   const store = {
     columns,
     mergeColumns,
+    moveColumn,
     addColumn,
     removeColumn,
     importState,
