@@ -75,7 +75,10 @@ const isDraggingDisabled = computed(
   <div
     class="flex min-w-[350px] max-w-[350px] flex-1 flex-col rounded border border-rad-border-hint bg-rad-background-dip"
   >
-    <div class="flex items-center justify-between gap-2 p-2">
+    <div
+      class="flex items-center justify-between gap-2 p-2 hover:cursor-grab"
+      data-column-handle
+    >
       <div class="flex items-baseline gap-2">
         <Icon :name="columnIcon.name" size="20" :class="`translate-y-1 ${columnIcon.class}`" />
         <h3 class="font-semibold">{{ title }}</h3>
