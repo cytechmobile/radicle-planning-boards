@@ -11,7 +11,7 @@ jobs:
     - name: Install Dependencies
       run: |
         npm install @commitlint/config-conventional
-        echo "module.exports = {extends: ['@commitlint/config-conventional'], rules: {}};" > commitlint.config.js
+        echo "module.exports = {extends: ['@commitlint/config-conventional'], rules: {}};" > commitlint.config.cjs
     - name: Lint the PR Title
       run: |
         echo "${PR_TITLE}" | npx --yes commitlint
