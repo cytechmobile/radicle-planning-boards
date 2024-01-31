@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { VueDraggable } from 'vue-draggable-plus'
+import type { VueDraggableEvent } from '~/types/vue-draggable-plus'
 
 const auth = useAuthStore()
 const issues = useIssuesStore()
@@ -13,7 +14,7 @@ watchEffect(() => {
   }
 })
 
-function handleUpdate({ oldIndex, newIndex }: { oldIndex: number; newIndex: number }) {
+function handleMoveColumn({ oldIndex, newIndex }: VueDraggableEvent) {
   const column = board.columns[oldIndex]
   if (!column) {
     return
@@ -38,7 +39,7 @@ function handleUpdate({ oldIndex, newIndex }: { oldIndex: number; newIndex: numb
       group="columns"
       :animation="300"
       handle="[data-column-handle]"
-      @update="handleUpdate"
+      @update="handleMoveColumn"
     >
       <Column
         v-for="column in columnsModel"
