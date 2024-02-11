@@ -35,7 +35,6 @@ function handleMoveColumn({ oldIndex, newIndex }: VueDraggableEvent) {
     <VueDraggable
       v-model="columnsModel"
       class="flex gap-4"
-      drag-class="opacity-0"
       group="columns"
       :animation="300"
       handle="[data-column-handle]"
