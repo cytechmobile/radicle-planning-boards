@@ -39,7 +39,7 @@ async function handleImport() {
 </script>
 
 <template>
-  <header class="flex gap-4">
+  <header class="flex gap-4 px-4">
     <UTooltip text="Copy board state to clipboard">
       <UButton
         :icon="isExportSuccess ? 'i-heroicons-check' : 'i-heroicons-square-2-stack'"
