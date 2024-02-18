@@ -5,15 +5,10 @@ const issues = useIssuesStore()
 const columns = computed(() =>
   issues.issuesByColumn ? Object.keys(issues.issuesByColumn) : null,
 )
-const isInIFrame = globalThis.window !== globalThis.window.parent
 </script>
 
 <template>
-  <div
-    v-if="columns"
-    class="flex flex-1 gap-4 overflow-x-auto"
-    :class="{ 'px-2 py-6': !isInIFrame }"
-  >
+  <div v-if="columns" class="flex flex-1 gap-4 overflow-x-auto px-4 pb-4">
     <Column
       v-for="column in columns"
       :key="column"
