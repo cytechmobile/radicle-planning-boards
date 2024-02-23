@@ -3,6 +3,9 @@ import { radicleInterfaceOrigin } from './constants/config'
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   ssr: false,
+  devServer: {
+    port: 4000,
+  },
   modules: [
     'nuxt-security',
     '@pinia/nuxt',
