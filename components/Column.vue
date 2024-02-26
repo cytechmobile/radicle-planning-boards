@@ -2,12 +2,7 @@
 import { VueDraggable } from 'vue-draggable-plus'
 import type { Issue } from '../types/issues'
 import { requiredColumns } from '~/constants/columns'
-
-interface VueDraggableEndEvent {
-  item: HTMLElement
-  to: HTMLElement
-  newIndex: number
-}
+import type { VueDraggableEvent } from '~/types/vue-draggable-plus'
 
 const props = defineProps<{ title: string; issues: Issue[] }>()
 
@@ -29,7 +24,7 @@ watchEffect(() => {
   }
 })
 
-function handleMove(event: VueDraggableEndEvent) {
+function handleMoveIssue(event: VueDraggableEvent) {
   const { id } = event.item.dataset
   const { column } = event.to.dataset
   const issue = props.issues.find((issue) => issue.id === id)
@@ -75,7 +70,10 @@ const isDraggingDisabled = computed(
   <div
     class="flex min-w-[350px] max-w-[350px] flex-1 flex-col rounded border border-rad-border-hint bg-rad-background-dip"
   >
-    <div class="flex items-center justify-between gap-2 p-2">
+    <div
+      class="flex items-center justify-between gap-2 p-2 hover:cursor-grab"
+      data-column-handle
+    >
       <div class="flex items-baseline gap-2">
         <Icon :name="columnIcon.name" size="20" :class="`translate-y-1 ${columnIcon.class}`" />
         <h3 class="font-semibold">{{ title }}</h3>
@@ -113,7 +111,7 @@ const isDraggingDisabled = computed(
       :data-column="title"
       :disabled="isDraggingDisabled"
       filter="[data-status='closed']"
-      @end="handleMove($event)"
+      @end="handleMoveIssue($event)"
     >
       <li
         v-for="issue in issuesModel"

@@ -1,20 +1,52 @@
 <script setup lang="ts">
+import { VueDraggable } from 'vue-draggable-plus'
+import type { VueDraggableEvent } from '~/types/vue-draggable-plus'
+
 const auth = useAuthStore()
 const issues = useIssuesStore()
+const board = useBoardStore()
 
-const columns = computed(() =>
-  issues.issuesByColumn ? Object.keys(issues.issuesByColumn) : null,
-)
+const columnsModel = ref<string[]>([...board.columns])
+
+watchEffect(() => {
+  if (JSON.stringify(columnsModel.value) !== JSON.stringify(board.columns)) {
+    columnsModel.value = [...board.columns]
+  }
+})
+
+function handleMoveColumn({ oldIndex, newIndex }: VueDraggableEvent) {
+  const column = board.columns[oldIndex]
+  if (!column) {
+    return
+  }
+
+  board.moveColumn({
+    name: column,
+    newIndex,
+  })
+}
 </script>
 
 <template>
-  <div v-if="columns" class="flex flex-1 gap-4 overflow-x-auto px-4 pb-4">
-    <Column
-      v-for="column in columns"
-      :key="column"
-      :title="column"
-      :issues="issues.issuesByColumn?.[column] ?? []"
-    />
+  <div
+    v-if="columnsModel"
+    class="flex flex-1 gap-4 overflow-x-auto overflow-y-hidden px-4 pb-4"
+  >
+    <VueDraggable
+      v-model="columnsModel"
+      class="flex gap-4"
+      group="columns"
+      :animation="300"
+      handle="[data-column-handle]"
+      @update="handleMoveColumn"
+    >
+      <Column
+        v-for="column in columnsModel"
+        :key="column"
+        :title="column"
+        :issues="issues.issuesByColumn?.[column] ?? []"
+      />
+    </VueDraggable>
     <NewColumn v-if="auth.isAuthenticated" />
   </div>
 </template>
