@@ -4,6 +4,7 @@ import type { Task } from '~/types/tasks'
 
 export const useTasksStore = defineStore('tasks', () => {
   const { $httpdFetch } = useNuxtApp()
+  const { updateTaskLabels } = useTasksFetch()
   const route = useRoute()
 
   const board = useBoardStore()
@@ -103,29 +104,7 @@ export const useTasksStore = defineStore('tasks', () => {
       for (const [index, task] of tasksWithoutPriority.entries()) {
         const priority = highestPriority + (index + 1) * taskPriorityIncrement
 
-        // TODO: zac extract this into a function
-        switch (task.rpb.kind) {
-          case 'issue':
-            await $httpdFetch(`/projects/{rid}/issues/{issue}`, {
-              path: { rid: route.params.rid, issue: task.id },
-              method: 'PATCH',
-              body: {
-                type: 'label',
-                labels: [...task.labels, createDataLabel('priority', priority)],
-              },
-            })
-            break
-          case 'patch':
-            await $httpdFetch(`/projects/{rid}/patches/{patch}`, {
-              path: { rid: route.params.rid, patch: task.id },
-              method: 'PATCH',
-              body: {
-                type: 'label',
-                labels: [...task.labels, createDataLabel('priority', priority)],
-              },
-            })
-            break
-        }
+        await updateTaskLabels(task, [...task.labels, createDataLabel('priority', priority)])
       }
     }
 
@@ -178,60 +157,13 @@ export const useTasksStore = defineStore('tasks', () => {
 
     isMovingTask.value = true
 
-    // TODO: extract this into a function
-    switch (task.rpb.kind) {
-      case 'issue':
-        await $httpdFetch('/projects/{rid}/issues/{issue}', {
-          path: { rid: route.params.rid, issue: task.id },
-          method: 'PATCH',
-          body: {
-            type: 'label',
-            labels: createUpdatedTaskLabels(task, {
-              column,
-              priority: currentTaskUpdate.priority,
-            }),
-          },
-        })
-        break
-      case 'patch':
-        await $httpdFetch('/projects/{rid}/patches/{patch}', {
-          path: { rid: route.params.rid, patch: task.id },
-          method: 'PATCH',
-          body: {
-            type: 'label',
-            labels: createUpdatedTaskLabels(task, {
-              column,
-              priority: currentTaskUpdate.priority,
-            }),
-          },
-        })
-        break
-    }
+    await updateTaskLabels(
+      task,
+      createUpdatedTaskLabels(task, { column, priority: currentTaskUpdate.priority }),
+    )
 
     for (const { task, priority } of otherTaskUpdates) {
-      // TODO: extract this into a function
-      switch (task.rpb.kind) {
-        case 'issue':
-          await $httpdFetch('/projects/{rid}/issues/{issue}', {
-            path: { rid: route.params.rid, issue: task.id },
-            method: 'PATCH',
-            body: {
-              type: 'label',
-              labels: createUpdatedTaskLabels(task, { priority }),
-            },
-          })
-          break
-        case 'patch':
-          await $httpdFetch('/projects/{rid}/patches/{patch}', {
-            path: { rid: route.params.rid, patch: task.id },
-            method: 'PATCH',
-            body: {
-              type: 'label',
-              labels: createUpdatedTaskLabels(task, { priority }),
-            },
-          })
-          break
-      }
+      await updateTaskLabels(task, createUpdatedTaskLabels(task, { priority }))
     }
 
     // TODO: check which needs to be refreshed and refresh only that one
