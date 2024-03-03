@@ -1,21 +1,21 @@
 <script setup lang="ts">
 import { VueDraggable } from 'vue-draggable-plus'
-import type { Issue } from '../types/issues'
+import type { Task } from '../types/tasks'
 import { requiredColumns } from '~/constants/columns'
 import type { VueDraggableEvent } from '~/types/vue-draggable-plus'
 
-const props = defineProps<{ title: string; issues: Issue[] }>()
+const props = defineProps<{ title: string; tasks: Task[] }>()
 
-const issuesModel = ref<Issue[]>([])
+const tasksModel = ref<Task[]>([])
 const isCreatingNewIssue = ref(false)
 
 const auth = useAuthStore()
 const board = useBoardStore()
-const issues = useIssuesStore()
+const tasks = useTasksStore()
 const { canEditLabels } = usePermissions()
 
 watchEffect(() => {
-  issuesModel.value = [...unref(props.issues)] // "clone" issues prop
+  tasksModel.value = [...unref(props.tasks)] // "clone" tasks prop
 })
 
 watchEffect(() => {
@@ -27,20 +27,20 @@ watchEffect(() => {
 function handleMoveIssue(event: VueDraggableEvent) {
   const { id } = event.item.dataset
   const { column } = event.to.dataset
-  const issue = props.issues.find((issue) => issue.id === id)
+  const issue = props.tasks.find((issue) => issue.id === id)
   if (!issue || !column) {
     return
   }
 
-  void issues.moveIssue({
-    issue,
+  void tasks.moveTask({
+    task: issue,
     column,
     index: event.newIndex,
   })
 }
 
 function handleCreate(title: string) {
-  void issues.createIssue({ title, column: props.title })
+  void tasks.createIssue({ title, column: props.title })
 }
 
 const columnIcon = computed(() => {
@@ -60,9 +60,9 @@ const columnIcon = computed(() => {
   return defaultIcon
 })
 
-const canBeDeleted = computed(() => props.issues.length === 0)
+const canBeDeleted = computed(() => props.tasks.length === 0)
 const isDraggingDisabled = computed(
-  () => !auth.isAuthenticated || !canEditLabels || issues.isLoading,
+  () => !auth.isAuthenticated || !canEditLabels || tasks.isLoading,
 )
 </script>
 
@@ -79,7 +79,7 @@ const isDraggingDisabled = computed(
         <h3 class="font-semibold">{{ title }}</h3>
 
         <small class="text-rad-foreground-gray text-sm font-semibold">
-          {{ issuesModel.length }}
+          {{ tasksModel.length }}
         </small>
       </div>
 
@@ -102,7 +102,7 @@ const isDraggingDisabled = computed(
     </div>
 
     <VueDraggable
-      v-model="issuesModel"
+      v-model="tasksModel"
       tag="ul"
       class="flex flex-1 flex-col gap-2 overflow-y-auto overflow-x-hidden p-2"
       ghost-class="opacity-50"
@@ -114,7 +114,7 @@ const isDraggingDisabled = computed(
       @end="handleMoveIssue($event)"
     >
       <li
-        v-for="issue in issuesModel"
+        v-for="issue in tasksModel"
         :key="issue.id"
         :data-id="issue.id"
         :data-status="issue.state.status"
@@ -122,7 +122,7 @@ const isDraggingDisabled = computed(
           'hover:cursor-grab': !isDraggingDisabled && issue.state.status === 'open',
         }"
       >
-        <ColumnIssueCard v-bind="issue" />
+        <ColumnTaskCard v-bind="issue" />
       </li>
       <NewColumnIssueCard
         v-if="isCreatingNewIssue"
@@ -131,4 +131,4 @@ const isDraggingDisabled = computed(
       />
     </VueDraggable>
   </div>
-</template>
+</template>../types/tasks

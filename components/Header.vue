@@ -1,6 +1,6 @@
 <script setup lang="ts">
 const board = useBoardStore()
-const issues = useIssuesStore()
+const tasks = useTasksStore()
 const isDebugging = useIsDebugging()
 
 const { isPending: isExportSuccess, start: showExportSuccess } = useTimeout(800, {
@@ -60,9 +60,9 @@ async function handleImport() {
     </UTooltip>
     <UTooltip v-if="isDebugging" text="Reset card order. All changes will be lost!">
       <UButton
-        :icon="issues.isResettingPriority ? 'i-heroicons-arrow-path' : undefined"
-        :disabled="issues.isLoading || issues.isResettingPriority"
-        @click="issues.resetPriority"
+        :icon="tasks.isResettingPriority ? 'i-heroicons-arrow-path' : undefined"
+        :disabled="tasks.isLoading || tasks.isResettingPriority"
+        @click="tasks.resetPriority"
       >
         Reset Order
       </UButton>

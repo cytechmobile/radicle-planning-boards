@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import type { Issue } from '~/types/issues'
+import type { Task } from '~/types/tasks'
 
 interface Props {
-  id: Issue['id']
-  title: Issue['title']
-  labels: Issue['labels']
-  state: Issue['state']
+  id: Task['id']
+  title: Task['title']
+  labels: Task['labels']
+  state: Task['state']
 }
 
 const props = defineProps<Props>()
@@ -38,7 +38,9 @@ const statusToIconMap = {
     <small class="flex items-center gap-2">
       <span class="sr-only">{{ state.status }}</span>
       <UTooltip :text="state.status" :popper="{ placement: 'top' }">
+        <!-- TODO: zac remove v-if once card is updated for patches -->
         <Icon
+          v-if="state.status === 'open' || state.status === 'closed'"
           :name="statusToIconMap[state.status].name"
           size="16"
           :class="statusToIconMap[state.status].class"

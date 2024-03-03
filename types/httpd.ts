@@ -7,3 +7,5 @@ export type RadicleIssue = DeepRequired<httpdApiComponents['schemas']['Issue']> 
     status: 'open' | 'closed'
   }
 }
+
+export type RadiclePatch = DeepRequired<httpdApiComponents['schemas']['Patch']>

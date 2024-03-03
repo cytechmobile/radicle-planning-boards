@@ -26,7 +26,8 @@
     "messages",
     "auth",
     "config",
-    "readme"
+    "readme",
+    "tasks"
   ],
   "conventionalCommits.gitmoji": false,
 

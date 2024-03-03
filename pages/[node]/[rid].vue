@@ -3,7 +3,7 @@ import { VueDraggable } from 'vue-draggable-plus'
 import type { VueDraggableEvent } from '~/types/vue-draggable-plus'
 
 const auth = useAuthStore()
-const issues = useIssuesStore()
+const tasks = useTasksStore()
 const board = useBoardStore()
 
 const columnsModel = ref<string[]>([...board.columns])
@@ -44,7 +44,7 @@ function handleMoveColumn({ oldIndex, newIndex }: VueDraggableEvent) {
         v-for="column in columnsModel"
         :key="column"
         :title="column"
-        :issues="issues.issuesByColumn?.[column] ?? []"
+        :tasks="tasks.tasksByColumn?.[column] ?? []"
       />
     </VueDraggable>
     <NewColumn v-if="auth.isAuthenticated" />

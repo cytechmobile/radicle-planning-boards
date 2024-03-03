@@ -1,1 +1,1 @@
-export const radicleInterfaceOrigin = 'https://guileless-puppy-2d91b5.netlify.app'
+export const radicleInterfaceOrigin = 'http://localhost:3000'
