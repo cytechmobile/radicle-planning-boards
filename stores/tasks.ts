@@ -89,6 +89,8 @@ export const useTasksStore = defineStore('tasks', () => {
       return
     }
 
+    const refreshPromises: Promise<unknown>[] = []
+
     for (const tasks of Object.values(tasksByColumn.value)) {
       const tasksWithoutPriority: Task[] = []
       let highestPriority = 0
@@ -96,6 +98,12 @@ export const useTasksStore = defineStore('tasks', () => {
       for (const task of tasks) {
         if (task.rpb.priority === null) {
           tasksWithoutPriority.push(task)
+
+          if (task.rpb.kind === 'issue') {
+            refreshPromises.push(refreshIssues())
+          } else if (task.rpb.kind === 'patch') {
+            refreshPromises.push(refreshPatches())
+          }
         } else if (task.rpb.priority > highestPriority) {
           highestPriority = task.rpb.priority
         }
@@ -108,9 +116,7 @@ export const useTasksStore = defineStore('tasks', () => {
       }
     }
 
-    // TODO: zac check which needs to be refreshed and refresh only that one
-    await refreshIssues()
-    await refreshPatches()
+    await Promise.all(refreshPromises)
   }
 
   watch(
@@ -145,30 +151,35 @@ export const useTasksStore = defineStore('tasks', () => {
       return
     }
 
-    const [currentTaskUpdate, ...otherTaskUpdates] = calculatePriorityUpdates({
+    const priorityUpdates = calculatePriorityUpdates({
       tasks: columnTasks,
       task,
       index,
     })
 
-    if (!currentTaskUpdate) {
+    if (priorityUpdates.length === 0) {
       return
     }
 
     isMovingTask.value = true
 
-    await updateTaskLabels(
-      task,
-      createUpdatedTaskLabels(task, { column, priority: currentTaskUpdate.priority }),
-    )
+    const refreshPromises: Promise<unknown>[] = []
 
-    for (const { task, priority } of otherTaskUpdates) {
-      await updateTaskLabels(task, createUpdatedTaskLabels(task, { priority }))
+    for (const [index, { task, priority }] of priorityUpdates.entries()) {
+      await updateTaskLabels(
+        task,
+        // Only update column on the task being moved (index === 0)
+        createUpdatedTaskLabels(task, { priority, column: index === 0 ? column : undefined }),
+      )
+
+      if (task.rpb.kind === 'issue') {
+        refreshPromises.push(refreshIssues())
+      } else if (task.rpb.kind === 'patch') {
+        refreshPromises.push(refreshPatches())
+      }
     }
 
-    // TODO: check which needs to be refreshed and refresh only that one
-    await refreshIssues()
-    await refreshPatches()
+    await Promise.all(refreshPromises)
 
     isMovingTask.value = false
   }
