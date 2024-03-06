@@ -107,7 +107,7 @@ const isDraggingDisabled = computed(
       class="flex flex-1 flex-col gap-2 overflow-y-auto overflow-x-hidden p-2"
       ghost-class="opacity-50"
       :animation="150"
-      group="issues"
+      group="tasks"
       :data-column="title"
       :disabled="isDraggingDisabled"
       filter="[data-status='closed']"
