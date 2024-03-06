@@ -200,7 +200,7 @@ export const useTasksStore = defineStore('tasks', () => {
   }
 
   async function resetPriority() {
-    if (!issues.value) {
+    if (!issues.value || !patches.value) {
       return
     }
 
@@ -208,22 +208,19 @@ export const useTasksStore = defineStore('tasks', () => {
 
     const partialPriorityLabel = createPartialDataLabel('priority')
 
-    for (const issue of issues.value) {
-      const newLabels = issue.labels.filter((label) => !label.startsWith(partialPriorityLabel))
+    const tasks = [...issues.value, ...patches.value]
 
-      if (newLabels.length !== issue.labels.length) {
-        await $httpdFetch(`/projects/{rid}/issues/{issue}`, {
-          path: { rid: route.params.rid, issue: issue.id },
-          method: 'PATCH',
-          body: {
-            type: 'label',
-            labels: newLabels,
-          },
-        })
+    for (const task of tasks) {
+      const priorityLabelIndex = task.labels.findIndex((label) =>
+        label.startsWith(partialPriorityLabel),
+      )
+
+      if (priorityLabelIndex !== -1) {
+        await updateTaskLabels(task, task.labels.toSpliced(priorityLabelIndex, 1))
       }
     }
 
-    await refreshIssues()
+    await Promise.all([refreshIssues(), refreshPatches()])
     await initializePriority()
 
     isResettingPriority.value = false
