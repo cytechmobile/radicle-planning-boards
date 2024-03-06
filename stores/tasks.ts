@@ -89,7 +89,8 @@ export const useTasksStore = defineStore('tasks', () => {
       return
     }
 
-    const refreshPromises: Promise<unknown>[] = []
+    let shouldRefreshIssues = false
+    let shouldRefreshPatches = false
 
     for (const tasks of Object.values(tasksByColumn.value)) {
       const tasksWithoutPriority: Task[] = []
@@ -100,9 +101,9 @@ export const useTasksStore = defineStore('tasks', () => {
           tasksWithoutPriority.push(task)
 
           if (task.rpb.kind === 'issue') {
-            refreshPromises.push(refreshIssues())
+            shouldRefreshIssues = true
           } else if (task.rpb.kind === 'patch') {
-            refreshPromises.push(refreshPatches())
+            shouldRefreshPatches = true
           }
         } else if (task.rpb.priority > highestPriority) {
           highestPriority = task.rpb.priority
@@ -116,7 +117,10 @@ export const useTasksStore = defineStore('tasks', () => {
       }
     }
 
-    await Promise.all(refreshPromises)
+    await Promise.all([
+      shouldRefreshIssues ? refreshIssues() : undefined,
+      shouldRefreshPatches ? refreshPatches() : undefined,
+    ])
   }
 
   watch(
@@ -163,7 +167,8 @@ export const useTasksStore = defineStore('tasks', () => {
 
     isMovingTask.value = true
 
-    const refreshPromises: Promise<unknown>[] = []
+    let shouldRefreshIssues = false
+    let shouldRefreshPatches = false
 
     for (const [index, { task, priority }] of priorityUpdates.entries()) {
       await updateTaskLabels(
@@ -173,13 +178,16 @@ export const useTasksStore = defineStore('tasks', () => {
       )
 
       if (task.rpb.kind === 'issue') {
-        refreshPromises.push(refreshIssues())
+        shouldRefreshIssues = true
       } else if (task.rpb.kind === 'patch') {
-        refreshPromises.push(refreshPatches())
+        shouldRefreshPatches = true
       }
     }
 
-    await Promise.all(refreshPromises)
+    await Promise.all([
+      shouldRefreshIssues ? refreshIssues() : undefined,
+      shouldRefreshPatches ? refreshPatches() : undefined,
+    ])
 
     isMovingTask.value = false
   }
