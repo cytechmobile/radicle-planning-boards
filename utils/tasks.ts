@@ -1,5 +1,5 @@
 import { initialColumns } from '~/constants/columns'
-import { taskPriorityIncrement } from '~/constants/tasks'
+import { doneTaskStatuses, taskPriorityIncrement } from '~/constants/tasks'
 import type { RadicleIssue, RadiclePatch } from '~/types/httpd'
 import type { Issue, Patch, RadicleTask, Task, TaskProperties } from '~/types/tasks'
 
@@ -12,6 +12,10 @@ export function isIssue(task: Task): task is Issue {
 
 export function isPatch(task: Task): task is Patch {
   return task.rpb.kind === 'patch'
+}
+
+export function isTaskDone(task: Task): boolean {
+  return doneTaskStatuses.includes(task.state.status)
 }
 
 function getTaskProperties(radicleTask: RadicleTask): TaskProperties {
@@ -76,7 +80,7 @@ export function groupTasksByColumn({
   )
 
   const tasksByColumn = tasks.reduce<Record<string, Task[]>>((tasksByColumn, task) => {
-    if (task.state.status === 'closed') {
+    if (isTaskDone(task)) {
       initializeArrayForKey(tasksByColumn, 'done').push(task)
     } else {
       initializeArrayForKey(tasksByColumn, task.rpb.column).push(task)

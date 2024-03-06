@@ -3,6 +3,7 @@ import { VueDraggable } from 'vue-draggable-plus'
 import type { Task } from '../types/tasks'
 import { requiredColumns } from '~/constants/columns'
 import type { VueDraggableEvent } from '~/types/vue-draggable-plus'
+import { doneTaskStatuses } from '~/constants/tasks'
 
 const props = defineProps<{ title: string; tasks: Task[] }>()
 
@@ -64,6 +65,9 @@ const canBeDeleted = computed(() => props.tasks.length === 0)
 const isDraggingDisabled = computed(
   () => !auth.isAuthenticated || !canEditLabels || tasks.isLoading,
 )
+const doneTasksFilter = doneTaskStatuses
+  .map((status) => `[data-status='${status}']`)
+  .join(', ')
 </script>
 
 <template>
@@ -110,7 +114,7 @@ const isDraggingDisabled = computed(
       group="tasks"
       :data-column="title"
       :disabled="isDraggingDisabled"
-      filter="[data-status='closed']"
+      :filter="doneTasksFilter"
       @end="handleMoveTask($event)"
     >
       <li
@@ -120,7 +124,7 @@ const isDraggingDisabled = computed(
         :data-kind="task.rpb.kind"
         :data-status="task.state.status"
         :class="{
-          'hover:cursor-grab': !isDraggingDisabled && task.state.status === 'open',
+          'hover:cursor-grab': !isDraggingDisabled && !isTaskDone(task),
         }"
       >
         <ColumnIssueCard v-if="isIssue(task)" :issue="task" />
