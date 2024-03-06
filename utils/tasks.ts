@@ -6,6 +6,14 @@ import type { Issue, Patch, RadicleTask, Task, TaskProperties } from '~/types/ta
 const partialColumnDataLabel = createPartialDataLabel('column')
 const partialPriorityDataLabel = createPartialDataLabel('priority')
 
+export function isIssue(task: Task): task is Issue {
+  return task.rpb.kind === 'issue'
+}
+
+export function isPatch(task: Task): task is Patch {
+  return task.rpb.kind === 'patch'
+}
+
 function getTaskProperties(radicleTask: RadicleTask): TaskProperties {
   let column = 'non-planned'
   let priority: number | null = null

@@ -24,22 +24,22 @@ watchEffect(() => {
   }
 })
 
-function handleMoveIssue(event: VueDraggableEvent) {
-  const { id } = event.item.dataset
+function handleMoveTask(event: VueDraggableEvent) {
+  const { id, kind } = event.item.dataset
   const { column } = event.to.dataset
-  const issue = props.tasks.find((issue) => issue.id === id)
-  if (!issue || !column) {
+  const task = props.tasks.find((task) => task.rpb.kind === kind && task.id === id)
+  if (!task || !column) {
     return
   }
 
   void tasks.moveTask({
-    task: issue,
+    task,
     column,
     index: event.newIndex,
   })
 }
 
-function handleCreate(title: string) {
+function handleCreateIssue(title: string) {
   void tasks.createIssue({ title, column: props.title })
 }
 
@@ -111,24 +111,26 @@ const isDraggingDisabled = computed(
       :data-column="title"
       :disabled="isDraggingDisabled"
       filter="[data-status='closed']"
-      @end="handleMoveIssue($event)"
+      @end="handleMoveTask($event)"
     >
       <li
-        v-for="issue in tasksModel"
-        :key="issue.id"
-        :data-id="issue.id"
-        :data-status="issue.state.status"
+        v-for="task in tasksModel"
+        :key="`${task.rpb.kind}-${task.id}`"
+        :data-id="task.id"
+        :data-kind="task.rpb.kind"
+        :data-status="task.state.status"
         :class="{
-          'hover:cursor-grab': !isDraggingDisabled && issue.state.status === 'open',
+          'hover:cursor-grab': !isDraggingDisabled && task.state.status === 'open',
         }"
       >
-        <ColumnTaskCard v-bind="issue" />
+        <ColumnIssueCard v-if="isIssue(task)" :issue="task" />
+        <ColumnPatchCard v-else-if="isPatch(task)" :patch="task" />
       </li>
       <NewColumnIssueCard
         v-if="isCreatingNewIssue"
-        @submit="handleCreate"
+        @submit="handleCreateIssue"
         @close="isCreatingNewIssue = false"
       />
     </VueDraggable>
   </div>
-</template>../types/tasks
+</template>

@@ -8,4 +8,8 @@ export type RadicleIssue = DeepRequired<httpdApiComponents['schemas']['Issue']> 
   }
 }
 
-export type RadiclePatch = DeepRequired<httpdApiComponents['schemas']['Patch']>
+export type RadiclePatch = DeepRequired<httpdApiComponents['schemas']['Patch']> & {
+  state: {
+    status: 'draft' | 'open' | 'archived' | 'merged'
+  }
+}
