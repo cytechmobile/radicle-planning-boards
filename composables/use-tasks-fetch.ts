@@ -1,8 +1,56 @@
+import type { RadicleIssue, RadiclePatch } from '~/types/httpd'
 import type { Task } from '~/types/tasks'
 
 export function useTasksFetch() {
   const { $httpdFetch } = useNuxtApp()
   const route = useRoute()
+
+  async function fetchIssues() {
+    const issueStatuses = ['open', 'closed'] satisfies RadicleIssue['state']['status'][]
+
+    const radicleIssuesByStatus = await Promise.all(
+      issueStatuses.map(
+        async (status) =>
+          await $httpdFetch('/projects/{rid}/issues', {
+            path: {
+              rid: route.params.rid,
+            },
+            // @ts-expect-error - wrong type definition
+            query: { perPage: 1000, state: status },
+          }),
+      ),
+    )
+
+    const radicleIssues = radicleIssuesByStatus.flat()
+
+    return radicleIssues as RadicleIssue[]
+  }
+
+  async function fetchPatches() {
+    const patchStatuses = [
+      'draft',
+      'open',
+      'archived',
+      'merged',
+    ] satisfies RadiclePatch['state']['status'][]
+
+    const radiclePatchesByStatus = await Promise.all(
+      patchStatuses.map(
+        async (status) =>
+          await $httpdFetch('/projects/{rid}/patches', {
+            path: {
+              rid: route.params.rid,
+            },
+            // @ts-expect-error - wrong type definition
+            query: { perPage: 1000, state: status },
+          }),
+      ),
+    )
+
+    const radiclePatches = radiclePatchesByStatus.flat()
+
+    return radiclePatches as RadiclePatch[]
+  }
 
   async function updateTaskLabels(task: Task, labels: string[]) {
     switch (task.rpb.kind) {
@@ -30,6 +78,8 @@ export function useTasksFetch() {
   }
 
   return {
+    fetchIssues,
+    fetchPatches,
     updateTaskLabels,
   }
 }

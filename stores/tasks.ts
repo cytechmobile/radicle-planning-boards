@@ -1,10 +1,9 @@
 import { taskPriorityIncrement } from '~/constants/tasks'
-import type { RadicleIssue, RadiclePatch } from '~/types/httpd'
 import type { Task } from '~/types/tasks'
 
 export const useTasksStore = defineStore('tasks', () => {
   const { $httpdFetch } = useNuxtApp()
-  const { updateTaskLabels } = useTasksFetch()
+  const { fetchIssues, fetchPatches, updateTaskLabels } = useTasksFetch()
   const route = useRoute()
 
   const board = useBoardStore()
@@ -17,49 +16,17 @@ export const useTasksStore = defineStore('tasks', () => {
     data: issues,
     pending: areIssuesPending,
     refresh: refreshIssues,
-  } = useAsyncData(
-    'all-issues',
-    async () => {
-      function createFetchIssuesOptions(state: 'open' | 'closed') {
-        return {
-          path: {
-            rid: route.params.rid,
-          },
-          query: { perPage: 1000, state },
-        }
-      }
-
-      const [openRadicleIssues, closedRadicleIssues] = await Promise.all([
-        $httpdFetch('/projects/{rid}/issues', createFetchIssuesOptions('open')),
-        $httpdFetch('/projects/{rid}/issues', createFetchIssuesOptions('closed')),
-      ])
-
-      return [...openRadicleIssues, ...closedRadicleIssues] as RadicleIssue[]
-    },
-    {
-      transform: (radicleIssues) => radicleIssues.map(transformRadicleIssueToIssue),
-    },
-  )
+  } = useAsyncData('issues', fetchIssues, {
+    transform: (radicleIssues) => radicleIssues.map(transformRadicleIssueToIssue),
+  })
 
   const {
     data: patches,
     pending: arePatchesPending,
     refresh: refreshPatches,
-  } = useAsyncData(
-    'patches',
-    async () => {
-      const radiclePatches = await $httpdFetch('/projects/{rid}/patches', {
-        path: {
-          rid: route.params.rid,
-        },
-      })
-
-      return radiclePatches as RadiclePatch[]
-    },
-    {
-      transform: (radiclePatches) => radiclePatches.map(transformRadiclePatchToPatch),
-    },
-  )
+  } = useAsyncData('patches', fetchPatches, {
+    transform: (radiclePatches) => radiclePatches.map(transformRadiclePatchToPatch),
+  })
 
   const isLoading = computed(
     () =>
