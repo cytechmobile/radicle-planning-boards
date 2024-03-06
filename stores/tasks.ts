@@ -6,6 +6,7 @@ export const useTasksStore = defineStore('tasks', () => {
   const { fetchIssues, fetchPatches, updateTaskLabels } = useTasksFetch()
   const route = useRoute()
 
+  const permissions = usePermissions()
   const board = useBoardStore()
 
   const isMovingTask = ref(false)
@@ -91,11 +92,10 @@ export const useTasksStore = defineStore('tasks', () => {
   }
 
   watch(
-    () => [issues.value, patches.value],
-    ([newIssues, newPatches], [oldIssues, oldPatches]) => {
-      // TODO: check if user has write access
-      // Only initialize tasks on first fetch
-      if ((newIssues && !oldIssues) || (newPatches && !oldPatches)) {
+    () => [permissions.canEditLabels, issues.value, patches.value],
+    ([canEditLabels, newIssues, newPatches], [_, oldIssues, oldPatches]) => {
+      // Only initialize task priority on first fetch
+      if (canEditLabels && newIssues && newPatches && (!oldIssues || !oldPatches)) {
         initializePriority()
       }
     },
