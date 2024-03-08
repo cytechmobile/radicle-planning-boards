@@ -3,13 +3,13 @@ import type { Task } from '~/types/tasks'
 
 export const useTasksStore = defineStore('tasks', () => {
   const { $httpdFetch } = useNuxtApp()
-  const { fetchIssues, fetchPatches, updateTaskLabels } = useTasksFetch()
+  const { fetchIssue, fetchPatch, fetchIssues, fetchPatches, updateTaskLabels } =
+    useTasksFetch()
   const route = useRoute()
 
   const permissions = usePermissions()
   const board = useBoardStore()
 
-  const isMovingTask = ref(false)
   const isCreatingTask = ref(false)
   const isResettingPriority = ref(false)
 
@@ -31,9 +31,8 @@ export const useTasksStore = defineStore('tasks', () => {
 
   const isLoading = computed(
     () =>
-      areIssuesPending.value ||
-      arePatchesPending.value ||
-      isMovingTask.value ||
+      (issues.value === null && areIssuesPending.value) ||
+      (patches.value === null && arePatchesPending.value) ||
       isCreatingTask.value,
   )
 
@@ -108,6 +107,26 @@ export const useTasksStore = defineStore('tasks', () => {
     }
   })
 
+  async function refreshTasks(tasks: Task[]) {
+    await Promise.all(
+      tasks.map(async (task) => {
+        switch (task.rpb.kind) {
+          case 'issue': {
+            const radicleIssue = await fetchIssue(task.id)
+            task = transformRadicleIssueToIssue(radicleIssue)
+            break
+          }
+
+          case 'patch': {
+            const radiclePatch = await fetchPatch(task.id)
+            task = transformRadiclePatchToPatch(radiclePatch)
+            break
+          }
+        }
+      }),
+    )
+  }
+
   async function moveTask({
     task,
     column,
@@ -132,31 +151,25 @@ export const useTasksStore = defineStore('tasks', () => {
       return
     }
 
-    isMovingTask.value = true
-
-    let shouldRefreshIssues = false
-    let shouldRefreshPatches = false
-
-    for (const [index, { task, priority }] of priorityUpdates.entries()) {
-      await updateTaskLabels(
-        task,
+    await Promise.all(
+      priorityUpdates.map(async ({ task, priority }, index) => {
         // Only update column on the task being moved (index === 0)
-        createUpdatedTaskLabels(task, { priority, column: index === 0 ? column : undefined }),
-      )
+        const updatedLabels = createUpdatedTaskLabels(task, {
+          priority,
+          column: index === 0 ? column : undefined,
+        })
 
-      if (task.rpb.kind === 'issue') {
-        shouldRefreshIssues = true
-      } else if (task.rpb.kind === 'patch') {
-        shouldRefreshPatches = true
-      }
-    }
+        task.labels = updatedLabels
+        task.rpb.priority = priority
+        if (index === 0) {
+          task.rpb.column = column
+        }
 
-    await Promise.all([
-      shouldRefreshIssues ? refreshIssues() : undefined,
-      shouldRefreshPatches ? refreshPatches() : undefined,
-    ])
+        await updateTaskLabels(task, updatedLabels)
+      }),
+    )
 
-    isMovingTask.value = false
+    await refreshTasks(priorityUpdates.map(({ task }) => task))
   }
 
   async function createIssue({ title, column }: { title: string; column: string }) {

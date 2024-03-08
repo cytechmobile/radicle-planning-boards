@@ -5,6 +5,14 @@ export function useTasksFetch() {
   const { $httpdFetch } = useNuxtApp()
   const route = useRoute()
 
+  async function fetchIssue(id: string) {
+    const issue = await $httpdFetch('/projects/{rid}/issues/{issue}', {
+      path: { rid: route.params.rid, issue: id },
+    })
+
+    return issue as RadicleIssue
+  }
+
   async function fetchIssues() {
     const issueStatuses = ['open', 'closed'] satisfies RadicleIssue['state']['status'][]
 
@@ -24,6 +32,14 @@ export function useTasksFetch() {
     const radicleIssues = radicleIssuesByStatus.flat()
 
     return radicleIssues as RadicleIssue[]
+  }
+
+  async function fetchPatch(id: string) {
+    const patch = await $httpdFetch('/projects/{rid}/patches/{patch}', {
+      path: { rid: route.params.rid, patch: id },
+    })
+
+    return patch as RadiclePatch
   }
 
   async function fetchPatches() {
@@ -78,7 +94,9 @@ export function useTasksFetch() {
   }
 
   return {
+    fetchIssue,
     fetchIssues,
+    fetchPatch,
     fetchPatches,
     updateTaskLabels,
   }
