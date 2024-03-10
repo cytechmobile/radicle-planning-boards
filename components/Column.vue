@@ -29,7 +29,7 @@ function handleMoveTask(event: VueDraggableEvent) {
   const { id, kind } = event.item.dataset
   const { column } = event.to.dataset
   const task = props.tasks.find((task) => task.rpb.kind === kind && task.id === id)
-  if (!task || !column) {
+  if (!task || !column || (task.rpb.column === column && event.oldIndex === event.newIndex)) {
     return
   }
 
