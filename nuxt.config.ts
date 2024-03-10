@@ -32,6 +32,9 @@ export default defineNuxtConfig({
   },
   security: {
     headers: {
+      // Allow nuxt devtools
+      crossOriginEmbedderPolicy:
+        process.env['NODE_ENV'] === 'development' ? 'unsafe-none' : 'require-corp',
       contentSecurityPolicy: {
         'frame-ancestors': [
           "'self'",
