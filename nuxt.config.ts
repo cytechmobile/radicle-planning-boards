@@ -46,7 +46,7 @@ export default defineNuxtConfig({
     '/': { redirect: '/seed.radicle.xyz:443/rad:z4V1sjrXqjvFdnCUbxPFqd5p4DtH5' },
   },
   openFetch: {
-    disablePlugin: true,
+    disableNuxtPlugin: true,
     clients: {
       httpd: {
         schema:

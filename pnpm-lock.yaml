@@ -38,8 +38,8 @@ devDependencies:
     specifier: ^3.10.3
     version: 3.10.3(eslint@8.57.0)(typescript@5.4.2)(vite@5.1.5)
   nuxt-open-fetch:
-    specifier: ^0.3.0
-    version: 0.3.0
+    specifier: ^0.6.2
+    version: 0.6.2
   nuxt-security:
     specifier: ^1.2.2
     version: 1.2.2
@@ -6026,8 +6026,8 @@ packages:
       - vue
     dev: false
 
-  /nuxt-open-fetch@0.3.0:
-    resolution: {integrity: sha512-YBX0KMbhWp9y8CdQ6TpXUgs4xW0ixp/Sef57jiDP/VYRLHjEZsAXkvz2z90oLrmjGqKbZW8ISMUTJ/np0q5URg==}
+  /nuxt-open-fetch@0.6.2:
+    resolution: {integrity: sha512-ScGzhHwxPsSKHEpPg0r/YAneaDQfvXp6ANZ8uBKtN1bu9xb4ITmGpy7LIvYyA2TIRC3YFFiwdDezU1lLFfBczQ==}
     dependencies:
       '@nuxt/kit': 3.10.3
       defu: 6.1.4

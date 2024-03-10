@@ -1,5 +1,6 @@
 import type { DeepRequired } from 'ts-essentials'
-import type { components as httpdApiComponents } from '#build/types/nuxt-open-fetch/httpd'
+// eslint-disable-next-line max-len
+import type { components as httpdApiComponents } from '#build/types/nuxt-open-fetch/schemas/httpd'
 
 // Not 100% accurate, but good enough for now
 export type RadicleIssue = DeepRequired<httpdApiComponents['schemas']['Issue']> & {

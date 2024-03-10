@@ -32,7 +32,7 @@
     "@maninak/eslint-config": "^0.1.4",
     "@nuxt/devtools": "^1.0.8",
     "nuxt": "^3.10.3",
-    "nuxt-open-fetch": "^0.3.0",
+    "nuxt-open-fetch": "^0.6.2",
     "nuxt-security": "^1.2.2",
     "ts-essentials": "^9.4.1",
     "typescript": "^5.4.2",
