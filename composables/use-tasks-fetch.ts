@@ -1,19 +1,20 @@
 import type { RadicleIssue, RadiclePatch } from '~/types/httpd'
-import type { Task } from '~/types/tasks'
+import type { Issue, Patch, Task } from '~/types/tasks'
 
 export function useTasksFetch() {
   const { $httpdFetch } = useNuxtApp()
   const route = useRoute()
 
-  async function fetchIssue(id: string) {
-    const issue = await $httpdFetch('/projects/{rid}/issues/{issue}', {
+  async function fetchIssue(id: string): Promise<Issue> {
+    const radicleIssue = await $httpdFetch('/projects/{rid}/issues/{issue}', {
       path: { rid: route.params.rid, issue: id },
     })
+    const issue = transformRadicleIssueToIssue(radicleIssue as RadicleIssue)
 
-    return issue as RadicleIssue
+    return issue
   }
 
-  async function fetchIssues() {
+  async function fetchIssues(): Promise<Issue[]> {
     const issueStatuses = ['open', 'closed'] satisfies RadicleIssue['state']['status'][]
 
     const radicleIssuesByStatus = await Promise.all(
@@ -30,19 +31,23 @@ export function useTasksFetch() {
     )
 
     const radicleIssues = radicleIssuesByStatus.flat()
+    const issues = radicleIssues.map((issue) =>
+      transformRadicleIssueToIssue(issue as RadicleIssue),
+    )
 
-    return radicleIssues as RadicleIssue[]
+    return issues
   }
 
-  async function fetchPatch(id: string) {
-    const patch = await $httpdFetch('/projects/{rid}/patches/{patch}', {
+  async function fetchPatch(id: string): Promise<Patch> {
+    const radiclePatch = await $httpdFetch('/projects/{rid}/patches/{patch}', {
       path: { rid: route.params.rid, patch: id },
     })
+    const patch = transformRadiclePatchToPatch(radiclePatch as RadiclePatch)
 
-    return patch as RadiclePatch
+    return patch
   }
 
-  async function fetchPatches() {
+  async function fetchPatches(): Promise<Patch[]> {
     const patchStatuses = [
       'draft',
       'open',
@@ -64,8 +69,28 @@ export function useTasksFetch() {
     )
 
     const radiclePatches = radiclePatchesByStatus.flat()
+    const patches = radiclePatches.map((patch) =>
+      transformRadiclePatchToPatch(patch as RadiclePatch),
+    )
 
-    return radiclePatches as RadiclePatch[]
+    return patches
+  }
+
+  async function refreshSpecificTasks(tasks: Task[]): Promise<void> {
+    await Promise.all(
+      tasks.map(async (task) => {
+        switch (task.rpb.kind) {
+          case 'issue':
+            task = await fetchIssue(task.id)
+            break
+          case 'patch':
+            task = await fetchPatch(task.id)
+            break
+          default:
+            throw new Error('Unsupported task kind')
+        }
+      }),
+    )
   }
 
   async function updateTaskLabels(task: Task, labels: string[]) {
@@ -93,11 +118,22 @@ export function useTasksFetch() {
     }
   }
 
+  const {
+    data: tasks,
+    pending: areTasksPending,
+    refresh: refreshTasks,
+  } = useAsyncData('tasks', async () => {
+    const issuesAndPatches = await Promise.all([fetchIssues(), fetchPatches()])
+    const tasks = issuesAndPatches.flat()
+
+    return tasks
+  })
+
   return {
-    fetchIssue,
-    fetchIssues,
-    fetchPatch,
-    fetchPatches,
+    tasks,
+    areTasksPending,
+    refreshTasks,
+    refreshSpecificTasks,
     updateTaskLabels,
   }
 }

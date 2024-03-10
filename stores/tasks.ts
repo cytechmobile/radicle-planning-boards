@@ -3,7 +3,7 @@ import type { Task } from '~/types/tasks'
 
 export const useTasksStore = defineStore('tasks', () => {
   const { $httpdFetch } = useNuxtApp()
-  const { fetchIssue, fetchPatch, fetchIssues, fetchPatches, updateTaskLabels } =
+  const { tasks, areTasksPending, refreshTasks, refreshSpecificTasks, updateTaskLabels } =
     useTasksFetch()
   const route = useRoute()
 
@@ -13,88 +13,53 @@ export const useTasksStore = defineStore('tasks', () => {
   const isCreatingTask = ref(false)
   const isResettingPriority = ref(false)
 
-  const {
-    data: issues,
-    pending: areIssuesPending,
-    refresh: refreshIssues,
-  } = useAsyncData('issues', fetchIssues, {
-    transform: (radicleIssues) => radicleIssues.map(transformRadicleIssueToIssue),
-  })
-
-  const {
-    data: patches,
-    pending: arePatchesPending,
-    refresh: refreshPatches,
-  } = useAsyncData('patches', fetchPatches, {
-    transform: (radiclePatches) => radiclePatches.map(transformRadiclePatchToPatch),
-  })
-
-  const isLoading = computed(
-    () =>
-      (issues.value === null && areIssuesPending.value) ||
-      (patches.value === null && arePatchesPending.value) ||
-      isCreatingTask.value,
-  )
+  const isLoading = computed(() => areTasksPending.value || isCreatingTask.value)
 
   const tasksByColumn = computed(() => {
-    if (issues.value === null || patches.value === null) {
+    if (tasks.value === null) {
       return null
     }
 
-    const tasks = orderTasksByColumn(
+    const orderedTasks = orderTasksByColumn(
       groupTasksByColumn({
-        tasks: [...issues.value, ...patches.value],
+        tasks: tasks.value,
         columns: board.columns,
       }),
     )
 
-    return tasks
+    return orderedTasks
   })
 
   async function initializePriority() {
-    if (!tasksByColumn.value) {
+    if (!tasks.value) {
       return
     }
 
-    let shouldRefreshIssues = false
-    let shouldRefreshPatches = false
+    const tasksWithoutPriority: Task[] = []
+    let highestPriority = 0
 
-    for (const tasks of Object.values(tasksByColumn.value)) {
-      const tasksWithoutPriority: Task[] = []
-      let highestPriority = 0
-
-      for (const task of tasks) {
-        if (task.rpb.priority === null) {
-          tasksWithoutPriority.push(task)
-
-          if (task.rpb.kind === 'issue') {
-            shouldRefreshIssues = true
-          } else if (task.rpb.kind === 'patch') {
-            shouldRefreshPatches = true
-          }
-        } else if (task.rpb.priority > highestPriority) {
-          highestPriority = task.rpb.priority
-        }
-      }
-
-      for (const [index, task] of tasksWithoutPriority.entries()) {
-        const priority = highestPriority + (index + 1) * taskPriorityIncrement
-
-        await updateTaskLabels(task, [...task.labels, createDataLabel('priority', priority)])
+    for (const task of tasks.value) {
+      if (task.rpb.priority === null) {
+        tasksWithoutPriority.push(task)
+      } else if (task.rpb.priority > highestPriority) {
+        highestPriority = task.rpb.priority
       }
     }
 
-    await Promise.all([
-      shouldRefreshIssues ? refreshIssues() : undefined,
-      shouldRefreshPatches ? refreshPatches() : undefined,
-    ])
+    for (const [index, task] of tasksWithoutPriority.entries()) {
+      const priority = highestPriority + (index + 1) * taskPriorityIncrement
+
+      await updateTaskLabels(task, [...task.labels, createDataLabel('priority', priority)])
+    }
+
+    await refreshTasks()
   }
 
   watch(
-    () => [permissions.canEditLabels, issues.value, patches.value],
-    ([canEditLabels, newIssues, newPatches], [_, oldIssues, oldPatches]) => {
+    () => [permissions.canEditLabels, tasks.value],
+    ([canEditLabels, newTasks], [_, oldTasks]) => {
       // Only initialize task priority on first fetch
-      if (canEditLabels && newIssues && newPatches && (!oldIssues || !oldPatches)) {
+      if (canEditLabels && newTasks && !oldTasks) {
         initializePriority()
       }
     },
@@ -106,26 +71,6 @@ export const useTasksStore = defineStore('tasks', () => {
       board.mergeColumns(Object.keys(tasksByColumn.value))
     }
   })
-
-  async function refreshTasks(tasks: Task[]) {
-    await Promise.all(
-      tasks.map(async (task) => {
-        switch (task.rpb.kind) {
-          case 'issue': {
-            const radicleIssue = await fetchIssue(task.id)
-            task = transformRadicleIssueToIssue(radicleIssue)
-            break
-          }
-
-          case 'patch': {
-            const radiclePatch = await fetchPatch(task.id)
-            task = transformRadiclePatchToPatch(radiclePatch)
-            break
-          }
-        }
-      }),
-    )
-  }
 
   async function moveTask({
     task,
@@ -169,7 +114,7 @@ export const useTasksStore = defineStore('tasks', () => {
       }),
     )
 
-    await refreshTasks(priorityUpdates.map(({ task }) => task))
+    await refreshSpecificTasks(priorityUpdates.map(({ task }) => task))
   }
 
   async function createIssue({ title, column }: { title: string; column: string }) {
@@ -207,13 +152,13 @@ export const useTasksStore = defineStore('tasks', () => {
       },
     })
 
-    await refreshIssues()
+    await refreshTasks()
 
     isCreatingTask.value = false
   }
 
   async function resetPriority() {
-    if (!issues.value || !patches.value) {
+    if (!tasks.value) {
       return
     }
 
@@ -221,9 +166,7 @@ export const useTasksStore = defineStore('tasks', () => {
 
     const partialPriorityLabel = createPartialDataLabel('priority')
 
-    const tasks = [...issues.value, ...patches.value]
-
-    for (const task of tasks) {
+    for (const task of tasks.value) {
       const priorityLabelIndex = task.labels.findIndex((label) =>
         label.startsWith(partialPriorityLabel),
       )
@@ -233,7 +176,7 @@ export const useTasksStore = defineStore('tasks', () => {
       }
     }
 
-    await Promise.all([refreshIssues(), refreshPatches()])
+    await refreshTasks()
     await initializePriority()
 
     isResettingPriority.value = false
