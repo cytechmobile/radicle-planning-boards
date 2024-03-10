@@ -1,4 +1,3 @@
-import { radicleInterfaceOrigin } from '~/constants/config'
 import { type IncomingMessage, incomingMessageSchema } from '~/types/messages'
 
 export function useRadicleInterfaceMessage<
@@ -7,8 +6,10 @@ export function useRadicleInterfaceMessage<
   type: IncomingMessageType,
   callback: (message: Extract<IncomingMessage, { type: IncomingMessageType }>) => void,
 ) {
+  const runtimeConfig = useRuntimeConfig()
+
   useEventListener('message', (event) => {
-    if (event.origin !== radicleInterfaceOrigin) {
+    if (event.origin !== runtimeConfig.public.parentOrigin) {
       return
     }
 

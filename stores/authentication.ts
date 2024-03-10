@@ -6,6 +6,7 @@ export const useAuthStore = defineStore('auth', () => {
 
   const token = ref<string | null>(null)
   const isAuthenticated = computed(() => !!token.value)
+  const postMessageToRadicleInterface = usePostMessageToRadicleInterface()
 
   if (!token.value) {
     postMessageToRadicleInterface({ type: 'request-auth-token' })

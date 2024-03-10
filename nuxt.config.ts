@@ -1,4 +1,6 @@
-import { radicleInterfaceOrigin } from './constants/config'
+import process from 'node:process'
+
+const defaultParentOrigin = 'https://guileless-puppy-2d91b5.netlify.app'
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
@@ -16,6 +18,11 @@ export default defineNuxtConfig({
   ],
   experimental: { typedPages: true },
   devtools: { enabled: true },
+  runtimeConfig: {
+    public: {
+      parentOrigin: defaultParentOrigin,
+    },
+  },
   app: {
     head: {
       bodyAttrs: {
@@ -26,7 +33,10 @@ export default defineNuxtConfig({
   security: {
     headers: {
       contentSecurityPolicy: {
-        'frame-ancestors': ["'self'", radicleInterfaceOrigin],
+        'frame-ancestors': [
+          "'self'",
+          process.env?.['NUXT_PUBLIC_PARENT_ORIGIN'] ?? defaultParentOrigin,
+        ],
       },
       xFrameOptions: false,
     },
