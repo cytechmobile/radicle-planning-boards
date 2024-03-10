@@ -52,7 +52,9 @@ export const useTasksStore = defineStore('tasks', () => {
       await updateTaskLabels(task, [...task.labels, createDataLabel('priority', priority)])
     }
 
-    await refreshTasks()
+    if (tasksWithoutPriority.length > 0) {
+      await refreshTasks()
+    }
   }
 
   watch(
