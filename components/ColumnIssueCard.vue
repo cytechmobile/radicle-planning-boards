@@ -20,11 +20,15 @@ const status = computed<ColumnCardStatus>(() => ({
   icon: statusIconMap[props.issue.state.status],
 }))
 
+const radicleInterfaceBaseUrl = useRadicleInterfaceBaseUrl()
+const isDebugging = useIsDebugging()
+
 const dataLabels = computed(() =>
-  props.issue.labels.filter((label) => label.startsWith(dataLabelNamespace)),
+  isDebugging.value
+    ? props.issue.labels.filter((label) => label.startsWith(dataLabelNamespace))
+    : [],
 )
 
-const radicleInterfaceBaseUrl = useRadicleInterfaceBaseUrl()
 const href = computed(() =>
   new URL(
     `/nodes/${route.params.node}/${route.params.rid}/issues/${props.issue.id}`,
