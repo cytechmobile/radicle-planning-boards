@@ -27,7 +27,8 @@
     "auth",
     "config",
     "readme",
-    "tasks"
+    "tasks",
+    "filtering"
   ],
   "conventionalCommits.gitmoji": false,
 

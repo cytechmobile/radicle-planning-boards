@@ -6,16 +6,16 @@ const auth = useAuthStore()
 const tasks = useTasksStore()
 const board = useBoardStore()
 
-const columnsModel = ref<string[]>([...board.columns])
+const columnsModel = ref<string[]>([...board.state.columns])
 
 watchEffect(() => {
-  if (JSON.stringify(columnsModel.value) !== JSON.stringify(board.columns)) {
-    columnsModel.value = [...board.columns]
+  if (JSON.stringify(columnsModel.value) !== JSON.stringify(board.state.columns)) {
+    columnsModel.value = [...board.state.columns]
   }
 })
 
 function handleMoveColumn({ oldIndex, newIndex }: VueDraggableEvent) {
-  const column = board.columns[oldIndex]
+  const column = board.state.columns[oldIndex]
   if (!column) {
     return
   }

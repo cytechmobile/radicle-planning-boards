@@ -30,7 +30,7 @@ function handleSubmit() {
   isCreatingNewColumn.value = false
 }
 
-const columnExists = computed(() => board.columns.includes(title.value.trim()))
+const columnExists = computed(() => board.state.columns.includes(title.value.trim()))
 </script>
 
 <template>

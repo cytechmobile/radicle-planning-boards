@@ -4,6 +4,7 @@ import type { Issue, Patch, Task } from '~/types/tasks'
 export function useTasksFetch() {
   const { $httpdFetch } = useNuxtApp()
   const route = useRoute()
+  const board = useBoardStore()
 
   async function fetchIssue(id: string): Promise<Issue> {
     const radicleIssue = await $httpdFetch('/projects/{rid}/issues/{issue}', {
@@ -119,7 +120,7 @@ export function useTasksFetch() {
   }
 
   const {
-    data: tasks,
+    data: fetchedTasks,
     pending: areTasksPending,
     refresh: refreshTasks,
   } = useAsyncData('tasks', async () => {
@@ -127,6 +128,22 @@ export function useTasksFetch() {
     const tasks = issuesAndPatches.flat()
 
     return tasks
+  })
+
+  const tasks = computed(() => {
+    if (!fetchedTasks.value) {
+      return null
+    }
+
+    if (!board.state.filter.taskKind) {
+      return fetchedTasks.value
+    }
+
+    const filteredTasks = fetchedTasks.value.filter(
+      (task) => board.state.filter.taskKind === task.rpb.kind,
+    )
+
+    return filteredTasks
   })
 
   return {

@@ -23,7 +23,7 @@ export const useTasksStore = defineStore('tasks', () => {
     const orderedTasks = orderTasksByColumn(
       groupTasksByColumn({
         tasks: tasks.value,
-        columns: board.columns,
+        columns: board.state.columns,
       }),
     )
 

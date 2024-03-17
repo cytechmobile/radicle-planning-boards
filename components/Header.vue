@@ -1,4 +1,5 @@
 <script setup lang="ts">
+const auth = useAuthStore()
 const board = useBoardStore()
 const tasks = useTasksStore()
 const isDebugging = useIsDebugging()
@@ -39,33 +40,42 @@ async function handleImport() {
 </script>
 
 <template>
-  <header class="flex gap-4 px-4">
-    <UTooltip text="Copy board state to clipboard">
-      <UButton
-        :icon="isExportSuccess ? 'i-heroicons-check' : 'i-heroicons-square-2-stack'"
-        class="rounded"
-        @click="handleExport"
-      >
-        Export
-      </UButton>
-    </UTooltip>
-    <UTooltip text="Import board state from clipboard">
-      <UButton
-        :icon="isImportSuccess ? 'i-heroicons-check' : 'i-heroicons-arrow-down-on-square'"
-        class="rounded"
-        @click="handleImport"
-      >
-        Import
-      </UButton>
-    </UTooltip>
-    <UTooltip v-if="isDebugging" text="Reset card order. All changes will be lost!">
-      <UButton
-        :icon="tasks.isResettingPriority ? 'i-heroicons-arrow-path' : undefined"
-        :disabled="tasks.isLoading || tasks.isResettingPriority"
-        @click="tasks.resetPriority"
-      >
-        Reset Order
-      </UButton>
-    </UTooltip>
+  <header class="flex justify-between gap-4 px-4">
+    <div class="flex gap-4">
+      <template v-if="auth.isAuthenticated">
+        <UTooltip text="Copy board state to clipboard">
+          <UButton
+            :icon="isExportSuccess ? 'i-heroicons-check' : 'i-heroicons-square-2-stack'"
+            class="rounded"
+            @click="handleExport"
+          >
+            Export
+          </UButton>
+        </UTooltip>
+        <UTooltip text="Import board state from clipboard">
+          <UButton
+            :icon="isImportSuccess ? 'i-heroicons-check' : 'i-heroicons-arrow-down-on-square'"
+            class="rounded"
+            @click="handleImport"
+          >
+            Import
+          </UButton>
+        </UTooltip>
+        <UTooltip v-if="isDebugging" text="Reset card order. All changes will be lost!">
+          <UButton
+            :icon="tasks.isResettingPriority ? 'i-heroicons-arrow-path' : undefined"
+            :disabled="tasks.isLoading || tasks.isResettingPriority"
+            @click="tasks.resetPriority"
+          >
+            Reset Order
+          </UButton>
+        </UTooltip>
+      </template>
+    </div>
+
+    <div class="flex items-center gap-2">
+      <label for="task-kind-select">Tasks</label>
+      <TaskKindSelect id="task-kind-select" class="w-32" />
+    </div>
   </header>
 </template>
