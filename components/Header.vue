@@ -41,6 +41,8 @@ async function handleImport() {
 
 <template>
   <header class="flex justify-between gap-4 px-4">
+    <TaskKindSelect />
+
     <div class="flex gap-4">
       <template v-if="auth.isAuthenticated">
         <UTooltip text="Copy board state to clipboard">
@@ -71,11 +73,6 @@ async function handleImport() {
           </UButton>
         </UTooltip>
       </template>
-    </div>
-
-    <div class="flex items-center gap-2">
-      <label for="task-kind-select">Tasks</label>
-      <TaskKindSelect id="task-kind-select" class="w-32" />
     </div>
   </header>
 </template>
