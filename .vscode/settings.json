@@ -25,7 +25,8 @@
     "cards",
     "messages",
     "auth",
-    "config"
+    "config",
+    "readme"
   ],
   "conventionalCommits.gitmoji": false,
 
