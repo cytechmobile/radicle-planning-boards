@@ -1,66 +1,49 @@
 <script setup lang="ts">
-import type { Issue } from '~/types/issues'
+import ColumnCard from './ColumnCard.vue'
+import type { Issue } from '~/types/tasks'
 
-interface Props {
-  id: Issue['id']
-  title: Issue['title']
-  labels: Issue['labels']
-  state: Issue['state']
-}
+const props = defineProps<{
+  issue: Issue
+}>()
 
-const props = defineProps<Props>()
+type ColumnCardStatus = InstanceType<typeof ColumnCard>['$props']['status']
+
 const route = useRoute()
 
-const dataLabels = computed(() =>
-  props.labels.filter((label) => label.startsWith(dataLabelNamespace)),
-)
+const statusIconMap = {
+  open: { name: 'octicon:issue-opened-16', class: 'text-rad-foreground-success' },
+  closed: { name: 'octicon:issue-closed-16', class: 'text-rad-foreground-red' },
+} satisfies Record<Issue['state']['status'], ColumnCardStatus['icon']>
+
+const status = computed<ColumnCardStatus>(() => ({
+  name: props.issue.state.status,
+  icon: statusIconMap[props.issue.state.status],
+}))
 
 const radicleInterfaceBaseUrl = useRadicleInterfaceBaseUrl()
 const isDebugging = useIsDebugging()
 
+const dataLabels = computed(() =>
+  isDebugging.value
+    ? props.issue.labels.filter((label) => label.startsWith(dataLabelNamespace))
+    : [],
+)
+
 const href = computed(() =>
   new URL(
-    `/nodes/${route.params.node}/${route.params.rid}/issues/${props.id}`,
+    `/nodes/${route.params.node}/${route.params.rid}/issues/${props.issue.id}`,
     radicleInterfaceBaseUrl,
   ).toString(),
 )
-
-const statusToIconMap = {
-  open: { name: 'octicon:issue-opened-16', class: 'text-rad-foreground-success' },
-  closed: { name: 'octicon:issue-closed-16', class: 'text-rad-foreground-red' },
-} satisfies Record<Props['state']['status'], { name: string; class: string }>
 </script>
 
+
 <template>
-  <article
-    class="flex flex-col gap-1 rounded bg-rad-background-float p-3 transition-opacity hover:bg-rad-fill-float-hover"
-  >
-    <small class="flex items-center gap-2">
-      <span class="sr-only">{{ state.status }}</span>
-      <UTooltip :text="state.status" :popper="{ placement: 'top' }">
-        <Icon
-          :name="statusToIconMap[state.status].name"
-          size="16"
-          :class="statusToIconMap[state.status].class"
-        />
-      </UTooltip>
-      <pre class="text-xs font-medium text-rad-foreground-dim">{{ id.slice(0, 7) }}</pre>
-    </small>
-
-    <h4>
-      <a :href="href" target="_blank" class="w-fit text-sm hover:underline">
-        {{ title }}
-      </a>
-    </h4>
-
-    <ul v-if="isDebugging">
-      <li
-        v-for="label in dataLabels"
-        :key="label"
-        class="mt-2 text-xs font-bold text-rad-foreground-emphasized"
-      >
-        {{ label }}
-      </li>
-    </ul>
-  </article>
+  <ColumnCard
+    :id="issue.id"
+    :title="issue.title"
+    :labels="dataLabels"
+    :href="href"
+    :status="status"
+  />
 </template>

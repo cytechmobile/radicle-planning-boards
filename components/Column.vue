@@ -1,21 +1,22 @@
 <script setup lang="ts">
 import { VueDraggable } from 'vue-draggable-plus'
-import type { Issue } from '../types/issues'
+import type { Task } from '../types/tasks'
 import { requiredColumns } from '~/constants/columns'
 import type { VueDraggableEvent } from '~/types/vue-draggable-plus'
+import { doneTaskStatuses } from '~/constants/tasks'
 
-const props = defineProps<{ title: string; issues: Issue[] }>()
+const props = defineProps<{ title: string; tasks: Task[] }>()
 
-const issuesModel = ref<Issue[]>([])
+const tasksModel = ref<Task[]>([])
 const isCreatingNewIssue = ref(false)
 
 const auth = useAuthStore()
 const board = useBoardStore()
-const issues = useIssuesStore()
+const tasks = useTasksStore()
 const { canEditLabels } = usePermissions()
 
 watchEffect(() => {
-  issuesModel.value = [...unref(props.issues)] // "clone" issues prop
+  tasksModel.value = [...unref(props.tasks)] // "clone" tasks prop
 })
 
 watchEffect(() => {
@@ -24,23 +25,23 @@ watchEffect(() => {
   }
 })
 
-function handleMoveIssue(event: VueDraggableEvent) {
-  const { id } = event.item.dataset
+function handleMoveTask(event: VueDraggableEvent) {
+  const { id, kind } = event.item.dataset
   const { column } = event.to.dataset
-  const issue = props.issues.find((issue) => issue.id === id)
-  if (!issue || !column) {
+  const task = props.tasks.find((task) => task.rpb.kind === kind && task.id === id)
+  if (!task || !column || (task.rpb.column === column && event.oldIndex === event.newIndex)) {
     return
   }
 
-  void issues.moveIssue({
-    issue,
+  void tasks.moveTask({
+    task,
     column,
     index: event.newIndex,
   })
 }
 
-function handleCreate(title: string) {
-  void issues.createIssue({ title, column: props.title })
+function handleCreateIssue(title: string) {
+  void tasks.createIssue({ title, column: props.title })
 }
 
 const columnIcon = computed(() => {
@@ -60,10 +61,13 @@ const columnIcon = computed(() => {
   return defaultIcon
 })
 
-const canBeDeleted = computed(() => props.issues.length === 0)
+const canBeDeleted = computed(() => props.tasks.length === 0)
 const isDraggingDisabled = computed(
-  () => !auth.isAuthenticated || !canEditLabels || issues.isLoading,
+  () => !auth.isAuthenticated || !canEditLabels || tasks.isLoading,
 )
+const doneTasksFilter = doneTaskStatuses
+  .map((status) => `[data-status='${status}']`)
+  .join(', ')
 </script>
 
 <template>
@@ -79,7 +83,7 @@ const isDraggingDisabled = computed(
         <h3 class="font-semibold">{{ title }}</h3>
 
         <small class="text-rad-foreground-gray text-sm font-semibold">
-          {{ issuesModel.length }}
+          {{ tasksModel.length }}
         </small>
       </div>
 
@@ -102,31 +106,33 @@ const isDraggingDisabled = computed(
     </div>
 
     <VueDraggable
-      v-model="issuesModel"
+      v-model="tasksModel"
       tag="ul"
       class="flex flex-1 flex-col gap-2 overflow-y-auto overflow-x-hidden p-2"
       ghost-class="opacity-50"
       :animation="150"
-      group="issues"
+      group="tasks"
       :data-column="title"
       :disabled="isDraggingDisabled"
-      filter="[data-status='closed']"
-      @end="handleMoveIssue($event)"
+      :filter="doneTasksFilter"
+      @end="handleMoveTask($event)"
     >
       <li
-        v-for="issue in issuesModel"
-        :key="issue.id"
-        :data-id="issue.id"
-        :data-status="issue.state.status"
+        v-for="task in tasksModel"
+        :key="`${task.rpb.kind}-${task.id}`"
+        :data-id="task.id"
+        :data-kind="task.rpb.kind"
+        :data-status="task.state.status"
         :class="{
-          'hover:cursor-grab': !isDraggingDisabled && issue.state.status === 'open',
+          'hover:cursor-grab': !isDraggingDisabled && !isTaskDone(task),
         }"
       >
-        <ColumnIssueCard v-bind="issue" />
+        <ColumnIssueCard v-if="isIssue(task)" :issue="task" />
+        <ColumnPatchCard v-else-if="isPatch(task)" :patch="task" />
       </li>
       <NewColumnIssueCard
         v-if="isCreatingNewIssue"
-        @submit="handleCreate"
+        @submit="handleCreateIssue"
         @close="isCreatingNewIssue = false"
       />
     </VueDraggable>

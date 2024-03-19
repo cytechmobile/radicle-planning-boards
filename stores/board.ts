@@ -4,17 +4,22 @@ import { initialColumns } from '~/constants/columns'
 
 const boardStateSchema = z.object({
   columns: z.array(z.string()),
+  filter: z.object({
+    taskKind: z.union([z.literal('issue'), z.literal('patch')]).optional(),
+  }),
 })
 
 type BoardState = z.infer<typeof boardStateSchema>
 
-const initialBoardState = {
+const initialBoardState: BoardState = {
   columns: initialColumns,
-} satisfies BoardState
+  filter: {
+    taskKind: 'issue',
+  },
+}
 
 export const useBoardStore = defineStore('board', () => {
   const state = useStorage('RPB_board-state', initialBoardState)
-  const columns = computed(() => state.value.columns)
 
   function mergeColumns(parsedColumns: string[]) {
     state.value.columns = [...new Set([...state.value.columns, ...parsedColumns])]
@@ -58,7 +63,7 @@ export const useBoardStore = defineStore('board', () => {
   }
 
   const store = {
-    columns,
+    state,
     mergeColumns,
     moveColumn,
     addColumn,
