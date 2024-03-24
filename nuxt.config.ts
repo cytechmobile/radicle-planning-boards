@@ -14,6 +14,7 @@ export default defineNuxtConfig({
     '@vueuse/nuxt',
     '@nuxt/ui',
     'nuxt-icon',
+    '@nuxtjs/google-fonts',
     'nuxt-open-fetch',
   ],
   experimental: { typedPages: true },
@@ -42,6 +43,11 @@ export default defineNuxtConfig({
         ],
       },
       xFrameOptions: false,
+    },
+  },
+  googleFonts: {
+    families: {
+      Inter: '100..900',
     },
   },
   ui: { global: true, icons: 'all' },
