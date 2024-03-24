@@ -8,7 +8,7 @@ const props = defineProps<{
 
 type ColumnCardStatus = InstanceType<typeof ColumnCard>['$props']['status']
 
-const route = useRoute()
+const route = useRoute('node-rid')
 
 const statusIconMap = {
   open: { name: 'octicon:issue-opened-16', class: 'text-rad-foreground-success' },

@@ -3,7 +3,7 @@ import type { Issue, Patch, Task } from '~/types/tasks'
 
 export function useTasksFetch() {
   const { $httpd } = useNuxtApp()
-  const route = useRoute()
+  const route = useRoute('node-rid')
   const board = useBoardStore()
 
   async function fetchIssue(id: string): Promise<Issue> {

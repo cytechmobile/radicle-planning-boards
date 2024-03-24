@@ -5,7 +5,7 @@ export const useTasksStore = defineStore('tasks', () => {
   const { $httpd } = useNuxtApp()
   const { tasks, areTasksPending, refreshTasks, refreshSpecificTasks, updateTaskLabels } =
     useTasksFetch()
-  const route = useRoute()
+  const route = useRoute('node-rid')
 
   const permissions = usePermissions()
   const board = useBoardStore()

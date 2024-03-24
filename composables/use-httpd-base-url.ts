@@ -1,7 +1,7 @@
 const defaultHttpdBaseUrl = 'http://127.0.0.1:8080'
 
 export function useHttpdBaseUrl() {
-  const route = useRoute()
+  const route = useRoute('node-rid')
 
   if (!route.params.node) {
     return defaultHttpdBaseUrl
