@@ -82,7 +82,7 @@ const doneTasksFilter = doneTaskStatuses
         <Icon :name="columnIcon.name" size="20" :class="`translate-y-1 ${columnIcon.class}`" />
         <h3 class="font-semibold">{{ title }}</h3>
 
-        <small class="text-rad-foreground-gray text-sm font-semibold">
+        <small class="text-sm font-semibold text-rad-foreground-dim">
           {{ tasksModel.length }}
         </small>
       </div>
