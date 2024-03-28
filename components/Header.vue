@@ -44,24 +44,30 @@ async function handleImport() {
     <TaskKindSelect />
 
     <div class="flex gap-4">
+      <a
+        class="flex h-8 items-center justify-center gap-2 rounded-sm border border-rad-border-hint px-3 text-sm font-semibold"
+        href="https://app.radicle.xyz/nodes/seed.radicle.gr/rad:z2BdUVZFvHdxRfdtGJQdSH2kyXNM6"
+        target="_blank"
+      >
+        <Icon name="octicon:link-external-16" size="16" />
+        About
+      </a>
+
       <template v-if="auth.isAuthenticated">
         <UTooltip text="Copy board state to clipboard">
-          <UButton
-            :icon="isExportSuccess ? 'i-heroicons-check' : 'i-heroicons-square-2-stack'"
-            class="rounded"
-            @click="handleExport"
-          >
+          <button class="button-solid" type="button" @click="handleExport">
+            <Icon :name="isExportSuccess ? 'octicon:check-16' : 'octicon:copy-16'" size="16" />
             Export
-          </UButton>
+          </button>
         </UTooltip>
         <UTooltip text="Import board state from clipboard">
-          <UButton
-            :icon="isImportSuccess ? 'i-heroicons-check' : 'i-heroicons-arrow-down-on-square'"
-            class="rounded"
-            @click="handleImport"
-          >
+          <button class="button-solid" type="button" @click="handleImport">
+            <Icon
+              :name="isImportSuccess ? 'octicon:check-16' : 'octicon:arrow-down-16'"
+              size="16"
+            />
             Import
-          </UButton>
+          </button>
         </UTooltip>
         <UTooltip v-if="isDebugging" text="Reset card order. All changes will be lost!">
           <UButton

@@ -126,3 +126,9 @@ body {
   background-color: var(--color-background-default);
   color: var(--color-foreground-contrast);
 }
+
+@layer components {
+  .button-solid {
+    @apply flex h-8 cursor-pointer items-center justify-center gap-2 rounded-sm bg-rad-fill-secondary px-3 text-sm font-semibold text-rad-foreground-match-background hover:bg-rad-fill-secondary-hover;
+  }
+}
