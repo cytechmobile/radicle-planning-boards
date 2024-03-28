@@ -1,11 +1,15 @@
 <script setup lang="ts">
 import { VueDraggable } from 'vue-draggable-plus'
 import type { Task } from '../types/tasks'
-import { requiredColumns } from '~/constants/columns'
 import type { VueDraggableEvent } from '~/types/vue-draggable-plus'
 import { doneTaskStatuses } from '~/constants/tasks'
 
-const props = defineProps<{ title: string; tasks: Task[] }>()
+const props = defineProps<{
+  title: string
+  tasks: Task[]
+  isDefaultColumn?: boolean
+  isDoneColumn?: boolean
+}>()
 
 const tasksModel = ref<Task[]>([])
 const isCreatingNewIssue = ref(false)
@@ -61,7 +65,9 @@ const columnIcon = computed(() => {
   return defaultIcon
 })
 
-const canBeDeleted = computed(() => props.tasks.length === 0)
+const isRequired = computed(() => props.isDefaultColumn || props.isDoneColumn)
+const canBeDeleted = computed(() => !isRequired.value && props.tasks.length === 0)
+const canCreateIssue = computed(() => props.isDefaultColumn || canEditLabels)
 const isDraggingDisabled = computed(
   () => !auth.isAuthenticated || !canEditLabels || tasks.isLoading,
 )
@@ -89,7 +95,7 @@ const doneTasksFilter = doneTaskStatuses
 
       <div v-if="auth.isAuthenticated" class="flex items-center gap-2">
         <UTooltip
-          v-if="!requiredColumns.includes(title)"
+          v-if="!isRequired"
           :text="canBeDeleted ? 'Delete column' : 'The column must be empty to be deleted'"
         >
           <IconButton
@@ -99,7 +105,7 @@ const doneTasksFilter = doneTaskStatuses
             @click="board.removeColumn(title)"
           />
         </UTooltip>
-        <UTooltip text="New issue">
+        <UTooltip v-if="canCreateIssue" text="New issue">
           <IconButton label="New issue" icon="bx:plus" @click="isCreatingNewIssue = true" />
         </UTooltip>
       </div>

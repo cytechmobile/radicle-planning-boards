@@ -127,15 +127,17 @@ export const useTasksStore = defineStore('tasks', () => {
 
     const labels: string[] = []
 
-    if (column !== 'non-planned') {
-      labels.push(createDataLabel('column', column))
-    }
+    if (permissions.canEditLabels) {
+      if (column !== 'non-planned') {
+        labels.push(createDataLabel('column', column))
+      }
 
-    const lastIssue = columnIssues.at(-1)
-    const priority = lastIssue
-      ? (lastIssue.rpb.priority ?? 0) + taskPriorityIncrement
-      : taskPriorityIncrement
-    labels.push(createDataLabel('priority', priority))
+      const lastIssue = columnIssues.at(-1)
+      const priority = lastIssue
+        ? (lastIssue.rpb.priority ?? 0) + taskPriorityIncrement
+        : taskPriorityIncrement
+      labels.push(createDataLabel('priority', priority))
+    }
 
     isCreatingTask.value = true
 

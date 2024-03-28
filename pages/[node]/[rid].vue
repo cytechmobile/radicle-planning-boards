@@ -45,6 +45,8 @@ function handleMoveColumn({ oldIndex, newIndex }: VueDraggableEvent) {
         :key="column"
         :title="column"
         :tasks="tasks.tasksByColumn?.[column] ?? []"
+        :is-default-column="column === 'non-planned'"
+        :is-done-column="column === 'done'"
       />
     </VueDraggable>
     <NewColumn v-if="auth.isAuthenticated" />
