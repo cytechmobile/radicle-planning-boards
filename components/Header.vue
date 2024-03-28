@@ -44,6 +44,15 @@ async function handleImport() {
     <TaskKindSelect />
 
     <div class="flex gap-4">
+      <a
+        class="flex h-8 items-center justify-center gap-2 rounded-sm border border-rad-border-hint px-3 text-sm font-semibold"
+        href="https://app.radicle.xyz/nodes/seed.radicle.gr/rad:z2BdUVZFvHdxRfdtGJQdSH2kyXNM6"
+        target="_blank"
+      >
+        <Icon name="octicon:link-external-16" size="16" />
+        About
+      </a>
+
       <template v-if="auth.isAuthenticated">
         <UTooltip text="Copy board state to clipboard">
           <UButton
