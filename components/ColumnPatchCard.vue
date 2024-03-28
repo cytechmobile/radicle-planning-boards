@@ -8,7 +8,7 @@ const props = defineProps<{
 
 type ColumnCardStatus = InstanceType<typeof ColumnCard>['$props']['status']
 
-const route = useRoute()
+const route = useRoute('node-rid')
 
 const statusIconMap = {
   draft: { name: 'octicon:git-pull-request-draft-16', class: 'text-rad-fill-gray' },

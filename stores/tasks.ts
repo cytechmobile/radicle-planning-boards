@@ -2,10 +2,10 @@ import { taskPriorityIncrement } from '~/constants/tasks'
 import type { Task } from '~/types/tasks'
 
 export const useTasksStore = defineStore('tasks', () => {
-  const { $httpdFetch } = useNuxtApp()
+  const { $httpd } = useNuxtApp()
   const { tasks, areTasksPending, refreshTasks, refreshSpecificTasks, updateTaskLabels } =
     useTasksFetch()
-  const route = useRoute()
+  const route = useRoute('node-rid')
 
   const permissions = usePermissions()
   const board = useBoardStore()
@@ -139,7 +139,7 @@ export const useTasksStore = defineStore('tasks', () => {
 
     isCreatingTask.value = true
 
-    await $httpdFetch('/projects/{rid}/issues', {
+    await $httpd('/projects/{rid}/issues', {
       method: 'POST',
       path: {
         rid: route.params.rid,

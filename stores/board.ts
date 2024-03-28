@@ -22,7 +22,10 @@ export const useBoardStore = defineStore('board', () => {
   const state = useStorage('RPB_board-state', initialBoardState)
 
   function mergeColumns(parsedColumns: string[]) {
-    state.value.columns = [...new Set([...state.value.columns, ...parsedColumns])]
+    const updatedColumns = [...new Set([...state.value.columns, ...parsedColumns])]
+    if (JSON.stringify(updatedColumns) !== JSON.stringify(state.value.columns)) {
+      state.value.columns = updatedColumns
+    }
   }
 
   function moveColumn({ name, newIndex }: { name: string; newIndex: number }) {

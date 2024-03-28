@@ -68,7 +68,7 @@ const columnExists = computed(() => board.state.columns.includes(title.value.tri
       </button>
     </UTooltip>
   </form>
-  <UTooltip v-else class="h-fit w-fit" text="New column">
+  <UTooltip v-else class="size-fit" text="New column">
     <button
       type="button"
       class="rounded border border-rad-border-hint p-3 leading-none text-rad-foreground-dim hover:border-rad-border-focus"

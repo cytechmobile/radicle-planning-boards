@@ -2,12 +2,12 @@ import type { RadicleIssue, RadiclePatch } from '~/types/httpd'
 import type { Issue, Patch, Task } from '~/types/tasks'
 
 export function useTasksFetch() {
-  const { $httpdFetch } = useNuxtApp()
-  const route = useRoute()
+  const { $httpd } = useNuxtApp()
+  const route = useRoute('node-rid')
   const board = useBoardStore()
 
   async function fetchIssue(id: string): Promise<Issue> {
-    const radicleIssue = await $httpdFetch('/projects/{rid}/issues/{issue}', {
+    const radicleIssue = await $httpd('/projects/{rid}/issues/{issue}', {
       path: { rid: route.params.rid, issue: id },
     })
     const issue = transformRadicleIssueToIssue(radicleIssue as RadicleIssue)
@@ -21,7 +21,7 @@ export function useTasksFetch() {
     const radicleIssuesByStatus = await Promise.all(
       issueStatuses.map(
         async (status) =>
-          await $httpdFetch('/projects/{rid}/issues', {
+          await $httpd('/projects/{rid}/issues', {
             path: {
               rid: route.params.rid,
             },
@@ -40,7 +40,7 @@ export function useTasksFetch() {
   }
 
   async function fetchPatch(id: string): Promise<Patch> {
-    const radiclePatch = await $httpdFetch('/projects/{rid}/patches/{patch}', {
+    const radiclePatch = await $httpd('/projects/{rid}/patches/{patch}', {
       path: { rid: route.params.rid, patch: id },
     })
     const patch = transformRadiclePatchToPatch(radiclePatch as RadiclePatch)
@@ -59,7 +59,7 @@ export function useTasksFetch() {
     const radiclePatchesByStatus = await Promise.all(
       patchStatuses.map(
         async (status) =>
-          await $httpdFetch('/projects/{rid}/patches', {
+          await $httpd('/projects/{rid}/patches', {
             path: {
               rid: route.params.rid,
             },
@@ -97,7 +97,7 @@ export function useTasksFetch() {
   async function updateTaskLabels(task: Task, labels: string[]) {
     switch (task.rpb.kind) {
       case 'issue':
-        return await $httpdFetch(`/projects/{rid}/issues/{issue}`, {
+        return await $httpd(`/projects/{rid}/issues/{issue}`, {
           path: { rid: route.params.rid, issue: task.id },
           method: 'PATCH',
           body: {
@@ -106,7 +106,7 @@ export function useTasksFetch() {
           },
         })
       case 'patch':
-        return await $httpdFetch(`/projects/{rid}/patches/{patch}`, {
+        return await $httpd(`/projects/{rid}/patches/{patch}`, {
           path: { rid: route.params.rid, patch: task.id },
           method: 'PATCH',
           body: {

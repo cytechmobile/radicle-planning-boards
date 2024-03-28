@@ -1,0 +1,11 @@
+{
+  "extends": [
+    "development"
+  ],
+  "hints": {
+    // TODO: zac remove this once the issue is fixed
+    // Incorrectly reports "bundler" as an invalid "moduleResolution" option
+    // https://github.com/webhintio/hint/issues/5563
+    "typescript-config/is-valid": "off"
+  }
+}

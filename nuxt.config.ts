@@ -32,6 +32,9 @@ export default defineNuxtConfig({
   },
   security: {
     headers: {
+      // Allow nuxt devtools
+      crossOriginEmbedderPolicy:
+        process.env['NODE_ENV'] === 'development' ? 'unsafe-none' : 'require-corp',
       contentSecurityPolicy: {
         'frame-ancestors': [
           "'self'",
@@ -46,7 +49,7 @@ export default defineNuxtConfig({
     '/': { redirect: '/seed.radicle.xyz:443/rad:z4V1sjrXqjvFdnCUbxPFqd5p4DtH5' },
   },
   openFetch: {
-    disablePlugin: true,
+    disableNuxtPlugin: true,
     clients: {
       httpd: {
         schema:
