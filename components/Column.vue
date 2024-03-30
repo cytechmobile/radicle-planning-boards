@@ -93,21 +93,31 @@ const doneTasksFilter = doneTaskStatuses
         </small>
       </div>
 
-      <div v-if="auth.isAuthenticated" class="flex items-center gap-2">
-        <UTooltip
-          v-if="!isRequired"
-          :text="canBeDeleted ? 'Delete column' : 'The column must be empty to be deleted'"
-        >
-          <IconButton
-            label="Delete column"
-            icon="bx:trash"
-            :disabled="!canBeDeleted"
-            @click="board.removeColumn(title)"
+      <div class="flex items-center gap-2">
+        <UTooltip v-if="isDoneColumn" text="Showing items from the last two weeks">
+          <p class="sr-only">Showing items from the last two weeks</p>
+          <Icon
+            name="bx:info-circle"
+            size="20"
+            class="cursor-default text-rad-foreground-dim"
           />
         </UTooltip>
-        <UTooltip v-if="canCreateIssue" text="New issue">
-          <IconButton label="New issue" icon="bx:plus" @click="isCreatingNewIssue = true" />
-        </UTooltip>
+        <template v-if="auth.isAuthenticated">
+          <UTooltip
+            v-if="!isRequired"
+            :text="canBeDeleted ? 'Delete column' : 'The column must be empty to be deleted'"
+          >
+            <IconButton
+              label="Delete column"
+              icon="bx:trash"
+              :disabled="!canBeDeleted"
+              @click="board.removeColumn(title)"
+            />
+          </UTooltip>
+          <UTooltip v-if="canCreateIssue" text="New issue">
+            <IconButton label="New issue" icon="bx:plus" @click="isCreatingNewIssue = true" />
+          </UTooltip>
+        </template>
       </div>
     </div>
 
