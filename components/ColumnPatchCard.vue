@@ -28,10 +28,10 @@ const status = computed<ColumnCardStatus>(() => ({
 const radicleInterfaceBaseUrl = useRadicleInterfaceBaseUrl()
 const isDebugging = useIsDebugging()
 
-const dataLabels = computed(() =>
+const labels = computed(() =>
   isDebugging.value
-    ? props.patch.labels.filter((label) => label.startsWith(dataLabelNamespace))
-    : [],
+    ? props.patch.labels
+    : props.patch.labels.filter((label) => !label.startsWith(dataLabelNamespace)),
 )
 
 const href = computed(() =>
@@ -47,7 +47,7 @@ const href = computed(() =>
   <ColumnCard
     :id="patch.id"
     :title="patch.title"
-    :labels="dataLabels"
+    :labels="labels"
     :href="href"
     :status="status"
   />
