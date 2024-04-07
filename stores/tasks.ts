@@ -6,10 +6,10 @@ export const useTasksStore = defineStore('tasks', () => {
   const { tasks, areTasksPending, refreshTasks, refreshSpecificTasks, updateTaskLabels } =
     useTasksFetch()
   const route = useRoute('node-rid')
-
   const permissions = usePermissions()
   const board = useBoardStore()
 
+  const isReady = ref(false)
   const isCreatingTask = ref(false)
   const isResettingPriority = ref(false)
 
@@ -56,6 +56,12 @@ export const useTasksStore = defineStore('tasks', () => {
       await refreshTasks()
     }
   }
+
+  watchEffect(() => {
+    if (!isReady.value && tasks.value) {
+      isReady.value = true
+    }
+  })
 
   watch(
     () => [permissions.canEditLabels, tasks.value],
@@ -188,10 +194,11 @@ export const useTasksStore = defineStore('tasks', () => {
 
   const store = {
     tasksByColumn,
+    isReady,
     isLoading,
+    isResettingPriority,
     moveTask,
     createIssue,
-    isResettingPriority,
     resetPriority,
   }
 
