@@ -30,6 +30,26 @@ export const useTasksStore = defineStore('tasks', () => {
     return orderedTasks
   })
 
+  watchEffect(() => {
+    if (!isReady.value && tasks.value) {
+      isReady.value = true
+    }
+  })
+
+  // Initialize task priority after first fetch
+  watchEffect(() => {
+    if (permissions.canEditLabels && isReady.value) {
+      initializePriority()
+    }
+  })
+
+  // Merge task-derived columns with existing columns
+  watchEffect(() => {
+    if (tasksByColumn.value) {
+      board.mergeColumns(Object.keys(tasksByColumn.value))
+    }
+  })
+
   async function initializePriority() {
     if (!tasks.value) {
       return
@@ -56,29 +76,6 @@ export const useTasksStore = defineStore('tasks', () => {
       await refreshTasks()
     }
   }
-
-  watchEffect(() => {
-    if (!isReady.value && tasks.value) {
-      isReady.value = true
-    }
-  })
-
-  watch(
-    () => [permissions.canEditLabels, tasks.value],
-    ([canEditLabels, newTasks], [_, oldTasks]) => {
-      // Only initialize task priority on first fetch
-      if (canEditLabels && newTasks && !oldTasks) {
-        initializePriority()
-      }
-    },
-  )
-
-  // Merge task-derived columns with existing columns
-  watchEffect(() => {
-    if (tasksByColumn.value) {
-      board.mergeColumns(Object.keys(tasksByColumn.value))
-    }
-  })
 
   async function moveTask({
     task,
