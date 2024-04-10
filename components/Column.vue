@@ -8,7 +8,7 @@ const props = defineProps<{
   title: string
   tasks: Task[]
   isDefaultColumn?: boolean
-  isDoneColumn?: boolean
+  isRequired?: boolean
 }>()
 
 const tasksModel = ref<Task[]>([])
@@ -65,8 +65,7 @@ const columnIcon = computed(() => {
   return defaultIcon
 })
 
-const isRequired = computed(() => props.isDefaultColumn || props.isDoneColumn)
-const canBeDeleted = computed(() => !isRequired.value && props.tasks.length === 0)
+const canBeDeleted = computed(() => !props.isRequired && props.tasks.length === 0)
 const canCreateIssue = computed(() => props.isDefaultColumn || canEditLabels)
 const isDraggingDisabled = computed(
   () => !auth.isAuthenticated || !canEditLabels || tasks.isLoading,
@@ -94,14 +93,7 @@ const doneTasksFilter = doneTaskStatuses
       </div>
 
       <div class="flex items-center gap-2">
-        <UTooltip v-if="isDoneColumn" text="Showing items from the last two weeks">
-          <p class="sr-only">Showing items from the last two weeks</p>
-          <Icon
-            name="bx:info-circle"
-            size="20"
-            class="cursor-default text-rad-foreground-dim"
-          />
-        </UTooltip>
+        <slot name="actions"></slot>
         <template v-if="auth.isAuthenticated">
           <UTooltip
             v-if="!isRequired"
@@ -146,6 +138,7 @@ const doneTasksFilter = doneTaskStatuses
         <ColumnIssueCard v-if="isIssue(task)" :issue="task" />
         <ColumnPatchCard v-else-if="isPatch(task)" :patch="task" />
       </li>
+
       <NewColumnIssueCard
         v-if="isCreatingNewIssue"
         @submit="handleCreateIssue"

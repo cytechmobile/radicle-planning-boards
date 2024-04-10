@@ -6,6 +6,7 @@ const boardStateSchema = z.object({
   columns: z.array(z.string()),
   filter: z.object({
     taskKind: z.union([z.literal('issue'), z.literal('patch')]).optional(),
+    recentDoneTasks: z.boolean().optional(),
   }),
 })
 
@@ -15,6 +16,7 @@ const initialBoardState: BoardState = {
   columns: initialColumns,
   filter: {
     taskKind: 'issue',
+    recentDoneTasks: true,
   },
 }
 

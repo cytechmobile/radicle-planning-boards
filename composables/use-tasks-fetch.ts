@@ -145,7 +145,11 @@ export function useTasksFetch() {
       }
 
       // Filter done tasks by date
-      if (isTaskDone(task) && task.rpb.relevantDate < twoWeeksAgo) {
+      if (
+        board.state.filter.recentDoneTasks &&
+        isTaskDone(task) &&
+        task.rpb.relevantDate < twoWeeksAgo
+      ) {
         return false
       }
 
