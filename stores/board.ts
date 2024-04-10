@@ -1,12 +1,13 @@
 import { useStorage } from '@vueuse/core'
 import z from 'zod'
+import deepMerge from 'deepmerge'
 import { initialColumns } from '~/constants/columns'
 
 const boardStateSchema = z.object({
   columns: z.array(z.string()),
   filter: z.object({
     taskKind: z.union([z.literal('issue'), z.literal('patch')]).optional(),
-    recentDoneTasks: z.boolean().optional(),
+    recentDoneTasks: z.boolean(),
   }),
 })
 
@@ -21,7 +22,12 @@ const initialBoardState: BoardState = {
 }
 
 export const useBoardStore = defineStore('board', () => {
-  const state = useStorage('RPB_board-state', initialBoardState)
+  const state = useStorage('RPB_board-state', initialBoardState, localStorage, {
+    mergeDefaults: (storageValue, defaults) =>
+      deepMerge(defaults, storageValue, {
+        arrayMerge: overwriteMerge,
+      }),
+  })
 
   function mergeColumns(parsedColumns: string[]) {
     const updatedColumns = [...new Set([...state.value.columns, ...parsedColumns])]
