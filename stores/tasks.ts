@@ -6,10 +6,10 @@ export const useTasksStore = defineStore('tasks', () => {
   const { tasks, areTasksPending, refreshTasks, refreshSpecificTasks, updateTaskLabels } =
     useTasksFetch()
   const route = useRoute('node-rid')
-
   const permissions = usePermissions()
   const board = useBoardStore()
 
+  const isReady = ref(false)
   const isCreatingTask = ref(false)
   const isResettingPriority = ref(false)
 
@@ -28,6 +28,26 @@ export const useTasksStore = defineStore('tasks', () => {
     )
 
     return orderedTasks
+  })
+
+  watchEffect(() => {
+    if (!isReady.value && tasks.value) {
+      isReady.value = true
+    }
+  })
+
+  // Initialize task priority after first fetch
+  watchEffect(() => {
+    if (permissions.canEditLabels && isReady.value) {
+      initializePriority()
+    }
+  })
+
+  // Merge task-derived columns with existing columns
+  watchEffect(() => {
+    if (tasksByColumn.value) {
+      board.mergeColumns(Object.keys(tasksByColumn.value))
+    }
   })
 
   async function initializePriority() {
@@ -56,23 +76,6 @@ export const useTasksStore = defineStore('tasks', () => {
       await refreshTasks()
     }
   }
-
-  watch(
-    () => [permissions.canEditLabels, tasks.value],
-    ([canEditLabels, newTasks], [_, oldTasks]) => {
-      // Only initialize task priority on first fetch
-      if (canEditLabels && newTasks && !oldTasks) {
-        initializePriority()
-      }
-    },
-  )
-
-  // Merge task-derived columns with existing columns
-  watchEffect(() => {
-    if (tasksByColumn.value) {
-      board.mergeColumns(Object.keys(tasksByColumn.value))
-    }
-  })
 
   async function moveTask({
     task,
@@ -188,10 +191,11 @@ export const useTasksStore = defineStore('tasks', () => {
 
   const store = {
     tasksByColumn,
+    isReady,
     isLoading,
+    isResettingPriority,
     moveTask,
     createIssue,
-    isResettingPriority,
     resetPriority,
   }
 
