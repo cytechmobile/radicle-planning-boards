@@ -18,7 +18,7 @@ defineProps<Props>()
 
 <template>
   <article
-    class="flex flex-col gap-1 rounded-sm border border-rad-border-hint bg-rad-background-float p-3 transition-opacity hover:bg-rad-fill-float-hover"
+    class="group flex flex-col gap-1 rounded-sm border border-rad-border-hint bg-rad-background-float p-3 transition-opacity hover:bg-rad-fill-float-hover"
   >
     <small class="flex items-center gap-2">
       <span class="sr-only">{{ status.name }}</span>
@@ -36,11 +36,11 @@ defineProps<Props>()
       </a>
     </h4>
 
-    <ul v-if="labels.length > 0">
+    <ul v-if="labels.length > 0" class="flex flex-wrap gap-2">
       <li
         v-for="label in labels"
         :key="label"
-        class="mt-2 text-xs font-bold text-rad-foreground-emphasized"
+        class="mt-2 rounded-full bg-rad-fill-ghost px-2 py-1 text-xs font-semibold text-rad-foreground-contrast group-hover:bg-rad-background-float"
       >
         {{ label }}
       </li>
