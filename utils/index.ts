@@ -8,3 +8,7 @@ export function initializeArrayForKey<Value>(
 
   return object[key] as Value[]
 }
+
+export function overwriteMerge<T>(_: T, source: T): T {
+  return source
+}

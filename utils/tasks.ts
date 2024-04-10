@@ -18,7 +18,7 @@ export function isTaskDone(task: Task): boolean {
   return doneTaskStatuses.includes(task.state.status)
 }
 
-function getTaskProperties(radicleTask: RadicleTask): TaskProperties {
+function getTaskProperties(radicleTask: RadicleTask): Omit<TaskProperties, 'relevantDate'> {
   let column = 'non-planned'
   let priority: number | null = null
 
@@ -31,7 +31,7 @@ function getTaskProperties(radicleTask: RadicleTask): TaskProperties {
     }
   }
 
-  const rpbTaskProperties: TaskProperties = {
+  const rpbTaskProperties: Omit<TaskProperties, 'relevantDate'> = {
     column,
     priority,
   }
@@ -40,10 +40,15 @@ function getTaskProperties(radicleTask: RadicleTask): TaskProperties {
 }
 
 export function transformRadicleIssueToIssue(radicleIssue: RadicleIssue): Issue {
+  // Multiplying timestamp with 1000 to convert from seconds to milliseconds
+  const timestamp = (radicleIssue.discussion[0]?.timestamp ?? 0) * 1000
+  const relevantDate = new Date(timestamp)
+
   const issue: Issue = {
     ...radicleIssue,
     rpb: {
       kind: 'issue',
+      relevantDate,
       ...getTaskProperties(radicleIssue),
     },
   }
@@ -52,10 +57,15 @@ export function transformRadicleIssueToIssue(radicleIssue: RadicleIssue): Issue 
 }
 
 export function transformRadiclePatchToPatch(radiclePatch: RadiclePatch): Patch {
+  // Multiplying timestamp with 1000 to convert from seconds to milliseconds
+  const timestamp = (radiclePatch.revisions.at(-1)?.timestamp ?? 0) * 1000
+  const relevantDate = new Date(timestamp)
+
   const patch: Patch = {
     ...radiclePatch,
     rpb: {
       kind: 'patch',
+      relevantDate,
       ...getTaskProperties(radiclePatch),
     },
   }

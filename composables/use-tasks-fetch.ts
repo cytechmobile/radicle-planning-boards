@@ -135,13 +135,26 @@ export function useTasksFetch() {
       return null
     }
 
-    if (!board.state.filter.taskKind) {
-      return fetchedTasks.value
-    }
+    const twoWeeksAgo = new Date()
+    twoWeeksAgo.setDate(twoWeeksAgo.getDate() - 14)
 
-    const filteredTasks = fetchedTasks.value.filter(
-      (task) => board.state.filter.taskKind === task.rpb.kind,
-    )
+    const filteredTasks = fetchedTasks.value.filter((task) => {
+      // Filter by task kind
+      if (board.state.filter.taskKind && board.state.filter.taskKind !== task.rpb.kind) {
+        return false
+      }
+
+      // Filter done tasks by date
+      if (
+        board.state.filter.recentDoneTasks &&
+        isTaskDone(task) &&
+        task.rpb.relevantDate < twoWeeksAgo
+      ) {
+        return false
+      }
+
+      return true
+    })
 
     return filteredTasks
   })

@@ -8,7 +8,7 @@ const props = defineProps<{
   title: string
   tasks: Task[]
   isDefaultColumn?: boolean
-  isDoneColumn?: boolean
+  isRequired?: boolean
 }>()
 
 const tasksModel = ref<Task[]>([])
@@ -65,8 +65,7 @@ const columnIcon = computed(() => {
   return defaultIcon
 })
 
-const isRequired = computed(() => props.isDefaultColumn || props.isDoneColumn)
-const canBeDeleted = computed(() => !isRequired.value && props.tasks.length === 0)
+const canBeDeleted = computed(() => !props.isRequired && props.tasks.length === 0)
 const canCreateIssue = computed(() => props.isDefaultColumn || canEditLabels)
 const isDraggingDisabled = computed(
   () => !auth.isAuthenticated || !canEditLabels || tasks.isLoading,
@@ -93,21 +92,24 @@ const doneTasksFilter = doneTaskStatuses
         </small>
       </div>
 
-      <div v-if="auth.isAuthenticated" class="flex items-center gap-2">
-        <UTooltip
-          v-if="!isRequired"
-          :text="canBeDeleted ? 'Delete column' : 'The column must be empty to be deleted'"
-        >
-          <IconButton
-            label="Delete column"
-            icon="bx:trash"
-            :disabled="!canBeDeleted"
-            @click="board.removeColumn(title)"
-          />
-        </UTooltip>
-        <UTooltip v-if="canCreateIssue" text="New issue">
-          <IconButton label="New issue" icon="bx:plus" @click="isCreatingNewIssue = true" />
-        </UTooltip>
+      <div class="flex items-center gap-2">
+        <slot name="actions"></slot>
+        <template v-if="auth.isAuthenticated">
+          <UTooltip
+            v-if="!isRequired"
+            :text="canBeDeleted ? 'Delete column' : 'The column must be empty to be deleted'"
+          >
+            <IconButton
+              label="Delete column"
+              icon="bx:trash"
+              :disabled="!canBeDeleted"
+              @click="board.removeColumn(title)"
+            />
+          </UTooltip>
+          <UTooltip v-if="canCreateIssue" text="New issue">
+            <IconButton label="New issue" icon="bx:plus" @click="isCreatingNewIssue = true" />
+          </UTooltip>
+        </template>
       </div>
     </div>
 
@@ -136,6 +138,7 @@ const doneTasksFilter = doneTaskStatuses
         <ColumnIssueCard v-if="isIssue(task)" :issue="task" />
         <ColumnPatchCard v-else-if="isPatch(task)" :patch="task" />
       </li>
+
       <NewColumnIssueCard
         v-if="isCreatingNewIssue"
         @submit="handleCreateIssue"
