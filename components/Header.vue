@@ -71,8 +71,8 @@ async function handleImport() {
         </UTooltip>
         <UTooltip v-if="isDebugging" text="Reset card order. All changes will be lost!">
           <UButton
-            :icon="tasks.isResettingPriority ? 'i-heroicons-arrow-path' : undefined"
-            :disabled="tasks.isLoading || tasks.isResettingPriority"
+            :icon="tasks.isResetPriorityPending ? 'i-heroicons-arrow-path' : undefined"
+            :disabled="tasks.isLoading || tasks.isResetPriorityPending"
             @click="tasks.resetPriority"
           >
             Reset Order
