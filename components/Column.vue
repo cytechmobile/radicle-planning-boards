@@ -37,7 +37,7 @@ function handleMoveTask(event: VueDraggableEvent) {
     return
   }
 
-  void tasks.moveTask({
+  tasks.moveTask({
     task,
     column,
     index: event.newIndex,
@@ -45,7 +45,7 @@ function handleMoveTask(event: VueDraggableEvent) {
 }
 
 function handleCreateIssue(title: string) {
-  void tasks.createIssue({ title, column: props.title })
+  tasks.createIssue({ title, column: props.title })
 }
 
 const columnIcon = computed(() => {

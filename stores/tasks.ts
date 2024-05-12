@@ -10,10 +10,6 @@ export const useTasksStore = defineStore('tasks', () => {
   const board = useBoardStore()
 
   const isReady = ref(false)
-  const isCreatingTask = ref(false)
-  const isResettingPriority = ref(false)
-
-  const isLoading = computed(() => areTasksPending.value || isCreatingTask.value)
 
   const { filteredTasks, taskHighlights } = useFilteredTasks()
   const tasksByColumn = computed(() => {
@@ -31,15 +27,172 @@ export const useTasksStore = defineStore('tasks', () => {
     return orderedTasks
   })
 
+  const { mutate: initializePriority, isIdle: isInitializePriorityIdle } = useMutation({
+    async mutationFn() {
+      if (!tasks.value) {
+        return false
+      }
+
+      const tasksWithoutPriority: Task[] = []
+      let highestPriority = 0
+
+      for (const task of tasks.value) {
+        if (task.rpb.priority === null) {
+          tasksWithoutPriority.push(task)
+        } else if (task.rpb.priority > highestPriority) {
+          highestPriority = task.rpb.priority
+        }
+      }
+
+      for (const [index, task] of tasksWithoutPriority.entries()) {
+        const priority = highestPriority + (index + 1) * taskPriorityIncrement
+
+        await updateTaskLabels(task, [...task.labels, createDataLabel('priority', priority)])
+      }
+
+      const shouldRefreshTasks = tasksWithoutPriority.length > 0
+
+      return shouldRefreshTasks
+    },
+    onSuccess(shouldRefreshTasks) {
+      if (shouldRefreshTasks) {
+        void refreshTasks()
+      }
+    },
+    onError() {
+      void refreshTasks()
+    },
+  })
+
+  const { mutate: moveTask } = useMutation({
+    async mutationFn({
+      task,
+      column,
+      index,
+    }: {
+      task: Task
+      column: string
+      index: number
+    }): Promise<Task[]> {
+      const columnTasks = tasksByColumn.value?.[column]
+      if (!columnTasks) {
+        return []
+      }
+
+      const priorityUpdates = calculatePriorityUpdates({
+        tasks: columnTasks,
+        task,
+        index,
+      })
+
+      if (priorityUpdates.length === 0) {
+        return []
+      }
+
+      await Promise.all(
+        priorityUpdates.map(async ({ task, priority }, index) => {
+          // Only update column on the task being moved (index === 0)
+          const updatedLabels = createUpdatedTaskLabels(task, {
+            priority,
+            column: index === 0 ? column : undefined,
+          })
+
+          task.labels = updatedLabels
+          task.rpb.priority = priority
+          if (index === 0) {
+            task.rpb.column = column
+          }
+
+          await updateTaskLabels(task, updatedLabels)
+        }),
+      )
+
+      const tasksToRefresh = priorityUpdates.map(({ task }) => task)
+
+      return tasksToRefresh
+    },
+    onSuccess(tasksToRefresh) {
+      void refreshSpecificTasks(tasksToRefresh)
+    },
+    onError() {
+      void refreshTasks()
+    },
+  })
+
+  const { mutate: createIssue, isPending: isCreateIssuePending } = useMutation({
+    async mutationFn({ title, column }: { title: string; column: string }) {
+      const columnIssues = tasksByColumn.value?.[column]
+      if (columnIssues === undefined) {
+        return
+      }
+
+      const labels: string[] = []
+
+      if (permissions.canEditLabels) {
+        if (column !== 'non-planned') {
+          labels.push(createDataLabel('column', column))
+        }
+
+        const lastIssue = columnIssues.at(-1)
+        const priority = lastIssue
+          ? (lastIssue.rpb.priority ?? 0) + taskPriorityIncrement
+          : taskPriorityIncrement
+        labels.push(createDataLabel('priority', priority))
+      }
+
+      await $httpd('/projects/{rid}/issues', {
+        method: 'POST',
+        path: {
+          rid: route.params.rid,
+        },
+        body: {
+          title,
+          description: '',
+          labels,
+          assignees: [],
+          // @ts-expect-error - wrong type definition
+          embeds: [],
+        },
+      })
+    },
+    onSuccess() {
+      void refreshTasks()
+    },
+  })
+
+  const { mutate: resetPriority, isPending: isResetPriorityPending } = useMutation({
+    async mutationFn() {
+      if (!tasks.value) {
+        return
+      }
+
+      const partialPriorityLabel = createPartialDataLabel('priority')
+
+      for (const task of tasks.value) {
+        const priorityLabelIndex = task.labels.findIndex((label) =>
+          label.startsWith(partialPriorityLabel),
+        )
+
+        if (priorityLabelIndex !== -1) {
+          await updateTaskLabels(task, task.labels.toSpliced(priorityLabelIndex, 1))
+        }
+      }
+    },
+    async onSuccess() {
+      await refreshTasks()
+      // initializePriority()
+    },
+  })
+
   watchEffect(() => {
     if (!isReady.value && tasks.value) {
       isReady.value = true
     }
   })
 
-  // Initialize task priority after first fetch
+  // Initialize task priority once
   watchEffect(() => {
-    if (permissions.canEditLabels && isReady.value) {
+    if (isInitializePriorityIdle.value && permissions.canEditLabels && isReady.value) {
       initializePriority()
     }
   })
@@ -51,151 +204,14 @@ export const useTasksStore = defineStore('tasks', () => {
     }
   })
 
-  async function initializePriority() {
-    if (!tasks.value) {
-      return
-    }
-
-    const tasksWithoutPriority: Task[] = []
-    let highestPriority = 0
-
-    for (const task of tasks.value) {
-      if (task.rpb.priority === null) {
-        tasksWithoutPriority.push(task)
-      } else if (task.rpb.priority > highestPriority) {
-        highestPriority = task.rpb.priority
-      }
-    }
-
-    for (const [index, task] of tasksWithoutPriority.entries()) {
-      const priority = highestPriority + (index + 1) * taskPriorityIncrement
-
-      await updateTaskLabels(task, [...task.labels, createDataLabel('priority', priority)])
-    }
-
-    if (tasksWithoutPriority.length > 0) {
-      await refreshTasks()
-    }
-  }
-
-  async function moveTask({
-    task,
-    column,
-    index,
-  }: {
-    task: Task
-    column: string
-    index: number
-  }) {
-    const columnTasks = tasksByColumn.value?.[column]
-    if (!task || !columnTasks) {
-      return
-    }
-
-    const priorityUpdates = calculatePriorityUpdates({
-      tasks: columnTasks,
-      task,
-      index,
-    })
-
-    if (priorityUpdates.length === 0) {
-      return
-    }
-
-    await Promise.all(
-      priorityUpdates.map(async ({ task, priority }, index) => {
-        // Only update column on the task being moved (index === 0)
-        const updatedLabels = createUpdatedTaskLabels(task, {
-          priority,
-          column: index === 0 ? column : undefined,
-        })
-
-        task.labels = updatedLabels
-        task.rpb.priority = priority
-        if (index === 0) {
-          task.rpb.column = column
-        }
-
-        await updateTaskLabels(task, updatedLabels)
-      }),
-    )
-
-    await refreshSpecificTasks(priorityUpdates.map(({ task }) => task))
-  }
-
-  async function createIssue({ title, column }: { title: string; column: string }) {
-    const columnIssues = tasksByColumn.value?.[column]
-    if (columnIssues === undefined) {
-      return
-    }
-
-    const labels: string[] = []
-
-    if (permissions.canEditLabels) {
-      if (column !== 'non-planned') {
-        labels.push(createDataLabel('column', column))
-      }
-
-      const lastIssue = columnIssues.at(-1)
-      const priority = lastIssue
-        ? (lastIssue.rpb.priority ?? 0) + taskPriorityIncrement
-        : taskPriorityIncrement
-      labels.push(createDataLabel('priority', priority))
-    }
-
-    isCreatingTask.value = true
-
-    await $httpd('/projects/{rid}/issues', {
-      method: 'POST',
-      path: {
-        rid: route.params.rid,
-      },
-      body: {
-        title,
-        description: '',
-        labels,
-        assignees: [],
-        // @ts-expect-error - wrong type definition
-        embeds: [],
-      },
-    })
-
-    await refreshTasks()
-
-    isCreatingTask.value = false
-  }
-
-  async function resetPriority() {
-    if (!tasks.value) {
-      return
-    }
-
-    isResettingPriority.value = true
-
-    const partialPriorityLabel = createPartialDataLabel('priority')
-
-    for (const task of tasks.value) {
-      const priorityLabelIndex = task.labels.findIndex((label) =>
-        label.startsWith(partialPriorityLabel),
-      )
-
-      if (priorityLabelIndex !== -1) {
-        await updateTaskLabels(task, task.labels.toSpliced(priorityLabelIndex, 1))
-      }
-    }
-
-    await refreshTasks()
-    await initializePriority()
-
-    isResettingPriority.value = false
-  }
+  const isLoading = computed(() => areTasksPending.value || isCreateIssuePending.value)
 
   return {
     tasksByColumn,
     taskHighlights,
     isReady,
     isLoading,
-    isResettingPriority,
+    isResetPriorityPending,
     moveTask,
     createIssue,
     resetPriority,
