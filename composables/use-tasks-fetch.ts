@@ -5,7 +5,7 @@ export function useTasksFetch() {
   const { $httpd } = useNuxtApp()
   const route = useRoute('node-rid')
 
-  async function fetchIssue(id: string): Promise<Issue> {
+  async function fetchIssueById(id: string): Promise<Issue> {
     const radicleIssue = await $httpd('/projects/{rid}/issues/{issue}', {
       path: { rid: route.params.rid, issue: id },
     })
@@ -38,7 +38,7 @@ export function useTasksFetch() {
     return issues
   }
 
-  async function fetchPatch(id: string): Promise<Patch> {
+  async function fetchPatchById(id: string): Promise<Patch> {
     const radiclePatch = await $httpd('/projects/{rid}/patches/{patch}', {
       path: { rid: route.params.rid, patch: id },
     })
@@ -76,23 +76,6 @@ export function useTasksFetch() {
     return patches
   }
 
-  async function refreshSpecificTasks(tasks: Task[]): Promise<void> {
-    await Promise.all(
-      tasks.map(async (task) => {
-        switch (task.rpb.kind) {
-          case 'issue':
-            task = await fetchIssue(task.id)
-            break
-          case 'patch':
-            task = await fetchPatch(task.id)
-            break
-          default:
-            throw new Error('Unsupported task kind')
-        }
-      }),
-    )
-  }
-
   async function updateTaskLabels(task: Task, labels: string[]) {
     switch (task.rpb.kind) {
       case 'issue':
@@ -128,6 +111,37 @@ export function useTasksFetch() {
 
     return tasks
   })
+
+  async function refreshSpecificTasks(tasksToRefetch: Task[]): Promise<void> {
+    if (!tasks.value) {
+      return
+    }
+
+    const refreshedTasks = await Promise.all(
+      tasksToRefetch.map(async (task) => {
+        switch (task.rpb.kind) {
+          case 'issue':
+            return await fetchIssueById(task.id)
+          case 'patch':
+            return await fetchPatchById(task.id)
+          default:
+            throw new Error('Unsupported task kind')
+        }
+      }),
+    )
+
+    for (const refreshedTask of refreshedTasks) {
+      const taskIndex = tasks.value?.findIndex(
+        (fetchedTask) => fetchedTask.id === refreshedTask.id,
+      )
+
+      if (taskIndex === undefined || taskIndex === -1) {
+        return
+      }
+
+      tasks.value.splice(taskIndex, 1, refreshedTask)
+    }
+  }
 
   return {
     tasks,

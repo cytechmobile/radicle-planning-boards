@@ -1,5 +1,12 @@
+import { useMutation } from '@tanstack/vue-query'
 import { taskPriorityIncrement } from '~/constants/tasks'
 import type { Task, TaskHighlights } from '~/types/tasks'
+
+interface TaskPositionUpdate {
+  task: Task
+  labels: string[]
+  rpb: Task['rpb']
+}
 
 export const useTasksStore = defineStore('tasks', () => {
   const { $httpd } = useNuxtApp()
@@ -64,60 +71,65 @@ export const useTasksStore = defineStore('tasks', () => {
     },
   })
 
-  const { mutate: moveTask } = useMutation({
-    async mutationFn({
-      task,
-      column,
-      index,
-    }: {
-      task: Task
-      column: string
-      index: number
-    }): Promise<Task[]> {
-      const columnTasks = tasksByColumn.value?.[column]
-      if (!columnTasks) {
-        return []
-      }
-
-      const priorityUpdates = calculatePriorityUpdates({
-        tasks: columnTasks,
-        task,
-        index,
-      })
-
-      if (priorityUpdates.length === 0) {
-        return []
-      }
-
+  const { mutate: optimisticallyUpdateTasksPositions } = useMutation({
+    async mutationFn(positionUpdates: TaskPositionUpdate[]) {
       await Promise.all(
-        priorityUpdates.map(async ({ task, priority }, index) => {
-          // Only update column on the task being moved (index === 0)
-          const updatedLabels = createUpdatedTaskLabels(task, {
-            priority,
-            column: index === 0 ? column : undefined,
-          })
-
-          task.labels = updatedLabels
-          task.rpb.priority = priority
-          if (index === 0) {
-            task.rpb.column = column
-          }
-
-          await updateTaskLabels(task, updatedLabels)
+        positionUpdates.map(async ({ task, labels }) => {
+          await updateTaskLabels(task, labels)
         }),
       )
-
-      const tasksToRefresh = priorityUpdates.map(({ task }) => task)
-
-      return tasksToRefresh
     },
-    onSuccess(tasksToRefresh) {
+    onMutate(positionUpdates) {
+      positionUpdates.forEach(({ task, labels, rpb }) => {
+        task.labels = labels
+        task.rpb = rpb
+      })
+    },
+    onSettled(data, error, positionUpdates) {
+      const tasksToRefresh = positionUpdates.map(({ task }) => task)
       void refreshSpecificTasks(tasksToRefresh)
     },
-    onError() {
-      void refreshTasks()
-    },
   })
+
+  function moveTask({ task, column, index }: { task: Task; column: string; index: number }) {
+    const columnTasks = tasksByColumn.value?.[column]
+    if (!columnTasks) {
+      return
+    }
+
+    const priorityUpdates = calculatePriorityUpdates({
+      tasks: columnTasks,
+      task,
+      index,
+    })
+
+    if (priorityUpdates.length === 0) {
+      return
+    }
+
+    const positionUpdates: TaskPositionUpdate[] = priorityUpdates.map(
+      ({ task, priority }, index) => {
+        // Only the first task may change columns since the rest are being moved
+        // within the same column to avoid conflicts
+        const newColumn = index === 0 ? column : task.rpb.column
+
+        return {
+          task,
+          labels: createUpdatedTaskLabels(task, {
+            priority,
+            column: newColumn,
+          }),
+          rpb: {
+            ...task.rpb,
+            priority,
+            column: newColumn,
+          },
+        }
+      },
+    )
+
+    optimisticallyUpdateTasksPositions(positionUpdates)
+  }
 
   const { mutate: createIssue, isPending: isCreateIssuePending } = useMutation({
     async mutationFn({ title, column }: { title: string; column: string }) {
@@ -180,7 +192,6 @@ export const useTasksStore = defineStore('tasks', () => {
     },
     async onSuccess() {
       await refreshTasks()
-      // initializePriority()
     },
   })
 
