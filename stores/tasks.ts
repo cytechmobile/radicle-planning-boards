@@ -33,39 +33,43 @@ export const useTasksStore = defineStore('tasks', () => {
     return orderedTasks
   })
 
-  const { mutate: initializePriority, isIdle: isInitializePriorityIdle } = useMutation({
+  const tasksSummary = computed(() => {
+    if (!permissions.canEditLabels || !tasks.value) {
+      return null
+    }
+
+    const tasksWithoutPriority: Task[] = []
+    let highestPriority = 0
+
+    for (const task of tasks.value) {
+      if (task.rpb.priority === null) {
+        tasksWithoutPriority.push(task)
+      } else if (task.rpb.priority > highestPriority) {
+        highestPriority = task.rpb.priority
+      }
+    }
+
+    return {
+      tasksWithoutPriority,
+      highestPriority,
+    }
+  })
+
+  const { mutate: initializePriority } = useMutation({
     async mutationFn() {
-      if (!tasks.value) {
-        return false
+      if (!tasksSummary.value) {
+        return
       }
 
-      const tasksWithoutPriority: Task[] = []
-      let highestPriority = 0
-
-      for (const task of tasks.value) {
-        if (task.rpb.priority === null) {
-          tasksWithoutPriority.push(task)
-        } else if (task.rpb.priority > highestPriority) {
-          highestPriority = task.rpb.priority
-        }
-      }
+      const { tasksWithoutPriority, highestPriority } = tasksSummary.value
 
       for (const [index, task] of tasksWithoutPriority.entries()) {
         const priority = highestPriority + (index + 1) * taskPriorityIncrement
 
         await updateTaskLabels(task, [...task.labels, createDataLabel('priority', priority)])
       }
-
-      const shouldRefreshTasks = tasksWithoutPriority.length > 0
-
-      return shouldRefreshTasks
     },
-    onSuccess(shouldRefreshTasks) {
-      if (shouldRefreshTasks) {
-        void refreshAllTasks()
-      }
-    },
-    onError() {
+    onSettled() {
       void refreshAllTasks()
     },
   })
@@ -173,7 +177,7 @@ export const useTasksStore = defineStore('tasks', () => {
 
   const { mutate: resetPriority, isPending: isResetPriorityPending } = useMutation({
     async mutationFn() {
-      if (!tasks.value) {
+      if (!permissions.canEditLabels || !tasks.value) {
         return
       }
 
@@ -189,8 +193,8 @@ export const useTasksStore = defineStore('tasks', () => {
         }
       }
     },
-    async onSuccess() {
-      await refreshAllTasks()
+    onSettled() {
+      void refreshAllTasks()
     },
   })
 
@@ -200,9 +204,9 @@ export const useTasksStore = defineStore('tasks', () => {
     }
   })
 
-  // Initialize task priority once
+  // Initialize priority for tasks without priority
   watchEffect(() => {
-    if (isInitializePriorityIdle.value && permissions.canEditLabels && isReady.value) {
+    if (tasksSummary.value && tasksSummary.value.tasksWithoutPriority.length > 0) {
       initializePriority()
     }
   })
