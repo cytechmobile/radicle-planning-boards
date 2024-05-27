@@ -34,38 +34,60 @@ export const useTasksStore = defineStore('tasks', () => {
     return orderedTasks
   })
 
-  const tasksSummary = computed(() => {
+  const tasksWithoutPriority = computed(() => {
     if (!permissions.canEditLabels || !tasks.value) {
       return null
     }
 
     const tasksWithoutPriority: Task[] = []
-    let highestPriority = 0
 
     for (const task of tasks.value) {
       if (task.rpb.priority === null) {
         tasksWithoutPriority.push(task)
-      } else if (task.rpb.priority > highestPriority) {
-        highestPriority = task.rpb.priority
       }
     }
 
-    return {
-      tasksWithoutPriority,
-      highestPriority,
-    }
+    return tasksWithoutPriority
   })
 
   const { mutate: initializePriority, isPending: isInitializePriorityPending } = useMutation({
     async mutationFn() {
-      if (!tasksSummary.value) {
+      if (!tasksByColumn.value || !tasksWithoutPriority.value) {
         return
       }
 
-      const { tasksWithoutPriority, highestPriority } = tasksSummary.value
+      function getHighestPriorityInColumn(column: string) {
+        const columnTasks = tasksByColumn.value?.[column]
+        if (!columnTasks) {
+          return 0
+        }
 
-      for (const [index, task] of tasksWithoutPriority.entries()) {
-        const priority = highestPriority + (index + 1) * taskPriorityIncrement
+        return columnTasks.reduce((acc, task) => {
+          return task.rpb.priority !== null && task.rpb.priority > acc
+            ? task.rpb.priority
+            : acc
+        }, 0)
+      }
+
+      const highestPriorityByColumn: Record<string, number> = {}
+      const taskIndexByColumn: Record<string, number> = {}
+
+      for (const task of tasksWithoutPriority.value) {
+        const { column } = task.rpb
+
+        if (highestPriorityByColumn[column] === undefined) {
+          highestPriorityByColumn[column] = getHighestPriorityInColumn(column)
+        }
+
+        if (taskIndexByColumn[column] === undefined) {
+          taskIndexByColumn[column] = 0
+        } else {
+          taskIndexByColumn[column]++
+        }
+
+        const priority =
+          (highestPriorityByColumn[column] ?? 0) +
+          ((taskIndexByColumn[column] ?? 0) + 1) * taskPriorityIncrement
 
         await updateTaskLabels(task, [...task.labels, createDataLabel('priority', priority)])
       }
@@ -203,7 +225,7 @@ export const useTasksStore = defineStore('tasks', () => {
 
   // Initialize priority for tasks without priority
   watchEffect(() => {
-    if (tasksSummary.value && tasksSummary.value.tasksWithoutPriority.length > 0) {
+    if (tasksWithoutPriority.value && tasksWithoutPriority.value.length > 0) {
       initializePriority()
     }
   })
