@@ -55,7 +55,7 @@ export const useTasksStore = defineStore('tasks', () => {
     }
   })
 
-  const { mutate: initializePriority } = useMutation({
+  const { mutate: initializePriority, isPending: isInitializePriorityPending } = useMutation({
     async mutationFn() {
       if (!tasksSummary.value) {
         return
@@ -175,28 +175,24 @@ export const useTasksStore = defineStore('tasks', () => {
     },
   })
 
-  const { mutate: resetPriority, isPending: isResetPriorityPending } = useMutation({
-    async mutationFn() {
-      if (!permissions.canEditLabels || !tasks.value) {
-        return
+  function resetPriority() {
+    if (!permissions.canEditLabels || !tasks.value) {
+      return
+    }
+
+    const partialPriorityLabel = createPartialDataLabel('priority')
+
+    for (const task of tasks.value) {
+      const priorityLabelIndex = task.labels.findIndex((label) =>
+        label.startsWith(partialPriorityLabel),
+      )
+
+      if (priorityLabelIndex !== -1) {
+        task.labels.splice(priorityLabelIndex, 1)
+        task.rpb.priority = null
       }
-
-      const partialPriorityLabel = createPartialDataLabel('priority')
-
-      for (const task of tasks.value) {
-        const priorityLabelIndex = task.labels.findIndex((label) =>
-          label.startsWith(partialPriorityLabel),
-        )
-
-        if (priorityLabelIndex !== -1) {
-          await updateTaskLabels(task, task.labels.toSpliced(priorityLabelIndex, 1))
-        }
-      }
-    },
-    onSettled() {
-      void refreshAllTasks()
-    },
-  })
+    }
+  }
 
   watchEffect(() => {
     if (!isReady.value && tasks.value) {
@@ -218,13 +214,15 @@ export const useTasksStore = defineStore('tasks', () => {
     }
   })
 
-  const isLoading = computed(() => areTasksPending.value || isCreateIssuePending.value)
+  const isLoading = computed(
+    () =>
+      areTasksPending.value || isCreateIssuePending.value || isInitializePriorityPending.value,
+  )
 
   const store = {
     tasksByColumn,
     isReady,
     isLoading,
-    isResetPriorityPending,
     moveTask,
     createIssue,
     resetPriority,
