@@ -24,8 +24,8 @@ dependencies:
     specifier: ^0.6.9
     version: 0.6.10(nuxt@3.11.1)(vite@5.2.5)(vue@3.4.21)
   vue-draggable-plus:
-    specifier: ^0.3.5
-    version: 0.3.5(@types/sortablejs@1.15.8)
+    specifier: ^0.5.0
+    version: 0.5.0(@types/sortablejs@1.15.8)
   zod:
     specifier: ^3.22.4
     version: 3.22.4
@@ -8779,8 +8779,8 @@ packages:
   /vue-devtools-stub@0.1.0:
     resolution: {integrity: sha512-RutnB7X8c5hjq39NceArgXg28WZtZpGc3+J16ljMiYnFhKvd8hITxSWQSQ5bvldxMDU6gG5mkxl1MTQLXckVSQ==}
 
-  /vue-draggable-plus@0.3.5(@types/sortablejs@1.15.8):
-    resolution: {integrity: sha512-HqIxV4Wr4U5LRPLRi2oV+EJ4g6ibyRKhuaiH4ZQo+LxK4zrk2XcBk9UyXC88OXp4SAq0XYH4Wco/T3LX5kJ79A==}
+  /vue-draggable-plus@0.5.0(@types/sortablejs@1.15.8):
+    resolution: {integrity: sha512-A5TT5+M5JceROSjPO9aDZTsrSN1TetEs419czPlboomarSiGIBIxTp2WD7XH53EHMrbO7Qo+leRiHWV/rMlyjA==}
     peerDependencies:
       '@types/sortablejs': ^1.15.0
       '@vue/composition-api': '*'
