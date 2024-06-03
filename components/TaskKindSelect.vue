@@ -50,7 +50,7 @@ function handleChange(selected: (typeof options)[number]) {
     <USelectMenu
       id="task-kind-select"
       :model-value="selected"
-      :options="options"
+      :options="options as unknown as string[]"
       size="sm"
       :ui-menu="{
         background:
