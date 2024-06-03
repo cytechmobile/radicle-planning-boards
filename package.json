@@ -35,7 +35,7 @@
     "@nuxt/devtools": "^1.0.8",
     "@nuxtjs/google-fonts": "^3.2.0",
     "nuxt": "^3.11.1",
-    "nuxt-open-fetch": "^0.6.2",
+    "nuxt-open-fetch": "^0.8.0",
     "nuxt-security": "^1.2.2",
     "ts-essentials": "^10.0.0",
     "typescript": "^5.4.2",
