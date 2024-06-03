@@ -49,7 +49,8 @@
     "vue-router": "^4.3.0"
   },
   "simple-git-hooks": {
-    "pre-commit": "npx lint-staged"
+    "pre-commit": "npx lint-staged",
+    "pre-push": "npm run test:unit"
   },
   "lint-staged": {
     "*": "eslint --fix --max-warnings 0 --no-warn-ignored --cache --cache-location node_modules/.cache/eslint"
