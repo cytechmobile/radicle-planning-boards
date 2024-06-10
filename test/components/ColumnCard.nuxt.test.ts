@@ -1,6 +1,7 @@
 import { screen } from '@testing-library/vue'
 import { renderSuspended } from '@nuxt/test-utils/runtime'
 import { ColumnCard } from '#components'
+import { taskTruncatedIdLength } from '~/constants/tasks'
 
 describe('<ColumnCard />', () => {
   it('should render the title (link to a new tab), status, id (truncated), and labels', async () => {
@@ -22,7 +23,7 @@ describe('<ColumnCard />', () => {
     })
 
     expect(screen.getByText(props.status.name)).toBeInTheDocument()
-    expect(screen.getByText(props.id.slice(0, 7))).toBeInTheDocument()
+    expect(screen.getByText(props.id.slice(0, taskTruncatedIdLength))).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: props.title })).toBeInTheDocument()
     props.labels.forEach((label) => {
       expect(screen.getByText(label)).toBeInTheDocument()
