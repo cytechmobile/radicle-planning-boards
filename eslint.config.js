@@ -10,7 +10,7 @@ export default maninak(
   {
     files: ['**/*.test.ts'],
     rules: {
-      'max-len': ['error', 120],
+      'max-len': ['warn', { code: 95, ignoreStrings: true }],
     },
   },
 )
