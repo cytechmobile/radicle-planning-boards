@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import type { Writable } from 'ts-essentials'
+
 const board = useBoardStore()
 
 const options = ['All', 'Issues', 'Patches'] as const
@@ -50,7 +52,7 @@ function handleChange(selected: (typeof options)[number]) {
     <USelectMenu
       id="task-kind-select"
       :model-value="selected"
-      :options="options as unknown as string[]"
+      :options="options as Writable<typeof options>"
       size="sm"
       :ui-menu="{
         background:
