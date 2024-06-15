@@ -6,7 +6,47 @@ export function useTasksFetch() {
   const route = useRoute('node-rid')
   const board = useBoardStore()
 
-  async function fetchIssue(id: string): Promise<Issue> {
+  const {
+    data: fetchedTasks,
+    pending: areTasksPending,
+    refresh: refreshAllTasks,
+  } = useAsyncData('tasks', async () => {
+    const issuesAndPatches = await Promise.all([fetchIssues(), fetchPatches()])
+    const tasks = issuesAndPatches.flat()
+
+    return tasks
+  })
+
+  const tasks = computed(() => {
+    if (!fetchedTasks.value) {
+      return null
+    }
+
+    const twoWeeksAgo = new Date()
+    twoWeeksAgo.setDate(twoWeeksAgo.getDate() - 14)
+
+    const filteredTasks = fetchedTasks.value.filter((task) => {
+      // Filter by task kind
+      if (board.state.filter.taskKind && board.state.filter.taskKind !== task.rpb.kind) {
+        return false
+      }
+
+      // Filter done tasks by date
+      if (
+        board.state.filter.recentDoneTasks &&
+        isTaskDone(task) &&
+        task.rpb.relevantDate < twoWeeksAgo
+      ) {
+        return false
+      }
+
+      return true
+    })
+
+    return filteredTasks
+  })
+
+  async function fetchIssueById(id: string): Promise<Issue> {
     const radicleIssue = await $httpd('/projects/{rid}/issues/{issue}', {
       path: { rid: route.params.rid, issue: id },
     })
@@ -39,7 +79,7 @@ export function useTasksFetch() {
     return issues
   }
 
-  async function fetchPatch(id: string): Promise<Patch> {
+  async function fetchPatchById(id: string): Promise<Patch> {
     const radiclePatch = await $httpd('/projects/{rid}/patches/{patch}', {
       path: { rid: route.params.rid, patch: id },
     })
@@ -77,23 +117,6 @@ export function useTasksFetch() {
     return patches
   }
 
-  async function refreshSpecificTasks(tasks: Task[]): Promise<void> {
-    await Promise.all(
-      tasks.map(async (task) => {
-        switch (task.rpb.kind) {
-          case 'issue':
-            task = await fetchIssue(task.id)
-            break
-          case 'patch':
-            task = await fetchPatch(task.id)
-            break
-          default:
-            throw new Error('Unsupported task kind')
-        }
-      }),
-    )
-  }
-
   async function updateTaskLabels(task: Task, labels: string[]) {
     switch (task.rpb.kind) {
       case 'issue':
@@ -119,50 +142,41 @@ export function useTasksFetch() {
     }
   }
 
-  const {
-    data: fetchedTasks,
-    pending: areTasksPending,
-    refresh: refreshTasks,
-  } = useAsyncData('tasks', async () => {
-    const issuesAndPatches = await Promise.all([fetchIssues(), fetchPatches()])
-    const tasks = issuesAndPatches.flat()
-
-    return tasks
-  })
-
-  const tasks = computed(() => {
+  async function refreshSpecificTasks(tasks: Task[]): Promise<void> {
     if (!fetchedTasks.value) {
-      return null
+      return
     }
 
-    const twoWeeksAgo = new Date()
-    twoWeeksAgo.setDate(twoWeeksAgo.getDate() - 14)
+    const refreshedTasks = await Promise.all(
+      tasks.map(async (task) => {
+        switch (task.rpb.kind) {
+          case 'issue':
+            return await fetchIssueById(task.id)
+          case 'patch':
+            return await fetchPatchById(task.id)
+          default:
+            throw new Error('Unsupported task kind')
+        }
+      }),
+    )
 
-    const filteredTasks = fetchedTasks.value.filter((task) => {
-      // Filter by task kind
-      if (board.state.filter.taskKind && board.state.filter.taskKind !== task.rpb.kind) {
-        return false
+    for (const refreshedTask of refreshedTasks) {
+      const taskIndex = fetchedTasks.value?.findIndex(
+        (fetchedTask) => fetchedTask.id === refreshedTask.id,
+      )
+
+      if (taskIndex === undefined || taskIndex === -1) {
+        return
       }
 
-      // Filter done tasks by date
-      if (
-        board.state.filter.recentDoneTasks &&
-        isTaskDone(task) &&
-        task.rpb.relevantDate < twoWeeksAgo
-      ) {
-        return false
-      }
-
-      return true
-    })
-
-    return filteredTasks
-  })
+      fetchedTasks.value.splice(taskIndex, 1, refreshedTask)
+    }
+  }
 
   return {
     tasks,
     areTasksPending,
-    refreshTasks,
+    refreshAllTasks,
     refreshSpecificTasks,
     updateTaskLabels,
   }

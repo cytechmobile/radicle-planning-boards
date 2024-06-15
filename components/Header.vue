@@ -70,13 +70,10 @@ async function handleImport() {
           </button>
         </UTooltip>
         <UTooltip v-if="isDebugging" text="Reset card order. All changes will be lost!">
-          <UButton
-            :icon="tasks.isResettingPriority ? 'i-heroicons-arrow-path' : undefined"
-            :disabled="tasks.isLoading || tasks.isResettingPriority"
-            @click="tasks.resetPriority"
-          >
+          <button class="button-solid" type="button" @click="tasks.resetPriority">
+            <Icon name="octicon:sync" size="16" />
             Reset Order
-          </UButton>
+          </button>
         </UTooltip>
       </template>
     </div>
