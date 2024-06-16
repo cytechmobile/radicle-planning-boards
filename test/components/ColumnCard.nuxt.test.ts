@@ -4,7 +4,7 @@ import { ColumnCard } from '#components'
 import { taskTruncatedIdLength } from '~/constants/tasks'
 
 describe('<ColumnCard />', () => {
-  it('should render the title (link to a new tab), status, id (truncated), and labels', async () => {
+  it('renders the title (link as new tab), status, id (truncated), and labels', async () => {
     const props = {
       id: '786cfb329a8a63dadda30caaa38437b870ab6bf8',
       title: 'Title',
@@ -18,9 +18,8 @@ describe('<ColumnCard />', () => {
       },
       href: 'https://example.com',
     }
-    await renderSuspended(ColumnCard, {
-      props,
-    })
+
+    await renderSuspended(ColumnCard, { props })
 
     expect(screen.getByText(props.status.name)).toBeInTheDocument()
     expect(screen.getByText(props.id.slice(0, taskTruncatedIdLength))).toBeInTheDocument()
