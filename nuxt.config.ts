@@ -4,6 +4,9 @@ const defaultParentOrigin = 'https://guileless-puppy-2d91b5.netlify.app'
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
+  future: {
+    compatibilityVersion: 4,
+  },
   ssr: false,
   devServer: {
     port: 4000,
