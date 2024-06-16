@@ -3,7 +3,7 @@
   "type": "module",
   "version": "0.1.0",
   "private": true,
-  "packageManager": "pnpm@8.15.2",
+  "packageManager": "pnpm@9.3.0",
   "license": "./LICENSE",
   "engines": {
     "npm": "^7",
@@ -12,7 +12,7 @@
   "scripts": {
     "preinstall": "npx -y only-allow pnpm",
     "postinstall": "nuxt prepare",
-    "verify-deps": "npx --yes pnpm@latest-8 i --frozen-lockfile --prefer-offline",
+    "verify-deps": "npx --yes pnpm@latest-9 i --frozen-lockfile --prefer-offline",
     "dev": "npm run verify-deps && nuxt dev",
     "build": "nuxt generate",
     "preview": "nuxt preview",
