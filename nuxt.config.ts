@@ -16,6 +16,7 @@ export default defineNuxtConfig({
     'nuxt-icon',
     '@nuxtjs/google-fonts',
     'nuxt-open-fetch',
+    '@nuxt/test-utils/module',
   ],
   experimental: { typedPages: true },
   devtools: { enabled: true },
