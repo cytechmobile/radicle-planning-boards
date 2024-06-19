@@ -23,7 +23,7 @@
   },
   "dependencies": {
     "@iconify/json": "^2.2.219",
-    "@nuxt/ui": "^2.15.2",
+    "@nuxt/ui": "2.15.2",
     "@pinia/nuxt": "^0.5.1",
     "@vueuse/nuxt": "^10.11.0",
     "deepmerge": "^4.3.1",
