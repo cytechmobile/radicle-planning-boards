@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { taskTruncatedIdLength } from '~/constants/tasks'
+
 interface Props {
   id: string
   title: string
@@ -26,7 +28,7 @@ defineProps<Props>()
         <Icon :name="status.icon.name" size="16" :class="status.icon.class" />
       </UTooltip>
       <pre class="text-xs font-medium text-rad-foreground-emphasized">{{
-        id.slice(0, 7)
+        id.slice(0, taskTruncatedIdLength)
       }}</pre>
     </small>
 

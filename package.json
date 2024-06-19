@@ -18,7 +18,7 @@
     "lint": "eslint . --max-warnings 0 --no-warn-ignored --cache --cache-location node_modules/.cache/eslint",
     "test": "npm run test:typings && npm run test:unit",
     "test:typings": "nuxt typecheck",
-    "test:unit": "echo \"Unit testing not yet implemented.\""
+    "test:unit": "vitest run"
   },
   "dependencies": {
     "@iconify/json": "^2.2.190",
@@ -33,17 +33,24 @@
   "devDependencies": {
     "@maninak/eslint-config": "^0.1.4",
     "@nuxt/devtools": "^1.0.8",
+    "@nuxt/test-utils": "^3.13.1",
     "@nuxtjs/google-fonts": "^3.2.0",
+    "@testing-library/jest-dom": "^6.4.5",
+    "@testing-library/vue": "^8.1.0",
+    "@vue/test-utils": "^2.4.6",
+    "happy-dom": "^14.11.1",
     "nuxt": "^3.11.1",
     "nuxt-open-fetch": "^0.6.2",
     "nuxt-security": "^1.2.2",
     "ts-essentials": "^9.4.1",
     "typescript": "^5.4.2",
+    "vitest": "^1.6.0",
     "vue": "^3.4.21",
     "vue-router": "^4.3.0"
   },
   "simple-git-hooks": {
-    "pre-commit": "npx lint-staged"
+    "pre-commit": "npx lint-staged",
+    "pre-push": "npm run test:unit"
   },
   "lint-staged": {
     "*": "eslint --fix --max-warnings 0 --no-warn-ignored --cache --cache-location node_modules/.cache/eslint"

@@ -13,6 +13,7 @@
     "Nuxtr.nuxtr-vscode",
     "antfu.iconify",
     "vue.volar",
+    "vitest.explorer",
   ],
   // Please make sure you disable the following extensions *for this workspace*
   "unwantedRecommendations": [
