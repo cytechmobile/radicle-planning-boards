@@ -25,6 +25,5 @@ jobs:
       run: pnpm run lint
     - name: Test Typings
       run: pnpm run test:typings
-      continue-on-error: true # temporarily allowed to fail because script fails due to a 3rd party lib bug
     - name: Test Unit
       run: pnpm run test:unit
