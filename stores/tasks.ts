@@ -15,14 +15,15 @@ export const useTasksStore = defineStore('tasks', () => {
 
   const isLoading = computed(() => areTasksPending.value || isCreatingTask.value)
 
+  const filteredTasks = useFilteredTasks()
   const tasksByColumn = computed(() => {
-    if (tasks.value === null) {
-      return null
+    if (filteredTasks.value === undefined) {
+      return undefined
     }
 
     const orderedTasks = orderTasksByColumn(
       groupTasksByColumn({
-        tasks: tasks.value,
+        tasks: filteredTasks.value,
         columns: board.state.columns,
       }),
     )
@@ -189,7 +190,7 @@ export const useTasksStore = defineStore('tasks', () => {
     isResettingPriority.value = false
   }
 
-  const store = {
+  return {
     tasksByColumn,
     isReady,
     isLoading,
@@ -198,6 +199,85 @@ export const useTasksStore = defineStore('tasks', () => {
     createIssue,
     resetPriority,
   }
-
-  return store
 })
+
+function useFilteredTasks() {
+  const { tasks } = useTasksFetch()
+  const board = useBoardStore()
+
+  const twoWeeksAgo = new Date()
+  twoWeeksAgo.setDate(twoWeeksAgo.getDate() - 14)
+
+  const broadlyFilteredTasksAndSearchableFields = computed(() => {
+    function filterAndLowercaseLabels(labels: string[]): string[] {
+      const filteredLabels: string[] = []
+      for (const label of labels) {
+        if (!label.startsWith(dataLabelNamespace)) {
+          filteredLabels.push(label.toLowerCase())
+        }
+      }
+
+      return filteredLabels
+    }
+
+    if (!tasks.value) {
+      return undefined
+    }
+
+    const broadlyFilteredTasksAndSearchableFields: {
+      task: Task
+      searchableFields: string[]
+    }[] = []
+
+    for (const task of tasks.value) {
+      // Filter by task kind
+      if (board.state.filter.taskKind && board.state.filter.taskKind !== task.rpb.kind) {
+        continue
+      }
+
+      // Filter done tasks by date
+      if (
+        board.state.filter.recentDoneTasks &&
+        isTaskDone(task) &&
+        task.rpb.relevantDate < twoWeeksAgo
+      ) {
+        continue
+      }
+
+      const searchableFields = [
+        task.title.toLowerCase(),
+        task.id.toLowerCase(),
+        ...filterAndLowercaseLabels(task.labels),
+      ]
+
+      broadlyFilteredTasksAndSearchableFields.push({ task, searchableFields })
+    }
+
+    return broadlyFilteredTasksAndSearchableFields
+  })
+
+  const filteredTasks = computed(() => {
+    if (!broadlyFilteredTasksAndSearchableFields.value) {
+      return undefined
+    }
+
+    const query = board.state.filter.query?.trim().toLowerCase()
+
+    if (!query) {
+      const tasks = broadlyFilteredTasksAndSearchableFields.value.map(({ task }) => task)
+
+      return tasks
+    }
+
+    const filteredTasks: Task[] = []
+    for (const { task, searchableFields } of broadlyFilteredTasksAndSearchableFields.value) {
+      if (searchableFields.some((field) => field.includes(query))) {
+        filteredTasks.push(task)
+      }
+    }
+
+    return filteredTasks
+  })
+
+  return filteredTasks
+}

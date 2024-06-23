@@ -41,7 +41,20 @@ async function handleImport() {
 
 <template>
   <header class="flex justify-between gap-4 px-4">
-    <TaskKindSelect />
+    <div class="flex gap-4">
+      <TaskKindSelect />
+      <div
+        class="flex w-72 items-center gap-2 rounded-sm border border-rad-border-hint bg-rad-background-dip pl-2 focus-within:outline focus-within:outline-rad-fill-secondary hover:border-rad-border-default"
+      >
+        <Icon name="octicon:filter-16" class="text-rad-foreground-dim" />
+        <input
+          v-model="board.state.filter.query"
+          type="text"
+          class="h-full flex-1 bg-inherit outline-none"
+          placeholder="Filter"
+        />
+      </div>
+    </div>
 
     <div class="flex gap-4">
       <a
