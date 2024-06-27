@@ -4,6 +4,7 @@ import type { Patch } from '~/types/tasks'
 
 const props = defineProps<{
   patch: Patch
+  query?: RegExp
 }>()
 
 type ColumnCardStatus = InstanceType<typeof ColumnCard>['$props']['status']
@@ -50,5 +51,6 @@ const href = computed(() =>
     :labels="labels"
     :href="href"
     :status="status"
+    :query="query"
   />
 </template>

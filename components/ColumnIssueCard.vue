@@ -4,6 +4,7 @@ import type { Issue } from '~/types/tasks'
 
 const props = defineProps<{
   issue: Issue
+  query?: RegExp
 }>()
 
 type ColumnCardStatus = InstanceType<typeof ColumnCard>['$props']['status']
@@ -45,5 +46,6 @@ const href = computed(() =>
     :labels="labels"
     :href="href"
     :status="status"
+    :query="query"
   />
 </template>

@@ -208,31 +208,11 @@ function useFilteredTasks() {
   const twoWeeksAgo = new Date()
   twoWeeksAgo.setDate(twoWeeksAgo.getDate() - 14)
 
-  const broadlyFilteredTasksAndSearchableFields = computed(() => {
-    function filterAndLowercaseLabels(labels: string[]): string[] {
-      const filteredLabels: string[] = []
-      for (const label of labels) {
-        if (!label.startsWith(dataLabelNamespace)) {
-          filteredLabels.push(label.toLowerCase())
-        }
-      }
-
-      return filteredLabels
-    }
-
-    if (!tasks.value) {
-      return undefined
-    }
-
-    const broadlyFilteredTasksAndSearchableFields: {
-      task: Task
-      searchableFields: string[]
-    }[] = []
-
-    for (const task of tasks.value) {
+  const broadlyFilteredTasks = computed(() => {
+    const broadlyFilteredTasks = tasks.value?.filter((task) => {
       // Filter by task kind
       if (board.state.filter.taskKind && board.state.filter.taskKind !== task.rpb.kind) {
-        continue
+        return false
       }
 
       // Filter done tasks by date
@@ -241,40 +221,32 @@ function useFilteredTasks() {
         isTaskDone(task) &&
         task.rpb.relevantDate < twoWeeksAgo
       ) {
-        continue
+        return false
       }
 
-      const searchableFields = [
-        task.title.toLowerCase(),
-        task.id.toLowerCase(),
-        ...filterAndLowercaseLabels(task.labels),
-      ]
+      return true
+    })
 
-      broadlyFilteredTasksAndSearchableFields.push({ task, searchableFields })
-    }
-
-    return broadlyFilteredTasksAndSearchableFields
+    return broadlyFilteredTasks
   })
 
-  const filteredTasks = computed(() => {
-    if (!broadlyFilteredTasksAndSearchableFields.value) {
+  const filteredTasks = computed<Task[] | undefined>(() => {
+    if (!broadlyFilteredTasks.value) {
       return undefined
     }
 
-    const query = board.state.filter.query?.trim().toLowerCase()
-
+    const query = board.state.filter.query?.trim()
     if (!query) {
-      const tasks = broadlyFilteredTasksAndSearchableFields.value.map(({ task }) => task)
-
-      return tasks
+      return broadlyFilteredTasks.value
     }
 
-    const filteredTasks: Task[] = []
-    for (const { task, searchableFields } of broadlyFilteredTasksAndSearchableFields.value) {
-      if (searchableFields.some((field) => field.includes(query))) {
-        filteredTasks.push(task)
-      }
-    }
+    const queryRegExp = new RegExp(query, 'gi')
+    const filteredTasks = broadlyFilteredTasks.value.filter(
+      (task) =>
+        queryRegExp.test(task.title) ||
+        queryRegExp.test(task.id) ||
+        task.labels.some((label) => queryRegExp.test(label)),
+    )
 
     return filteredTasks
   })

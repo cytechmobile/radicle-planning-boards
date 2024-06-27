@@ -73,6 +73,15 @@ const isDraggingDisabled = computed(
 const doneTasksFilter = doneTaskStatuses
   .map((status) => `[data-status='${status}']`)
   .join(', ')
+
+// TODO: zac move this elsewhere
+const query = computed(() => {
+  if (!board.state.filter.query) {
+    return undefined
+  }
+
+  return new RegExp(board.state.filter.query, 'gi')
+})
 </script>
 
 <template>
@@ -135,8 +144,8 @@ const doneTasksFilter = doneTaskStatuses
           'hover:cursor-grab': !isDraggingDisabled && !isTaskDone(task),
         }"
       >
-        <ColumnIssueCard v-if="isIssue(task)" :issue="task" />
-        <ColumnPatchCard v-else-if="isPatch(task)" :patch="task" />
+        <ColumnIssueCard v-if="isIssue(task)" :issue="task" :query="query" />
+        <ColumnPatchCard v-else-if="isPatch(task)" :patch="task" :query="query" />
       </li>
 
       <NewColumnIssueCard
