@@ -132,6 +132,7 @@ const query = computed(() => {
       :data-column="title"
       :disabled="isDraggingDisabled"
       :filter="doneTasksFilter"
+      aria-live="polite"
       @end="handleMoveTask($event)"
     >
       <li
