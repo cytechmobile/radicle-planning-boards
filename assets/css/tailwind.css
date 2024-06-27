@@ -127,6 +127,12 @@ body {
   color: var(--color-foreground-contrast);
 }
 
+::selection, mark {
+  /* !important used to override selection color */
+  background: var(--color-fill-yellow-iconic) !important;
+  color: var(--color-foreground-black);
+}
+
 @layer components {
   .button-solid {
     @apply flex h-8 cursor-pointer items-center justify-center gap-2 rounded-sm bg-rad-fill-secondary px-3 text-sm font-semibold text-rad-foreground-match-background hover:bg-rad-fill-secondary-hover;

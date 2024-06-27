@@ -27,7 +27,7 @@ function getHighlightedText(text: string, query: RegExp | undefined) {
   const queryRegExp = new RegExp(query, 'gi')
 
   return text.replace(queryRegExp, (match) => {
-    return `<mark class="bg-rad-foreground-emphasized">${match}</mark>`
+    return `<mark>${match}</mark>`
   })
 }
 </script>
