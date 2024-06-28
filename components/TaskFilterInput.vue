@@ -51,7 +51,7 @@ function handleMouseDown(event: MouseEvent) {
       type="text"
       class="h-full flex-1 bg-inherit outline-none"
       :aria-label="label"
-      :placeholder="label"
+      :placeholder="`${label}…`"
     />
     <UTooltip v-show="Boolean(queryParams.query)" text="Clear filters">
       <IconButton label="Clear filters" icon="octicon:x-16" @click="queryParams.query = ''" />
