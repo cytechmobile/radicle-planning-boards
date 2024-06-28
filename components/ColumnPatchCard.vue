@@ -29,11 +29,31 @@ const status = computed<ColumnCardStatus>(() => ({
 const radicleInterfaceBaseUrl = useRadicleInterfaceBaseUrl()
 const isDebugging = useIsDebugging()
 
+// TODO: zac reduce duplication between ColumnIssueCard and ColumnPatchCard
 const labels = computed(() =>
   isDebugging.value
     ? props.patch.labels
     : props.patch.labels.filter((label) => !label.startsWith(dataLabelNamespace)),
 )
+
+const highlights = computed(() => {
+  if (!props.highlights) {
+    return undefined
+  }
+
+  if (isDebugging.value) {
+    return props.highlights
+  }
+
+  const filteredHighlightLabels = props.highlights.labels.filter(
+    (label) => !(label[0] ?? '').startsWith(dataLabelNamespace),
+  )
+
+  return {
+    ...props.highlights,
+    labels: filteredHighlightLabels,
+  }
+})
 
 const href = computed(() =>
   new URL(
