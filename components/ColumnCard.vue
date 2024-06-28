@@ -19,13 +19,23 @@ interface Props {
 
 defineProps<Props>()
 
-// A function that takes an array of strings and a limit and returns the characters up to the limit in the same form as before
-// e.g. ['this', 'is', 'a', 'test'], 8 => ['this', 'is', 'a', 't']
-function truncateSegmentedText(text: string[], limit: number): string[] {
+/**
+ * Truncates segmented text based on a character limit.
+ *
+ * @param {string[]} segments - The segmented text to truncate.
+ * @param {number} limit - The character limit.
+ * @returns The truncated segmented text.
+ *
+ * @example
+ * ```ts
+ * truncateSegmentedText(['foo', 'bar'], 5) // ['foo', 'ba']
+ * ```
+ */
+function truncateSegmentedText(segments: string[], limit: number): string[] {
   const truncatedText = []
   let currentLength = 0
 
-  for (const segment of text) {
+  for (const segment of segments) {
     if (currentLength + segment.length > limit) {
       truncatedText.push(segment.slice(0, limit - currentLength))
       break
