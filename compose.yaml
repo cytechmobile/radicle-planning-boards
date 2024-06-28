@@ -2,6 +2,7 @@ version: '3.8'
 
 services:
   planning-boards:
+    image:  quay.io/radicle_in_containers/radicle-planning-boards
     container_name: radicle-planning-boards
     build:
       dockerfile: ./Containerfile
