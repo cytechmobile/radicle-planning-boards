@@ -81,7 +81,7 @@ const query = computed(() => {
     return undefined
   }
 
-  return new RegExp(queryParams.query, 'gi')
+  return toRegExp(queryParams.query, 'i')
 })
 </script>
 

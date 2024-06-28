@@ -24,9 +24,7 @@ function getHighlightedText(text: string, query: RegExp | undefined) {
     return text
   }
 
-  const queryRegExp = new RegExp(query, 'gi')
-
-  return text.replace(queryRegExp, (match) => {
+  return text.replace(query, (match) => {
     return `<mark>${match}</mark>`
   })
 }

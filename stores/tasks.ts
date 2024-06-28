@@ -241,7 +241,7 @@ function useFilteredTasks() {
       return broadlyFilteredTasks.value
     }
 
-    const queryRegExp = new RegExp(query, 'gi')
+    const queryRegExp = toRegExp(query, 'i')
     const filteredTasks = broadlyFilteredTasks.value.filter(
       (task) =>
         queryRegExp.test(task.title) ||
