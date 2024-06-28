@@ -7,6 +7,11 @@ const inputRef = ref<HTMLInputElement>()
 const { focused } = useFocus(inputRef)
 // TODO: zac disable this while a modal is open
 onKeyStroke('/', (event) => {
+  // Allow typing in input elements
+  if (/input|textarea|select/i.test((event.target as HTMLElement | null)?.tagName ?? '')) {
+    return
+  }
+
   event.preventDefault()
   inputRef.value?.focus()
 })
@@ -22,14 +27,21 @@ const label = computed(() => {
       return 'Filter tasks'
   }
 })
+
+// Prevents blur when clicking outside the input element
+function handleMouseDown(event: MouseEvent) {
+  if (event.target !== inputRef.value) {
+    event.preventDefault()
+  }
+}
 </script>
 
 <template>
   <form
     role="search"
     class="flex w-96 cursor-text items-center gap-2 rounded-sm border border-rad-border-hint bg-rad-background-dip px-2 focus-within:outline focus-within:outline-rad-fill-secondary hover:border-rad-border-default"
-    @mousedown.prevent
     @click="inputRef?.focus()"
+    @mousedown="handleMouseDown"
   >
     <Icon name="octicon:filter-16" class="text-rad-foreground-dim" />
     <input
