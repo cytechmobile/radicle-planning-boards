@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  planning-boards:
+    container_name: radicle-planning-boards
+    build:
+      dockerfile: ./Containerfile
+      context: .
+      args:
+        - NUXT_PUBLIC_PARENT_ORIGIN
+    ports:
+      - "3090:80"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - boards_caddy_data:/data
+
+
+volumes:
+  boards_caddy_data:
