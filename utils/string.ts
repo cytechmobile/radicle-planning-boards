@@ -1,23 +1,16 @@
 /**
- * Escapes any special characters from a string and converts it to a regular expression.
+ * Escapes special characters in a string so that it can be used in a regular expression.
  *
- * @param {string} string - The string to convert to a regular expression.
- * @param {string} [flags] - Optional flags to be applied to the regular expression.
- * @returns A regular expression object.
- *
- * @example
- * ```ts
- * toRegExp('foo.bar') // /foo\.bar/
- * ```
+ * @param {string} string - The string to escape.
+ * @returns The escaped string.
  *
  * @example
  * ```ts
- * toRegExp('foo.bar', 'i') // /foo\.bar/i
+ * escapeString('foo.bar') // 'foo\.bar'
  * ```
  */
-export function toRegExp(string: string, flags?: string): RegExp {
-  const escapedString = string.replace(/[/\-\\^$*+?.()|[\]{}]/g, '\\$&')
-  const regExp = new RegExp(escapedString, flags)
+export function escapeRegExp(string: string): string {
+  const escapedString = string.replace(/[\\^$.*+?()[\]{}|]/g, '\\$&')
 
-  return regExp
+  return escapedString
 }

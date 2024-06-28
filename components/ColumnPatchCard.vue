@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import ColumnCard from './ColumnCard.vue'
-import type { Patch } from '~/types/tasks'
+import type { Patch, TaskHighlights } from '~/types/tasks'
 
 const props = defineProps<{
   patch: Patch
-  query?: RegExp
+  highlights?: TaskHighlights
 }>()
 
 type ColumnCardStatus = InstanceType<typeof ColumnCard>['$props']['status']
@@ -51,6 +51,6 @@ const href = computed(() =>
     :labels="labels"
     :href="href"
     :status="status"
-    :query="query"
+    :highlights="highlights"
   />
 </template>

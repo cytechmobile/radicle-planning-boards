@@ -1,5 +1,5 @@
 import { taskPriorityIncrement } from '~/constants/tasks'
-import type { Task } from '~/types/tasks'
+import type { Task, TaskHighlights } from '~/types/tasks'
 
 export const useTasksStore = defineStore('tasks', () => {
   const { $httpd } = useNuxtApp()
@@ -15,7 +15,7 @@ export const useTasksStore = defineStore('tasks', () => {
 
   const isLoading = computed(() => areTasksPending.value || isCreatingTask.value)
 
-  const filteredTasks = useFilteredTasks()
+  const { filteredTasks, taskHighlights } = useFilteredTasks()
   const tasksByColumn = computed(() => {
     if (filteredTasks.value === undefined) {
       return undefined
@@ -192,6 +192,7 @@ export const useTasksStore = defineStore('tasks', () => {
 
   return {
     tasksByColumn,
+    taskHighlights,
     isReady,
     isLoading,
     isResettingPriority,
@@ -231,26 +232,59 @@ function useFilteredTasks() {
   })
 
   const { queryParams } = useQueryParamsStore()
+  const queryRegExp = computed(() => {
+    const query = queryParams.query?.trim()
+    if (!query) {
+      return undefined
+    }
+
+    // Wrap query in a capture group (parenthesis) so string.split() keeps the matches in the
+    // resulting array
+    const queryRegExp = new RegExp(`(${escapeRegExp(query)})`, 'i')
+
+    return queryRegExp
+  })
+
   const filteredTasks = computed<Task[] | undefined>(() => {
     if (!broadlyFilteredTasks.value) {
       return undefined
     }
 
-    const query = queryParams.query?.trim()
-    if (!query) {
+    const regExp = queryRegExp.value
+    if (!regExp) {
       return broadlyFilteredTasks.value
     }
 
-    const queryRegExp = toRegExp(query, 'i')
     const filteredTasks = broadlyFilteredTasks.value.filter(
       (task) =>
-        queryRegExp.test(task.title) ||
-        queryRegExp.test(task.id) ||
-        task.labels.some((label) => queryRegExp.test(label)),
+        regExp.test(task.title) ||
+        regExp.test(task.id) ||
+        task.labels.some((label) => regExp.test(label)),
     )
 
     return filteredTasks
   })
 
-  return filteredTasks
+  const taskHighlights = computed(() => {
+    const highlights = new Map<string, TaskHighlights>()
+
+    const regExp = queryRegExp.value
+    if (!filteredTasks.value || !regExp) {
+      return highlights
+    }
+
+    for (const task of filteredTasks.value) {
+      const taskHighlights = {
+        id: task.id.split(regExp),
+        title: task.title.split(regExp),
+        labels: task.labels.map((label) => label.split(regExp)),
+      }
+
+      highlights.set(task.id, taskHighlights)
+    }
+
+    return highlights
+  })
+
+  return { filteredTasks, taskHighlights }
 }
