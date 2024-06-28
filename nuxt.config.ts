@@ -1,6 +1,6 @@
 import process from 'node:process'
 
-const defaultParentOrigin = 'https://guileless-puppy-2d91b5.netlify.app'
+const defaultParentOrigin = 'http://localhost'
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
