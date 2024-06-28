@@ -259,7 +259,9 @@ function useFilteredTasks() {
       (task) =>
         regExp.test(task.title) ||
         regExp.test(task.id) ||
-        task.labels.some((label) => regExp.test(label)),
+        task.labels.some(
+          (label) => !label.startsWith(dataLabelNamespace) && regExp.test(label),
+        ),
     )
 
     return filteredTasks
@@ -277,7 +279,14 @@ function useFilteredTasks() {
       const taskHighlights = {
         id: task.id.split(regExp),
         title: task.title.split(regExp),
-        labels: task.labels.map((label) => label.split(regExp)),
+        labels: task.labels.map((label) => {
+          if (label.startsWith(dataLabelNamespace)) {
+            return [label]
+          }
+          const segments = label.split(regExp)
+
+          return segments
+        }),
       }
 
       highlights.set(task.id, taskHighlights)
