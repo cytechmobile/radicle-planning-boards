@@ -230,12 +230,13 @@ function useFilteredTasks() {
     return broadlyFilteredTasks
   })
 
+  const { queryParams } = useQueryParamsStore()
   const filteredTasks = computed<Task[] | undefined>(() => {
     if (!broadlyFilteredTasks.value) {
       return undefined
     }
 
-    const query = board.state.filter.query?.trim()
+    const query = queryParams.query?.trim()
     if (!query) {
       return broadlyFilteredTasks.value
     }

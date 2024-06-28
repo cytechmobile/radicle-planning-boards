@@ -6,7 +6,6 @@ import { initialColumns } from '~/constants/columns'
 const boardStateSchema = z.object({
   columns: z.array(z.string()),
   filter: z.object({
-    query: z.string().optional(),
     taskKind: z.union([z.literal('issue'), z.literal('patch')]).optional(),
     recentDoneTasks: z.boolean(),
   }),
@@ -17,7 +16,6 @@ type BoardState = z.infer<typeof boardStateSchema>
 const initialBoardState: BoardState = {
   columns: initialColumns,
   filter: {
-    query: '',
     taskKind: 'issue',
     recentDoneTasks: true,
   },

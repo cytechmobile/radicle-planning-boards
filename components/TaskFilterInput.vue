@@ -1,6 +1,7 @@
 <script setup lang="ts">
 defineOptions({ inheritAttrs: false })
-const board = useBoardStore()
+
+const { queryParams } = useQueryParamsStore()
 
 const inputRef = ref<HTMLInputElement>()
 const { focused } = useFocus(inputRef)
@@ -10,6 +11,7 @@ onKeyStroke('/', (event) => {
   inputRef.value?.focus()
 })
 
+const board = useBoardStore()
 const label = computed(() => {
   switch (board.state.filter.taskKind) {
     case 'issue':
@@ -33,18 +35,14 @@ const label = computed(() => {
     <input
       v-bind="$attrs"
       ref="inputRef"
-      v-model="board.state.filter.query"
+      v-model="queryParams.query"
       type="text"
       class="h-full flex-1 bg-inherit outline-none"
       :aria-label="label"
       :placeholder="label"
     />
-    <UTooltip v-show="Boolean(board.state.filter.query)" text="Clear filters">
-      <IconButton
-        label="Clear filters"
-        icon="octicon:x-16"
-        @click="board.state.filter.query = ''"
-      />
+    <UTooltip v-show="Boolean(queryParams.query)" text="Clear filters">
+      <IconButton label="Clear filters" icon="octicon:x-16" @click="queryParams.query = ''" />
     </UTooltip>
     <kbd
       v-show="!focused"

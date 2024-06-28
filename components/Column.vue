@@ -75,12 +75,13 @@ const doneTasksFilter = doneTaskStatuses
   .join(', ')
 
 // TODO: zac move this elsewhere
+const { queryParams } = useQueryParamsStore()
 const query = computed(() => {
-  if (!board.state.filter.query) {
+  if (!queryParams.query) {
     return undefined
   }
 
-  return new RegExp(board.state.filter.query, 'gi')
+  return new RegExp(queryParams.query, 'gi')
 })
 </script>
 
