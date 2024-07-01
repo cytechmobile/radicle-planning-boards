@@ -2,6 +2,7 @@ localhost:80 {
 	root * /usr/share/caddy
 	try_files {path} /index.html
 	file_server
+	#consider below options in more production-focused scenarios
 	#header @static Cache-Control "public, max-age=259200"
 	#encode zstd gzip
 	#@skip path_regexp \.(wasm|js|css|png|jpe?g|gif|ico|woff2?|otf|ttf|eot|svg|txt|pdf|docx?|xlsx?)$
