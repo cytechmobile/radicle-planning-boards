@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { elementIds } from '~/constants/elements'
+
 defineOptions({ inheritAttrs: false })
 
 const { queryParams } = useQueryParamsStore()
@@ -6,14 +8,24 @@ const { queryParams } = useQueryParamsStore()
 const inputRef = ref<HTMLInputElement>()
 const { focused } = useFocus(inputRef)
 // TODO: zac disable this while a modal is open
-onKeyStroke('/', (event) => {
-  // Allow typing in input elements
-  if (/input|textarea|select/i.test((event.target as HTMLElement | null)?.tagName ?? '')) {
+useEventListener('keydown', (event) => {
+  const ctrlF = (event.ctrlKey || event.metaKey) && event.code === 'KeyF'
+  if (!ctrlF) {
     return
   }
 
   event.preventDefault()
   inputRef.value?.focus()
+})
+
+// TODO: zac disable this while a modal is open
+onKeyStroke('Escape', (event) => {
+  if (!focused) {
+    return
+  }
+
+  event.preventDefault()
+  inputRef.value?.blur()
 })
 
 const board = useBoardStore()
@@ -24,7 +36,7 @@ const label = computed(() => {
     case 'patch':
       return 'Filter patches'
     default:
-      return 'Filter tasks'
+      return 'Filter'
   }
 })
 
@@ -34,16 +46,25 @@ function handleMouseDown(event: MouseEvent) {
     event.preventDefault()
   }
 }
+
+// TODO: zac pull this out into a generic utility file if reused
+function isMac() {
+  // TODO: zac look into non-deprecated alternative
+  return navigator.platform.toLowerCase().includes('mac')
+}
+const filterShortcut = `${isMac() ? 'Cmd' : 'Ctrl'}+F`
 </script>
 
 <template>
   <form
+    :id="elementIds.taskFilterForm"
     role="search"
-    class="flex w-96 cursor-text items-center gap-2 rounded-sm border border-rad-border-hint bg-rad-background-dip px-2 focus-within:outline focus-within:outline-rad-fill-secondary hover:border-rad-border-default"
+    class="flex w-96 cursor-text items-center gap-2 rounded-sm border border-rad-border-hint bg-rad-background-dip px-2 text-sm focus-within:ring-2 focus-within:ring-rad-fill-secondary hover:border-rad-border-default"
     @click="inputRef?.focus()"
     @mousedown="handleMouseDown"
+    @submit.prevent
   >
-    <Icon name="octicon:filter-16" class="text-rad-foreground-dim" />
+    <Icon name="octicon:filter-16" class="text-rad-foreground-dim" size="16" />
     <input
       v-bind="$attrs"
       ref="inputRef"
@@ -53,14 +74,21 @@ function handleMouseDown(event: MouseEvent) {
       :aria-label="label"
       :placeholder="`${label}…`"
     />
-    <UTooltip v-show="Boolean(queryParams.query)" text="Clear filters">
-      <IconButton label="Clear filters" icon="octicon:x-16" @click="queryParams.query = ''" />
+    <UTooltip v-show="Boolean(queryParams.query)" text="Clear">
+      <IconButton
+        label="Clear"
+        icon="octicon:x-16"
+        :padded="false"
+        @click="queryParams.query = ''"
+      />
     </UTooltip>
-    <kbd
-      v-show="!focused"
-      class="flex h-5 min-w-5 items-center justify-center rounded-sm border border-rad-border-default px-1 font-sans text-xs font-medium"
-    >
-      /
-    </kbd>
+    <!-- TODO: zac hide on mobile devices -->
+    <UTooltip v-show="!focused" :text="`Press ${filterShortcut} to focus`">
+      <kbd
+        class="flex h-5 min-w-5 select-none items-center justify-center rounded-sm border border-rad-border-default px-1 font-sans text-xs font-medium"
+      >
+        {{ filterShortcut }}
+      </kbd>
+    </UTooltip>
   </form>
 </template>
