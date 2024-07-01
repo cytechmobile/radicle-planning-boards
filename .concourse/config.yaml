@@ -1,0 +1,125 @@
+
+jobs:
+
+- name: get-parameters
+  plan:
+    - get: jq-image
+    - get: radicle-planning-boards
+      trigger: true
+    - task: env-vars-http-server
+      image: jq-image
+      config:
+        platform: linux
+        inputs:
+          - name: radicle-planning-boards
+        outputs: [ { name: image-facts } ]
+        run:
+          path: /bin/sh
+          dir: radicle-planning-boards
+          args:
+            - -c
+            - |
+
+              ## parse the image tag
+              jq '.version' package.json | tr -d '\n' > ../image-facts/image_tag
+
+              cat ../image-facts/image_tag
+
+    - put: boards-image-params
+      params:
+        directory: image-facts
+
+
+- name: build-and-push-images
+  plan:
+  - get: radicle-planning-boards
+    trigger: true
+    passed: [get-parameters]
+
+  - get: boards-image-data
+    resource: boards-image-params
+    trigger: true
+    passed: [get-parameters]
+
+
+   # build images
+
+  - load_var: boards_image_tag
+    file: boards-image-data/image_tag
+    format: raw
+    reveal: true
+  - task: build-boards-image
+    privileged: true
+    output_mapping:
+      image: node-image
+    config:
+      platform: linux
+      image_resource:
+        type: registry-image
+        source:
+          repository: concourse/oci-build-task
+      inputs:
+      - name: radicle-planning-boards
+      outputs:
+      - name: image
+      params:
+        CONTEXT: radicle-planning-boards
+        DOCKERFILE: radicle-planning-boards/Containerfile
+        BUILD_ARG_VERSION: ((.:boards_image_tag))
+        BUILD_ARG_PLATFORM: x86_64-unknown-linux-musl
+        IMAGE_PLATFORM: linux/amd64
+      run:
+        path: build
+
+  # push images
+  - put: boards-image
+    params:
+      image: node-image/image.tar
+      version: ((.:boards_image_tag))
+
+
+resource_types:
+  - name: latest-git
+    type: registry-image
+    source:
+      repository: concourse/git-resource
+      tag: 1.16.0
+
+  - name: key-value
+    type: registry-image
+    source:
+      repository: gstack/keyval-resource
+
+resources:
+# The repo with our Dockerfile
+- name: radicle-planning-boards
+  type: latest-git
+  icon: git
+  source:
+    uri: https://seed.radicle.gr/z2BdUVZFvHdxRfdtGJQdSH2kyXNM6.git
+    branch: main
+    git_config:
+    - name: safe.directory
+      value: /tmp/build/get
+#  version:
+#    ref: commit-sha
+
+# Where we will push the image
+- name: boards-image
+  type: registry-image
+  icon: docker
+  source:
+    repository: quay.io/radicle_in_containers/radicle-planning-boards
+    tag: latest
+    username: ((registry-username))
+    password: ((registry-password))
+
+
+- name: jq-image
+  type: registry-image
+  source:
+    repository: docker.io/badouralix/curl-jq
+    tag: latest
+
+- name: boards-image-params
+  type: key-value
