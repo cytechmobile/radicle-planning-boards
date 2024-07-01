@@ -21,7 +21,7 @@ jobs:
             - |
 
               ## parse the image tag
-              jq '.version' package.json | tr -d '\n' > ../image-facts/image_tag
+              jq '.version' package.json | tr -d '\n' | tr -d '"' > ../image-facts/image_tag
 
               cat ../image-facts/image_tag
 
