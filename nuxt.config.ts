@@ -1,6 +1,6 @@
 import process from 'node:process'
 
-const defaultParentOrigin = 'http://localhost'
+const defaultParentOrigin = 'http://localhost:3080'
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
