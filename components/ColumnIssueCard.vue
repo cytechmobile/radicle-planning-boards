@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import ColumnCard from './ColumnCard.vue'
-import type { Issue } from '~/types/tasks'
+import type { Issue, TaskHighlights } from '~/types/tasks'
 
 const props = defineProps<{
   issue: Issue
+  highlights?: TaskHighlights
 }>()
 
 type ColumnCardStatus = InstanceType<typeof ColumnCard>['$props']['status']
@@ -23,11 +24,31 @@ const status = computed<ColumnCardStatus>(() => ({
 const radicleInterfaceBaseUrl = useRadicleInterfaceBaseUrl()
 const isDebugging = useIsDebugging()
 
+// TODO: zac reduce duplication between ColumnIssueCard and ColumnPatchCard
 const labels = computed(() =>
   isDebugging.value
     ? props.issue.labels
     : props.issue.labels.filter((label) => !label.startsWith(dataLabelNamespace)),
 )
+
+const highlights = computed(() => {
+  if (!props.highlights) {
+    return undefined
+  }
+
+  if (isDebugging.value) {
+    return props.highlights
+  }
+
+  const filteredHighlightLabels = props.highlights.labels.filter(
+    (label) => !(label[0] ?? '').startsWith(dataLabelNamespace),
+  )
+
+  return {
+    ...props.highlights,
+    labels: filteredHighlightLabels,
+  }
+})
 
 const href = computed(() =>
   new URL(
@@ -45,5 +66,6 @@ const href = computed(() =>
     :labels="labels"
     :href="href"
     :status="status"
+    :highlights="highlights"
   />
 </template>

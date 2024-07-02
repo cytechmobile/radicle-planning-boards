@@ -40,8 +40,11 @@ async function handleImport() {
 </script>
 
 <template>
-  <header class="flex justify-between gap-4 px-4">
-    <TaskKindSelect />
+  <header class="flex justify-between gap-4 p-4">
+    <div class="flex gap-4">
+      <TaskKindSelect />
+      <TaskFilterInput />
+    </div>
 
     <div class="flex gap-4">
       <a

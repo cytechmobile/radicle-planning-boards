@@ -4,7 +4,6 @@ import type { Issue, Patch, Task } from '~/types/tasks'
 export function useTasksFetch() {
   const { $httpd } = useNuxtApp()
   const route = useRoute('node-rid')
-  const board = useBoardStore()
 
   async function fetchIssue(id: string): Promise<Issue> {
     const radicleIssue = await $httpd('/projects/{rid}/issues/{issue}', {
@@ -120,7 +119,7 @@ export function useTasksFetch() {
   }
 
   const {
-    data: fetchedTasks,
+    data: tasks,
     pending: areTasksPending,
     refresh: refreshTasks,
   } = useAsyncData('tasks', async () => {
@@ -128,35 +127,6 @@ export function useTasksFetch() {
     const tasks = issuesAndPatches.flat()
 
     return tasks
-  })
-
-  const tasks = computed(() => {
-    if (!fetchedTasks.value) {
-      return null
-    }
-
-    const twoWeeksAgo = new Date()
-    twoWeeksAgo.setDate(twoWeeksAgo.getDate() - 14)
-
-    const filteredTasks = fetchedTasks.value.filter((task) => {
-      // Filter by task kind
-      if (board.state.filter.taskKind && board.state.filter.taskKind !== task.rpb.kind) {
-        return false
-      }
-
-      // Filter done tasks by date
-      if (
-        board.state.filter.recentDoneTasks &&
-        isTaskDone(task) &&
-        task.rpb.relevantDate < twoWeeksAgo
-      ) {
-        return false
-      }
-
-      return true
-    })
-
-    return filteredTasks
   })
 
   return {
