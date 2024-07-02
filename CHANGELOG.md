@@ -1,5 +1,17 @@
 # Radicle Planning Boards Change Log
 
+## **v0.2.0** - Jul 2nd 2024
+
+### 🚀 Enhancements
+
+- Add support for filtering via a text field
+
+### 🧹 Chores
+
+- Add container packaging
+- Set up unit testing
+- Update packages
+
 ## **v0.1.0** - Apr 23rd 2024
 
 ### 🚀 Enhancements
