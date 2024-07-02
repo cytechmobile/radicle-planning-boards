@@ -233,7 +233,7 @@ function useFilteredTasks() {
 
   const { queryParams } = useQueryParamsStore()
   const queryRegExp = computed(() => {
-    const query = queryParams.query?.trim()
+    const query = queryParams.filter?.trim()
     if (!query) {
       return undefined
     }

@@ -68,18 +68,18 @@ const filterShortcut = `${isMac() ? 'Cmd' : 'Ctrl'}+F`
     <input
       v-bind="$attrs"
       ref="inputRef"
-      v-model="queryParams.query"
+      v-model="queryParams.filter"
       type="text"
       class="h-full flex-1 bg-inherit outline-none"
       :aria-label="label"
       :placeholder="`${label}…`"
     />
-    <UTooltip v-show="Boolean(queryParams.query)" text="Clear">
+    <UTooltip v-show="Boolean(queryParams.filter)" text="Clear">
       <IconButton
         label="Clear"
         icon="octicon:x-16"
         :padded="false"
-        @click="queryParams.query = ''"
+        @click="queryParams.filter = ''"
       />
     </UTooltip>
     <!-- TODO: zac hide on mobile devices -->

@@ -1,7 +1,7 @@
 import { debounceFilter } from '@vueuse/core'
 
 interface QueryParams extends Record<string, string | undefined> {
-  query?: string
+  filter?: string
 }
 
 export const useQueryParamsStore = defineStore('query-params', () => {
