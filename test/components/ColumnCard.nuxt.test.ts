@@ -3,6 +3,7 @@ import { renderSuspended } from '@nuxt/test-utils/runtime'
 import { ColumnCard } from '#components'
 import { taskTruncatedIdLength } from '~/constants/tasks'
 
+// TODO: zac write tests for highlighting
 describe('<ColumnCard />', () => {
   it('renders the title (link as new tab), status, id (truncated), and labels', async () => {
     const props = {

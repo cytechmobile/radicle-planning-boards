@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { VueDraggable } from 'vue-draggable-plus'
+import { elementIds } from '~/constants/elements'
 import type { VueDraggableEvent } from '~/types/vue-draggable-plus'
 
 const auth = useAuthStore()
@@ -28,8 +29,9 @@ function handleMoveColumn({ oldIndex, newIndex }: VueDraggableEvent) {
 </script>
 
 <template>
-  <div
+  <output
     v-if="columnsModel"
+    :form="elementIds.taskFilterForm"
     class="flex flex-1 gap-4 overflow-x-auto overflow-y-hidden px-4 pb-4"
   >
     <VueDraggable
@@ -55,5 +57,5 @@ function handleMoveColumn({ oldIndex, newIndex }: VueDraggableEvent) {
       </template>
     </VueDraggable>
     <NewColumn v-if="auth.isAuthenticated" />
-  </div>
+  </output>
 </template>

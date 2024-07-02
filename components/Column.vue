@@ -135,8 +135,16 @@ const doneTasksFilter = doneTaskStatuses
           'hover:cursor-grab': !isDraggingDisabled && !isTaskDone(task),
         }"
       >
-        <ColumnIssueCard v-if="isIssue(task)" :issue="task" />
-        <ColumnPatchCard v-else-if="isPatch(task)" :patch="task" />
+        <ColumnIssueCard
+          v-if="isIssue(task)"
+          :issue="task"
+          :highlights="tasks.taskHighlights.get(task.id)"
+        />
+        <ColumnPatchCard
+          v-else-if="isPatch(task)"
+          :patch="task"
+          :highlights="tasks.taskHighlights.get(task.id)"
+        />
       </li>
 
       <NewColumnIssueCard

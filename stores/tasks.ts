@@ -1,5 +1,5 @@
 import { taskPriorityIncrement } from '~/constants/tasks'
-import type { Task } from '~/types/tasks'
+import type { Task, TaskHighlights } from '~/types/tasks'
 
 export const useTasksStore = defineStore('tasks', () => {
   const { $httpd } = useNuxtApp()
@@ -15,14 +15,15 @@ export const useTasksStore = defineStore('tasks', () => {
 
   const isLoading = computed(() => areTasksPending.value || isCreatingTask.value)
 
+  const { filteredTasks, taskHighlights } = useFilteredTasks()
   const tasksByColumn = computed(() => {
-    if (tasks.value === null) {
-      return null
+    if (filteredTasks.value === undefined) {
+      return undefined
     }
 
     const orderedTasks = orderTasksByColumn(
       groupTasksByColumn({
-        tasks: tasks.value,
+        tasks: filteredTasks.value,
         columns: board.state.columns,
       }),
     )
@@ -189,8 +190,9 @@ export const useTasksStore = defineStore('tasks', () => {
     isResettingPriority.value = false
   }
 
-  const store = {
+  return {
     tasksByColumn,
+    taskHighlights,
     isReady,
     isLoading,
     isResettingPriority,
@@ -198,6 +200,100 @@ export const useTasksStore = defineStore('tasks', () => {
     createIssue,
     resetPriority,
   }
-
-  return store
 })
+
+function useFilteredTasks() {
+  const { tasks } = useTasksFetch()
+  const board = useBoardStore()
+
+  const twoWeeksAgo = new Date()
+  twoWeeksAgo.setDate(twoWeeksAgo.getDate() - 14)
+
+  const broadlyFilteredTasks = computed(() => {
+    const broadlyFilteredTasks = tasks.value?.filter((task) => {
+      // Filter by task kind
+      if (board.state.filter.taskKind && board.state.filter.taskKind !== task.rpb.kind) {
+        return false
+      }
+
+      // Filter done tasks by date
+      if (
+        board.state.filter.recentDoneTasks &&
+        isTaskDone(task) &&
+        task.rpb.relevantDate < twoWeeksAgo
+      ) {
+        return false
+      }
+
+      return true
+    })
+
+    return broadlyFilteredTasks
+  })
+
+  const { queryParams } = useQueryParamsStore()
+  const queryRegExp = computed(() => {
+    const query = queryParams.filter?.trim()
+    if (!query) {
+      return undefined
+    }
+
+    // Wrap query in a capture group (parenthesis) so string.split() keeps the matches in the
+    // resulting array
+    const queryRegExp = new RegExp(`(${escapeRegExp(query)})`, 'i')
+
+    return queryRegExp
+  })
+
+  const filteredTasks = computed<Task[] | undefined>(() => {
+    if (!broadlyFilteredTasks.value) {
+      return undefined
+    }
+
+    const regExp = queryRegExp.value
+    if (!regExp) {
+      return broadlyFilteredTasks.value
+    }
+
+    const filteredTasks = broadlyFilteredTasks.value.filter(
+      (task) =>
+        regExp.test(task.title) ||
+        regExp.test(task.id) ||
+        task.labels.some(
+          (label) => !label.startsWith(dataLabelNamespace) && regExp.test(label),
+        ),
+    )
+
+    return filteredTasks
+  })
+
+  const taskHighlights = computed(() => {
+    const highlights = new Map<string, TaskHighlights>()
+
+    const regExp = queryRegExp.value
+    if (!filteredTasks.value || !regExp) {
+      return highlights
+    }
+
+    for (const task of filteredTasks.value) {
+      const taskHighlights = {
+        id: task.id.split(regExp),
+        title: task.title.split(regExp),
+        labels: task.labels.map((label) => {
+          if (label.startsWith(dataLabelNamespace)) {
+            return [label]
+          }
+          const segments = label.split(regExp)
+
+          return segments
+        }),
+      }
+
+      highlights.set(task.id, taskHighlights)
+    }
+
+    return highlights
+  })
+
+  return { filteredTasks, taskHighlights }
+}

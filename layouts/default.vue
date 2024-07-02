@@ -4,11 +4,7 @@ const tasksStore = useTasksStore()
 </script>
 
 <template>
-  <div
-    class="flex h-dvh flex-col gap-4 pt-4"
-    aria-live="polite"
-    :aria-busy="!tasksStore.isReady"
-  >
+  <div class="flex h-dvh flex-col" aria-live="polite" :aria-busy="!tasksStore.isReady">
     <Loading v-if="!tasksStore.isReady" />
     <template v-else>
       <Header />

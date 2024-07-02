@@ -23,10 +23,9 @@ const initialBoardState: BoardState = {
 
 export const useBoardStore = defineStore('board', () => {
   const state = useStorage('RPB_board-state', initialBoardState, localStorage, {
-    mergeDefaults: (storageValue, defaults) =>
-      deepMerge(defaults, storageValue, {
-        arrayMerge: overwriteMerge,
-      }),
+    mergeDefaults: (storageValue, defaults) => {
+      return deepMerge(defaults, storageValue, { arrayMerge: overwriteMerge })
+    },
   })
 
   function mergeColumns(parsedColumns: string[]) {
