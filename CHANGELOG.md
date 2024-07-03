@@ -1,15 +1,17 @@
 # Radicle Planning Boards Change Log
 
-## **v0.2.0** - Jul 2nd 2024
+## **v0.2.0** - Jul 3rd 2024
 
 ### 🚀 Enhancements
 
 - Add support for filtering via a text field
   - Uses partial string matching on the id, title, and labels of cards
   - Filters the cards while keeping their column and order
-  - Visually highlights the matched part(s) on the cards
-  - Features shortcuts for focusing and blurring the filterbox (`Ctrl/Cmd+F` and `Escape` respectively)
-  - Syncs the filterbox value with the URL for enhanced shareability
+  - Visually highlights the matched substring(s) on each card
+  - Features shortcuts for focusing and blurring the filterbox (`Ctrl/Cmd+F` and `Escape`
+  respectively)
+  - Filtering state synced with and driven by the URL means that any links you copy at any
+  time and send to others will result in the same cards shown on their screen
 
 ### 🧹 Chores
 
