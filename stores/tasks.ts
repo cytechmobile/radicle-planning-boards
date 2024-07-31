@@ -249,6 +249,7 @@ function useFilteredTasks() {
 
   const twoWeeksAgo = new Date()
   twoWeeksAgo.setDate(twoWeeksAgo.getDate() - 14)
+  twoWeeksAgo.setHours(0, 0, 0, 0)
 
   const broadlyFilteredTasks = computed(() => {
     const broadlyFilteredTasks = tasks.value?.filter((task) => {
