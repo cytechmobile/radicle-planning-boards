@@ -1,11 +1,13 @@
 <script setup lang="ts">
 useTheme()
 const tasksStore = useTasksStore()
+
+const isLoading = computed(() => !tasksStore.tasksByColumn)
 </script>
 
 <template>
-  <div class="flex h-dvh flex-col" aria-live="polite" :aria-busy="!tasksStore.isReady">
-    <Loading v-if="!tasksStore.isReady" />
+  <div class="flex h-dvh flex-col" aria-live="polite" :aria-busy="isLoading">
+    <Loading v-if="isLoading" />
     <template v-else>
       <Header />
 

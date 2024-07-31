@@ -16,8 +16,6 @@ export const useTasksStore = defineStore('tasks', () => {
   const permissions = usePermissions()
   const board = useBoardStore()
 
-  const isReady = ref(false)
-
   const { filteredTasks, taskHighlights } = useFilteredTasks()
   const tasksByColumn = computed(() => {
     if (filteredTasks.value === undefined) {
@@ -217,12 +215,6 @@ export const useTasksStore = defineStore('tasks', () => {
     }
   }
 
-  watchEffect(() => {
-    if (!isReady.value && tasks.value) {
-      isReady.value = true
-    }
-  })
-
   // Initialize priority for tasks without priority
   watchEffect(() => {
     if (tasksWithoutPriority.value && tasksWithoutPriority.value.length > 0) {
@@ -245,7 +237,6 @@ export const useTasksStore = defineStore('tasks', () => {
   return {
     tasksByColumn,
     taskHighlights,
-    isReady,
     isLoading,
     moveTask,
     createIssue,
