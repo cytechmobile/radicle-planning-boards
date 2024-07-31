@@ -253,12 +253,10 @@ function useFilteredTasks() {
 
   const broadlyFilteredTasks = computed(() => {
     const broadlyFilteredTasks = tasks.value?.filter((task) => {
-      // Filter by task kind
       if (board.state.filter.taskKind && board.state.filter.taskKind !== task.rpb.kind) {
         return false
       }
 
-      // Filter done tasks by date
       if (
         board.state.filter.recentDoneTasks &&
         isTaskDone(task) &&
