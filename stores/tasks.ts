@@ -95,6 +95,12 @@ export const useTasksStore = defineStore('tasks', () => {
     },
   })
 
+  watchEffect(() => {
+    if (tasksWithoutPriority.value?.length) {
+      initializePriority()
+    }
+  })
+
   const { mutate: optimisticallyUpdateTasksPositions } = useMutation({
     async mutationFn(positionUpdates: TaskPositionUpdate[]) {
       await Promise.all(
@@ -214,13 +220,6 @@ export const useTasksStore = defineStore('tasks', () => {
       }
     }
   }
-
-  // Initialize priority for tasks without priority
-  watchEffect(() => {
-    if (tasksWithoutPriority.value && tasksWithoutPriority.value.length > 0) {
-      initializePriority()
-    }
-  })
 
   // Merge task-derived columns with existing columns
   watchEffect(() => {
