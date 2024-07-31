@@ -10,7 +10,7 @@ interface TaskPositionUpdate {
 
 export const useTasksStore = defineStore('tasks', () => {
   const { $httpd } = useNuxtApp()
-  const { tasks, areTasksPending, refetchTasks, refetchSpecificTasks, updateTaskLabels } =
+  const { tasks, areTasksPending, refetchAllTasks, refetchSpecificTasks, updateTaskLabels } =
     useTasksFetch()
   const route = useRoute('node-rid')
   const permissions = usePermissions()
@@ -91,7 +91,7 @@ export const useTasksStore = defineStore('tasks', () => {
       }
     },
     onSettled() {
-      void refetchTasks()
+      void refetchAllTasks()
     },
   })
 
@@ -198,7 +198,7 @@ export const useTasksStore = defineStore('tasks', () => {
       })
     },
     onSuccess() {
-      void refetchTasks()
+      void refetchAllTasks()
     },
   })
 

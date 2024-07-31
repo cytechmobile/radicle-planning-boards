@@ -14,7 +14,7 @@ export function useTasksFetch() {
     return issue
   }
 
-  async function fetchIssues(): Promise<Issue[]> {
+  async function fetchAllIssues(): Promise<Issue[]> {
     const issueStatuses = ['open', 'closed'] satisfies RadicleIssue['state']['status'][]
 
     const radicleIssuesByStatus = await Promise.all(
@@ -47,7 +47,7 @@ export function useTasksFetch() {
     return patch
   }
 
-  async function fetchPatches(): Promise<Patch[]> {
+  async function fetchAllPatches(): Promise<Patch[]> {
     const patchStatuses = [
       'draft',
       'open',
@@ -104,9 +104,9 @@ export function useTasksFetch() {
   const {
     data: tasks,
     pending: areTasksPending,
-    refresh: refetchTasks,
+    refresh: refetchAllTasks,
   } = useAsyncData('tasks', async () => {
-    const issuesAndPatches = await Promise.all([fetchIssues(), fetchPatches()])
+    const issuesAndPatches = await Promise.all([fetchAllIssues(), fetchAllPatches()])
     const tasks = issuesAndPatches.flat()
 
     return tasks
@@ -144,7 +144,7 @@ export function useTasksFetch() {
   return {
     tasks,
     areTasksPending,
-    refetchTasks,
+    refetchAllTasks,
     refetchSpecificTasks,
     updateTaskLabels,
   }
