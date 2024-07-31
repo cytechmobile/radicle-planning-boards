@@ -104,7 +104,7 @@ export function useTasksFetch() {
   const {
     data: tasks,
     pending: areTasksPending,
-    refresh: refreshTasks,
+    refresh: refetchTasks,
   } = useAsyncData('tasks', async () => {
     const issuesAndPatches = await Promise.all([fetchIssues(), fetchPatches()])
     const tasks = issuesAndPatches.flat()
@@ -112,12 +112,12 @@ export function useTasksFetch() {
     return tasks
   })
 
-  async function refreshSpecificTasks(tasksToRefetch: Task[]): Promise<void> {
+  async function refetchSpecificTasks(tasksToRefetch: Task[]): Promise<void> {
     if (!tasks.value) {
       return
     }
 
-    const refreshedTasks = await Promise.all(
+    const refetchedTasks = await Promise.all(
       tasksToRefetch.map(async (task) => {
         switch (task.rpb.kind) {
           case 'issue':
@@ -130,24 +130,22 @@ export function useTasksFetch() {
       }),
     )
 
-    for (const refreshedTask of refreshedTasks) {
-      const taskIndex = tasks.value?.findIndex(
-        (fetchedTask) => fetchedTask.id === refreshedTask.id,
-      )
+    for (const refetchedTask of refetchedTasks) {
+      const taskIndex = tasks.value?.findIndex((task) => task.id === refetchedTask.id)
 
       if (taskIndex === undefined || taskIndex === -1) {
         return
       }
 
-      tasks.value.splice(taskIndex, 1, refreshedTask)
+      tasks.value.splice(taskIndex, 1, refetchedTask)
     }
   }
 
   return {
     tasks,
     areTasksPending,
-    refreshTasks,
-    refreshSpecificTasks,
+    refetchTasks,
+    refetchSpecificTasks,
     updateTaskLabels,
   }
 }
