@@ -90,7 +90,7 @@ export const useTasksStore = defineStore('tasks', () => {
         await updateTaskLabels(task, [...task.labels, createDataLabel('priority', priority)])
       }
     },
-    onSettled() {
+    onError() {
       void refetchAllTasks()
     },
   })
@@ -115,7 +115,7 @@ export const useTasksStore = defineStore('tasks', () => {
         task.rpb = rpb
       })
     },
-    onSettled(data, error, positionUpdates) {
+    onError(_, positionUpdates) {
       const tasksToRefresh = positionUpdates.map(({ task }) => task)
       void refetchSpecificTasks(tasksToRefresh)
     },
@@ -196,9 +196,6 @@ export const useTasksStore = defineStore('tasks', () => {
           embeds: [],
         },
       })
-    },
-    onSuccess() {
-      void refetchAllTasks()
     },
   })
 
