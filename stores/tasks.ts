@@ -2,6 +2,11 @@ import { useMutation } from '@tanstack/vue-query'
 import { taskPriorityIncrement } from '~/constants/tasks'
 import type { Task, TaskHighlights } from '~/types/tasks'
 
+interface TaskColumn {
+  tasks: Task[]
+  highestPriority: number
+}
+
 interface TaskPositionUpdate {
   task: Task
   labels: string[]
@@ -17,7 +22,7 @@ export const useTasksStore = defineStore('tasks', () => {
   const board = useBoardStore()
 
   const { filteredTasks, taskHighlights } = useFilteredTasks()
-  const tasksByColumn = computed(() => {
+  const columnMap = computed(() => {
     if (filteredTasks.value === undefined) {
       return undefined
     }
@@ -29,7 +34,18 @@ export const useTasksStore = defineStore('tasks', () => {
       }),
     )
 
-    return orderedTasks
+    const columnMap: Record<string, TaskColumn> = {}
+    for (const [column, tasks] of Object.entries(orderedTasks)) {
+      const highestPriority =
+        tasks.findLast((task) => task.rpb.priority !== null)?.rpb.priority ?? 0
+
+      columnMap[column] = {
+        tasks,
+        highestPriority,
+      }
+    }
+
+    return columnMap
   })
 
   const tasksWithoutPriority = computed(() => {
@@ -50,32 +66,14 @@ export const useTasksStore = defineStore('tasks', () => {
 
   const { mutate: initializePriority, isPending: isInitializePriorityPending } = useMutation({
     async mutationFn() {
-      if (!tasksByColumn.value || !tasksWithoutPriority.value) {
+      if (!columnMap.value || !tasksWithoutPriority.value) {
         return
       }
 
-      function getHighestPriorityInColumn(column: string) {
-        const columnTasks = tasksByColumn.value?.[column]
-        if (!columnTasks) {
-          return 0
-        }
-
-        return columnTasks.reduce((acc, task) => {
-          return task.rpb.priority !== null && task.rpb.priority > acc
-            ? task.rpb.priority
-            : acc
-        }, 0)
-      }
-
-      const highestPriorityByColumn: Record<string, number> = {}
       const taskIndexByColumn: Record<string, number> = {}
 
       for (const task of tasksWithoutPriority.value) {
         const { column } = task.rpb
-
-        if (highestPriorityByColumn[column] === undefined) {
-          highestPriorityByColumn[column] = getHighestPriorityInColumn(column)
-        }
 
         if (taskIndexByColumn[column] === undefined) {
           taskIndexByColumn[column] = 0
@@ -84,8 +82,8 @@ export const useTasksStore = defineStore('tasks', () => {
         }
 
         const priority =
-          (highestPriorityByColumn[column] ?? 0) +
-          ((taskIndexByColumn[column] ?? 0) + 1) * taskPriorityIncrement
+          (columnMap.value[column]?.highestPriority ?? 0) +
+          (taskIndexByColumn[column] + 1) * taskPriorityIncrement
 
         await updateTaskLabels(task, [...task.labels, createDataLabel('priority', priority)])
       }
@@ -122,7 +120,7 @@ export const useTasksStore = defineStore('tasks', () => {
   })
 
   function moveTask({ task, column, index }: { task: Task; column: string; index: number }) {
-    const columnTasks = tasksByColumn.value?.[column]
+    const columnTasks = columnMap.value?.[column]?.tasks
     if (!columnTasks) {
       return
     }
@@ -163,8 +161,7 @@ export const useTasksStore = defineStore('tasks', () => {
 
   const { mutate: createIssue, isPending: isCreateIssuePending } = useMutation({
     async mutationFn({ title, column }: { title: string; column: string }) {
-      const columnIssues = tasksByColumn.value?.[column]
-      if (columnIssues === undefined) {
+      if (columnMap.value?.[column] === undefined) {
         return
       }
 
@@ -175,10 +172,7 @@ export const useTasksStore = defineStore('tasks', () => {
           labels.push(createDataLabel('column', column))
         }
 
-        const lastIssue = columnIssues.at(-1)
-        const priority = lastIssue
-          ? (lastIssue.rpb.priority ?? 0) + taskPriorityIncrement
-          : taskPriorityIncrement
+        const priority = columnMap.value[column].highestPriority + taskPriorityIncrement
         labels.push(createDataLabel('priority', priority))
       }
 
@@ -220,8 +214,8 @@ export const useTasksStore = defineStore('tasks', () => {
 
   // Merge task-derived columns with existing columns
   watchEffect(() => {
-    if (tasksByColumn.value) {
-      board.mergeColumns(Object.keys(tasksByColumn.value))
+    if (columnMap.value) {
+      board.mergeColumns(Object.keys(columnMap.value))
     }
   })
 
@@ -231,7 +225,7 @@ export const useTasksStore = defineStore('tasks', () => {
   )
 
   return {
-    tasksByColumn,
+    columnMap,
     taskHighlights,
     isLoading,
     moveTask,
