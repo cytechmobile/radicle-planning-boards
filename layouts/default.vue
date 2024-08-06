@@ -2,7 +2,7 @@
 useTheme()
 const tasksStore = useTasksStore()
 
-const isLoading = computed(() => !tasksStore.tasksByColumn)
+const isLoading = computed(() => !tasksStore.columnMap)
 </script>
 
 <template>

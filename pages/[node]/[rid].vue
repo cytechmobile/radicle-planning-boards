@@ -46,12 +46,12 @@ function handleMoveColumn({ oldIndex, newIndex }: VueDraggableEvent) {
         <DoneColumn
           v-if="column === 'done'"
           :title="column"
-          :tasks="tasks.tasksByColumn?.[column] ?? []"
+          :tasks="tasks.columnMap?.[column]?.tasks ?? []"
         />
         <Column
           v-else
           :title="column"
-          :tasks="tasks.tasksByColumn?.[column] ?? []"
+          :tasks="tasks.columnMap?.[column]?.tasks ?? []"
           :is-default-column="column === 'non-planned'"
         />
       </template>
