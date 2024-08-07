@@ -5,7 +5,7 @@ export function useTasksFetch() {
   const { $httpd } = useNuxtApp()
   const route = useRoute('node-rid')
 
-  async function fetchIssue(id: string): Promise<Issue> {
+  async function fetchIssueById(id: string): Promise<Issue> {
     const radicleIssue = await $httpd('/projects/{rid}/issues/{issue}', {
       path: { rid: route.params.rid, issue: id },
     })
@@ -14,7 +14,7 @@ export function useTasksFetch() {
     return issue
   }
 
-  async function fetchIssues(): Promise<Issue[]> {
+  async function fetchAllIssues(): Promise<Issue[]> {
     const issueStatuses = ['open', 'closed'] satisfies RadicleIssue['state']['status'][]
 
     const radicleIssuesByStatus = await Promise.all(
@@ -38,7 +38,7 @@ export function useTasksFetch() {
     return issues
   }
 
-  async function fetchPatch(id: string): Promise<Patch> {
+  async function fetchPatchById(id: string): Promise<Patch> {
     const radiclePatch = await $httpd('/projects/{rid}/patches/{patch}', {
       path: { rid: route.params.rid, patch: id },
     })
@@ -47,7 +47,7 @@ export function useTasksFetch() {
     return patch
   }
 
-  async function fetchPatches(): Promise<Patch[]> {
+  async function fetchAllPatches(): Promise<Patch[]> {
     const patchStatuses = [
       'draft',
       'open',
@@ -74,23 +74,6 @@ export function useTasksFetch() {
     )
 
     return patches
-  }
-
-  async function refreshSpecificTasks(tasks: Task[]): Promise<void> {
-    await Promise.all(
-      tasks.map(async (task) => {
-        switch (task.rpb.kind) {
-          case 'issue':
-            task = await fetchIssue(task.id)
-            break
-          case 'patch':
-            task = await fetchPatch(task.id)
-            break
-          default:
-            throw new Error('Unsupported task kind')
-        }
-      }),
-    )
   }
 
   async function updateTaskLabels(task: Task, labels: string[]) {
@@ -121,19 +104,58 @@ export function useTasksFetch() {
   const {
     data: tasks,
     pending: areTasksPending,
-    refresh: refreshTasks,
+    refresh: refetchAllTasks,
   } = useAsyncData('tasks', async () => {
-    const issuesAndPatches = await Promise.all([fetchIssues(), fetchPatches()])
+    const issuesAndPatches = await Promise.all([fetchAllIssues(), fetchAllPatches()])
     const tasks = issuesAndPatches.flat()
 
     return tasks
   })
 
+  async function refetchTask(task: Task): Promise<void> {
+    if (!tasks.value) {
+      return
+    }
+
+    let refetchedTask: Task
+    switch (task.rpb.kind) {
+      case 'issue':
+        refetchedTask = await fetchIssueById(task.id)
+        break
+      case 'patch':
+        refetchedTask = await fetchPatchById(task.id)
+        break
+      default:
+        throw new Error('Unsupported task kind')
+    }
+
+    const taskIndex = tasks.value.indexOf(task)
+    if (taskIndex === undefined || taskIndex === -1) {
+      return
+    }
+
+    tasks.value[taskIndex] = refetchedTask
+  }
+
+  async function refetchSpecificTasks(tasksToRefetch: Task[]): Promise<void> {
+    await Promise.all(
+      tasksToRefetch.map(async (task) => {
+        await refetchTask(task)
+      }),
+    )
+  }
+
+  async function fetchIssueByIdAndAddToTasks(id: string): Promise<void> {
+    const issue = await fetchIssueById(id)
+    tasks.value?.push(issue)
+  }
+
   return {
     tasks,
     areTasksPending,
-    refreshTasks,
-    refreshSpecificTasks,
+    refetchAllTasks,
+    refetchSpecificTasks,
     updateTaskLabels,
+    fetchIssueByIdAndAddToTasks,
   }
 }
