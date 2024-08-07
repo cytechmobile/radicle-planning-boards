@@ -112,33 +112,37 @@ export function useTasksFetch() {
     return tasks
   })
 
-  async function refetchSpecificTasks(tasksToRefetch: Task[]): Promise<void> {
+  async function refetchTask(task: Task): Promise<void> {
     if (!tasks.value) {
       return
     }
 
-    const refetchedTasks = await Promise.all(
+    let refetchedTask: Task
+    switch (task.rpb.kind) {
+      case 'issue':
+        refetchedTask = await fetchIssueById(task.id)
+        break
+      case 'patch':
+        refetchedTask = await fetchPatchById(task.id)
+        break
+      default:
+        throw new Error('Unsupported task kind')
+    }
+
+    const taskIndex = tasks.value.indexOf(task)
+    if (taskIndex === undefined || taskIndex === -1) {
+      return
+    }
+
+    tasks.value[taskIndex] = refetchedTask
+  }
+
+  async function refetchSpecificTasks(tasksToRefetch: Task[]): Promise<void> {
+    await Promise.all(
       tasksToRefetch.map(async (task) => {
-        switch (task.rpb.kind) {
-          case 'issue':
-            return await fetchIssueById(task.id)
-          case 'patch':
-            return await fetchPatchById(task.id)
-          default:
-            throw new Error('Unsupported task kind')
-        }
+        await refetchTask(task)
       }),
     )
-
-    for (const refetchedTask of refetchedTasks) {
-      const taskIndex = tasks.value?.findIndex((task) => task.id === refetchedTask.id)
-
-      if (taskIndex === undefined || taskIndex === -1) {
-        return
-      }
-
-      tasks.value.splice(taskIndex, 1, refetchedTask)
-    }
   }
 
   return {
