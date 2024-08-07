@@ -145,11 +145,17 @@ export function useTasksFetch() {
     )
   }
 
+  async function fetchIssueByIdAndAddToTasks(id: string): Promise<void> {
+    const issue = await fetchIssueById(id)
+    tasks.value?.push(issue)
+  }
+
   return {
     tasks,
     areTasksPending,
     refetchAllTasks,
     refetchSpecificTasks,
     updateTaskLabels,
+    fetchIssueByIdAndAddToTasks,
   }
 }

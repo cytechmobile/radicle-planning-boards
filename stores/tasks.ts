@@ -15,8 +15,14 @@ interface TaskPositionUpdate {
 
 export const useTasksStore = defineStore('tasks', () => {
   const { $httpd } = useNuxtApp()
-  const { tasks, areTasksPending, refetchAllTasks, refetchSpecificTasks, updateTaskLabels } =
-    useTasksFetch()
+  const {
+    tasks,
+    areTasksPending,
+    fetchIssueByIdAndAddToTasks,
+    refetchAllTasks,
+    refetchSpecificTasks,
+    updateTaskLabels,
+  } = useTasksFetch()
   const route = useRoute('node-rid')
   const permissions = usePermissions()
   const board = useBoardStore()
@@ -174,7 +180,7 @@ export const useTasksStore = defineStore('tasks', () => {
   const { mutate: createIssue, isPending: isCreateIssuePending } = useMutation({
     async mutationFn({ title, column }: { title: string; column: string }) {
       if (columnMap.value?.[column] === undefined) {
-        return
+        return undefined
       }
 
       const labels: string[] = []
@@ -188,7 +194,7 @@ export const useTasksStore = defineStore('tasks', () => {
         labels.push(createDataLabel('priority', priority))
       }
 
-      await $httpd('/projects/{rid}/issues', {
+      const { id } = await $httpd('/projects/{rid}/issues', {
         method: 'POST',
         path: {
           rid: route.params.rid,
@@ -202,6 +208,13 @@ export const useTasksStore = defineStore('tasks', () => {
           embeds: [],
         },
       })
+
+      return id
+    },
+    onSuccess(id) {
+      if (id) {
+        fetchIssueByIdAndAddToTasks(id)
+      }
     },
   })
 
