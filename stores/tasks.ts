@@ -48,6 +48,36 @@ export const useTasksStore = defineStore('tasks', () => {
     return columnMap
   })
 
+  interface OptimisticallyUpdateTasksPositionsOptions {
+    positionUpdates: TaskPositionUpdate[]
+    refetchAllTasksOnError?: boolean
+  }
+  const { mutate: optimisticallyUpdateTasksPositions } = useMutation({
+    async mutationFn({ positionUpdates }: OptimisticallyUpdateTasksPositionsOptions) {
+      await Promise.all(
+        positionUpdates.map(async ({ task, labels }) => {
+          await updateTaskLabels(task, labels)
+        }),
+      )
+    },
+    onMutate({ positionUpdates }) {
+      positionUpdates.forEach(({ task, labels, rpb }) => {
+        task.labels = labels
+        task.rpb = rpb
+      })
+    },
+    onError(_, { positionUpdates, refetchAllTasksOnError }) {
+      if (refetchAllTasksOnError) {
+        void refetchAllTasks()
+
+        return
+      }
+
+      const tasksToRefresh = positionUpdates.map(({ task }) => task)
+      void refetchSpecificTasks(tasksToRefresh)
+    },
+  })
+
   const tasksWithoutPriority = computed(() => {
     if (!permissions.canEditLabels || !tasks.value) {
       return null
@@ -64,59 +94,41 @@ export const useTasksStore = defineStore('tasks', () => {
     return tasksWithoutPriority
   })
 
-  const { mutate: initializePriority, isPending: isInitializePriorityPending } = useMutation({
-    async mutationFn() {
-      if (!columnMap.value || !tasksWithoutPriority.value) {
-        return
+  function initializeTasksPriority() {
+    if (!columnMap.value || !tasksWithoutPriority.value) {
+      return
+    }
+
+    const taskIndexByColumn: Record<string, number> = {}
+    const positionUpdates: TaskPositionUpdate[] = []
+
+    for (const task of tasksWithoutPriority.value) {
+      const { column } = task.rpb
+
+      if (taskIndexByColumn[column] === undefined) {
+        taskIndexByColumn[column] = 0
+      } else {
+        taskIndexByColumn[column]++
       }
 
-      const taskIndexByColumn: Record<string, number> = {}
+      const priority =
+        (columnMap.value[column]?.highestPriority ?? 0) +
+        (taskIndexByColumn[column] + 1) * taskPriorityIncrement
 
-      for (const task of tasksWithoutPriority.value) {
-        const { column } = task.rpb
+      positionUpdates.push({
+        task,
+        labels: createUpdatedTaskLabels(task, { priority }),
+        rpb: { ...task.rpb, priority },
+      })
+    }
 
-        if (taskIndexByColumn[column] === undefined) {
-          taskIndexByColumn[column] = 0
-        } else {
-          taskIndexByColumn[column]++
-        }
-
-        const priority =
-          (columnMap.value[column]?.highestPriority ?? 0) +
-          (taskIndexByColumn[column] + 1) * taskPriorityIncrement
-
-        await updateTaskLabels(task, [...task.labels, createDataLabel('priority', priority)])
-      }
-    },
-    onError() {
-      void refetchAllTasks()
-    },
-  })
+    optimisticallyUpdateTasksPositions({ positionUpdates, refetchAllTasksOnError: true })
+  }
 
   watchEffect(() => {
-    if (tasksWithoutPriority.value?.length) {
-      initializePriority()
+    if (columnMap.value && tasksWithoutPriority.value?.length) {
+      initializeTasksPriority()
     }
-  })
-
-  const { mutate: optimisticallyUpdateTasksPositions } = useMutation({
-    async mutationFn(positionUpdates: TaskPositionUpdate[]) {
-      await Promise.all(
-        positionUpdates.map(async ({ task, labels }) => {
-          await updateTaskLabels(task, labels)
-        }),
-      )
-    },
-    onMutate(positionUpdates) {
-      positionUpdates.forEach(({ task, labels, rpb }) => {
-        task.labels = labels
-        task.rpb = rpb
-      })
-    },
-    onError(_, positionUpdates) {
-      const tasksToRefresh = positionUpdates.map(({ task }) => task)
-      void refetchSpecificTasks(tasksToRefresh)
-    },
   })
 
   function moveTask({ task, column, index }: { task: Task; column: string; index: number }) {
@@ -156,7 +168,7 @@ export const useTasksStore = defineStore('tasks', () => {
       },
     )
 
-    optimisticallyUpdateTasksPositions(positionUpdates)
+    optimisticallyUpdateTasksPositions({ positionUpdates })
   }
 
   const { mutate: createIssue, isPending: isCreateIssuePending } = useMutation({
@@ -219,10 +231,7 @@ export const useTasksStore = defineStore('tasks', () => {
     }
   })
 
-  const isLoading = computed(
-    () =>
-      areTasksPending.value || isCreateIssuePending.value || isInitializePriorityPending.value,
-  )
+  const isLoading = computed(() => areTasksPending.value || isCreateIssuePending.value)
 
   return {
     columnMap,
