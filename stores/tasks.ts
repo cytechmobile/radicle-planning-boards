@@ -70,13 +70,13 @@ export const useTasksStore = defineStore('tasks', () => {
 
   const tasksWithoutPriority = computed(() => {
     if (!permissions.canEditLabels || !tasks.value) {
-      return null
+      return undefined
     }
 
     const tasksWithoutPriority: Task[] = []
 
     for (const task of tasks.value) {
-      if (task.rpb.priority === null) {
+      if (task.rpb.priority === undefined) {
         tasksWithoutPriority.push(task)
       }
     }
@@ -86,7 +86,7 @@ export const useTasksStore = defineStore('tasks', () => {
 
   function getColumnTopPriority(column: string) {
     const topPriorityTask = tasksByColumn.value?.[column]?.findLast(
-      (task) => task.rpb.priority !== null,
+      (task) => task.rpb.priority !== undefined,
     )
     const topPriority = topPriorityTask?.rpb.priority ?? 0
 
@@ -228,7 +228,7 @@ export const useTasksStore = defineStore('tasks', () => {
 
       if (priorityLabelIndex !== -1) {
         task.labels.splice(priorityLabelIndex, 1)
-        task.rpb.priority = null
+        task.rpb.priority = undefined
       }
     }
   }

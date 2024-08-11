@@ -20,14 +20,14 @@ export function isTaskDone(task: Task): boolean {
 
 function getTaskProperties(radicleTask: RadicleTask): Omit<TaskProperties, 'relevantDate'> {
   let column = 'non-planned'
-  let priority: number | null = null
+  let priority: number | undefined
 
   for (const label of radicleTask.labels) {
     if (label.startsWith(partialColumnDataLabel)) {
       column = getDataLabelValue(label) ?? 'non-planned'
     } else if (label.startsWith(partialPriorityDataLabel)) {
       const value = getDataLabelValue(label)
-      priority = value ? Number(value) : null
+      priority = value ? Number(value) : undefined
     }
   }
 

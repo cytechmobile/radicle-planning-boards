@@ -4,8 +4,8 @@ export const useAuthStore = defineStore('auth', () => {
   const isDebugging = useIsDebugging()
   const debuggingAuthToken = useStorage('RPB_config-auth-token', '')
 
-  const token = ref<string | null>(null)
-  const isAuthenticated = computed(() => !!token.value)
+  const token = ref<string>()
+  const isAuthenticated = computed(() => Boolean(token.value))
   const postMessageToRadicleInterface = usePostMessageToRadicleInterface()
 
   if (!token.value) {
@@ -19,7 +19,7 @@ export const useAuthStore = defineStore('auth', () => {
   })
 
   useRadicleInterfaceMessage('remove-auth-token', () => {
-    token.value = null
+    token.value = undefined
   })
 
   watchEffect(() => {

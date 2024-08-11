@@ -1,8 +1,8 @@
 <script setup lang="ts">
 const board = useBoardStore()
 
-const formRef = ref<HTMLFormElement | null>(null)
-const titleInputRef = ref<HTMLInputElement | null>(null)
+const formRef = ref<HTMLFormElement>()
+const titleInputRef = ref<HTMLInputElement>()
 const isCreatingNewColumn = ref(false)
 const title = ref('')
 
