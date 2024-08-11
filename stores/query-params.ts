@@ -14,16 +14,16 @@ export const useQueryParamsStore = defineStore('query-params', () => {
   }
 
   const hostAppQueryParams = reactive<QueryParams>({})
-  const postMessage = usePostMessageToRadicleInterface()
+  const { onHostAppMessage, postMessageToHostApp } = useHostAppMessage()
 
   onMounted(() => {
-    postMessage({ type: 'request-query-params' })
+    postMessageToHostApp({ type: 'request-query-params' })
   })
 
   const { pause, resume } = watchPausable(
     hostAppQueryParams,
     () => {
-      postMessage({
+      postMessageToHostApp({
         type: 'set-query-params',
         // ! Sending the reactive object directly causes an object cloning error
         queryParams: Object.assign({}, hostAppQueryParams),
@@ -35,7 +35,7 @@ export const useQueryParamsStore = defineStore('query-params', () => {
     { eventFilter: debounceFilter(500) },
   )
 
-  useRadicleInterfaceMessage('query-params-updated', (message) => {
+  onHostAppMessage('query-params-updated', (message) => {
     pause()
 
     const unusedKeys = Object.keys(hostAppQueryParams)
