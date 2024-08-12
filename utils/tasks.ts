@@ -1,5 +1,5 @@
-import { initialColumns } from '~/constants/columns'
-import { doneTaskStatuses, taskPriorityIncrement } from '~/constants/tasks'
+import { initialColumns, taskPriorityIncrement } from '~/constants/config'
+import { doneTaskStatuses } from '~/constants/tasks'
 import type { RadicleIssue, RadiclePatch } from '~/types/httpd'
 import type { Issue, Patch, RadicleTask, Task, TaskProperties } from '~/types/tasks'
 

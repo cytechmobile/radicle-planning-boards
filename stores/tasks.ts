@@ -1,5 +1,5 @@
 import { useMutation } from '@tanstack/vue-query'
-import { taskPriorityIncrement } from '~/constants/tasks'
+import { taskPriorityIncrement } from '~/constants/config'
 import type { Task, TaskHighlights } from '~/types/tasks'
 
 interface TaskPositionUpdate {

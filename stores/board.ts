@@ -1,7 +1,7 @@
 import { useStorage } from '@vueuse/core'
 import z from 'zod'
 import deepMerge from 'deepmerge'
-import { initialColumns } from '~/constants/columns'
+import { initialColumns } from '~/constants/config'
 
 const boardStateSchema = z.object({
   columns: z.array(z.string()),
