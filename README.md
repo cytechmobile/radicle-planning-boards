@@ -20,11 +20,11 @@ Requests, Issues, etc, via a peer-to-peer, free and open-source network built on
 - Move Cards between Columns
 - Create New Issues
 - Filter by Issues or Patches
-- [Radicle Interface Integration](#radicle-interface-integration)
+- [Radicle Explorer Integration](#radicle-explorer-integration)
 
-### Radicle Interface Integration
+### Radicle Explorer Integration
 
-Radicle Planning Boards is built with [Radicle Interface](https://app.radicle.xyz/nodes/seed.radicle.garden/rad:z4V1sjrXqjvFdnCUbxPFqd5p4DtH5)
+Radicle Planning Boards is built with [Radicle Explorer](https://app.radicle.xyz/nodes/seed.radicle.garden/rad:z4V1sjrXqjvFdnCUbxPFqd5p4DtH5)
 integration in mind, a web-based client for the [Radicle](https://radicle.xyz/) peer-to-peer
 network. This allows it to leverage features like authentication, themes, and more to provide a
 seamless experience for users.
@@ -38,10 +38,10 @@ feature set and not require its own database.
 
 ## Self hosting
 
-You will need two domains, one for the Radicle Planning Boards and another for the Radicle Interface.
+You will need two domains, one for the Radicle Planning Boards and another for the Radicle Explorer.
 
 1. Deploy the `radicle-planning-boards` repository
-    - Set the `NUXT_PUBLIC_PARENT_ORIGIN` environment variable to your Radicle Interface domain
+    - Set the `NUXT_PUBLIC_PARENT_ORIGIN` environment variable to your Radicle Explorer domain
 2. Deploy the [radicle-interface-with-planning-boards](https://github.com/maninak/radicle-interface-with-planning-boards)
 repository
     - Update `src/config.json` with your Radicle Planning Boards domain e.g.
