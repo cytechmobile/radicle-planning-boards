@@ -1,13 +1,12 @@
 import { useStorage } from '@vueuse/core'
+import { defaultRadicleExplorerBaseUrl } from '~/constants/config'
 
 export function useRadicleInterfaceBaseUrl(): string {
-  const defaultRadicleInterfaceBaseUrl = 'https://app.radicle.xyz'
-
   const { baseUrl } = useRoute().query
 
   const configuredRadicleInterfaceBaseUrl = useStorage(
     'RPB_config-radicle-interface-base-url',
-    defaultRadicleInterfaceBaseUrl,
+    defaultRadicleExplorerBaseUrl,
   )
 
   try {
@@ -17,6 +16,6 @@ export function useRadicleInterfaceBaseUrl(): string {
 
     return new URL(configuredRadicleInterfaceBaseUrl.value).origin
   } catch {
-    return defaultRadicleInterfaceBaseUrl
+    return defaultRadicleExplorerBaseUrl
   }
 }

@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { defaultRadicleExplorerBaseUrl } from '~/constants/config'
+
 const auth = useAuthStore()
 const board = useBoardStore()
 const tasks = useTasksStore()
@@ -37,6 +39,11 @@ async function handleImport() {
     console.error('Failed to import board data')
   }
 }
+
+const aboutLink = new URL(
+  `/nodes/seed.radicle.gr/rad:z2BdUVZFvHdxRfdtGJQdSH2kyXNM6`,
+  defaultRadicleExplorerBaseUrl,
+).toString()
 </script>
 
 <template>
@@ -49,7 +56,7 @@ async function handleImport() {
     <div class="flex gap-4">
       <a
         class="flex h-8 items-center justify-center gap-2 rounded-sm border border-rad-border-hint px-3 text-sm font-semibold"
-        href="https://app.radicle.at/nodes/seed.radicle.gr/rad:z2BdUVZFvHdxRfdtGJQdSH2kyXNM6"
+        :href="aboutLink"
         target="_blank"
       >
         <Icon name="octicon:link-external-16" size="16" />
