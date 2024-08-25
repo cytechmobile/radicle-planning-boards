@@ -1,24 +1,24 @@
-import z from 'zod'
+import * as v from 'valibot'
 
-export const incomingMessageSchema = z.union([
-  z.object({
-    type: z.literal('theme'),
-    theme: z.enum(['light', 'dark']),
+export const incomingMessageSchema = v.union([
+  v.object({
+    type: v.literal('theme'),
+    theme: v.picklist(['light', 'dark']),
   }),
-  z.object({
-    type: z.literal('set-auth-token'),
-    authToken: z.string(),
+  v.object({
+    type: v.literal('set-auth-token'),
+    authToken: v.string(),
   }),
-  z.object({
-    type: z.literal('remove-auth-token'),
+  v.object({
+    type: v.literal('remove-auth-token'),
   }),
-  z.object({
-    type: z.literal('query-params-updated'),
-    queryParams: z.record(z.string(), z.string()),
+  v.object({
+    type: v.literal('query-params-updated'),
+    queryParams: v.record(v.string(), v.string()),
   }),
 ])
 
-export type IncomingMessage = z.infer<typeof incomingMessageSchema>
+export type IncomingMessage = v.InferInput<typeof incomingMessageSchema>
 
 export type OutgoingMessage =
   | { type: 'request-auth-token' }

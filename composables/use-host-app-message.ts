@@ -1,3 +1,4 @@
+import * as v from 'valibot'
 import {
   type IncomingMessage,
   type OutgoingMessage,
@@ -16,12 +17,12 @@ export function useHostAppMessage() {
         return
       }
 
-      const result = incomingMessageSchema.safeParse(event.data)
-      if (!result.success || result.data.type !== type) {
+      const result = v.safeParse(incomingMessageSchema, event.data)
+      if (!result.success || result.output.type !== type) {
         return
       }
 
-      callback(result.data as Extract<IncomingMessage, { type: IncomingMessageType }>)
+      callback(result.output as Extract<IncomingMessage, { type: IncomingMessageType }>)
     })
   }
 

@@ -29,12 +29,12 @@ importers:
       nuxt-icon:
         specifier: ^0.6.9
         version: 0.6.10(magicast@0.3.4)(nuxt@3.12.2(@parcel/watcher@2.4.1)(@types/node@20.11.30)(@unocss/reset@0.58.6)(encoding@0.1.13)(eslint@8.57.0)(floating-vue@5.2.2(@nuxt/kit@3.12.2(magicast@0.3.4)(rollup@4.18.0))(vue@3.4.29(typescript@5.5.4)))(fuse.js@6.6.2)(ioredis@5.3.2)(magicast@0.3.4)(optionator@0.9.3)(rollup@4.18.0)(stylus@0.57.0)(terser@5.29.2)(typescript@5.5.4)(unocss@0.58.6(postcss@8.4.38)(rollup@4.18.0)(vite@5.3.1(@types/node@20.11.30)(stylus@0.57.0)(terser@5.29.2)))(vite@5.3.1(@types/node@20.11.30)(stylus@0.57.0)(terser@5.29.2)))(rollup@4.18.0)(vite@5.3.1(@types/node@20.11.30)(stylus@0.57.0)(terser@5.29.2))(vue@3.4.29(typescript@5.5.4))
+      valibot:
+        specifier: ^0.39.0
+        version: 0.39.0(typescript@5.5.4)
       vue-draggable-plus:
         specifier: ^0.5.0
         version: 0.5.0(@types/sortablejs@1.15.8)
-      zod:
-        specifier: ^3.23.8
-        version: 3.23.8
     devDependencies:
       '@maninak/eslint-config':
         specifier: ^0.1.4
@@ -5317,6 +5317,14 @@ packages:
   util-deprecate@1.0.2:
     resolution: {integrity: sha512-EPD5q1uXyFxJpCrLnCc1nHnq3gOa6DZBocAIiI2TaSCA7VCJ1UJDMagCzIkXNsUYfD1daK//LTEQ8xiIbrHtcw==}
 
+  valibot@0.39.0:
+    resolution: {integrity: sha512-d+vE8SDRNy9zKg6No5MHz2tdz8H6CW8X3OdqYdmlhnoqQmEoM6Hu0hJUrZv3tPSVrzZkIIMCtdCQtMzcM6NCWw==}
+    peerDependencies:
+      typescript: '>=5'
+    peerDependenciesMeta:
+      typescript:
+        optional: true
+
   validate-npm-package-license@3.0.4:
     resolution: {integrity: sha512-DpKm2Ui/xN7/HQKCtpZxoRWBhZ9Z0kqtygG8XCgNQ8ZlDnxuQmWhj566j8fN4Cu3/JmbhsDo7fcAJq4s9h27Ew==}
 
@@ -5670,9 +5678,6 @@ packages:
   zip-stream@6.0.1:
     resolution: {integrity: sha512-zK7YHHz4ZXpW89AHXUPbQVGKI7uvkd3hzusTdotCg1UxyaVtg0zFJSTfW/Dq5f7OBBVnq6cZIaC8Ti4hb6dtCA==}
     engines: {node: '>= 14'}
-
-  zod@3.23.8:
-    resolution: {integrity: sha512-XBx9AXhXktjUqnepgTiE5flcKIYWi/rme0Eaj+5Y0lftuGBq+jyRu/md4WnuxqgP1ubdpNCsYEYPxrzVHD8d6g==}
 
 snapshots:
 
@@ -11900,6 +11905,10 @@ snapshots:
 
   util-deprecate@1.0.2: {}
 
+  valibot@0.39.0(typescript@5.5.4):
+    optionalDependencies:
+      typescript: 5.5.4
+
   validate-npm-package-license@3.0.4:
     dependencies:
       spdx-correct: 3.2.0
@@ -12269,5 +12278,3 @@ snapshots:
       archiver-utils: 5.0.2
       compress-commons: 6.0.2
       readable-stream: 4.5.2
-
-  zod@3.23.8: {}
