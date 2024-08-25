@@ -106,14 +106,19 @@ export function useTasksFetch() {
 
   const {
     data: tasks,
-    pending: areTasksPending,
+    status: tasksStatus,
     refresh: refetchAllTasks,
-  } = useAsyncData('tasks', async () => {
-    const issuesAndPatches = await Promise.all([fetchAllIssues(), fetchAllPatches()])
-    const tasks = issuesAndPatches.flat()
+  } = useAsyncData(
+    'tasks',
+    async () => {
+      const issuesAndPatches = await Promise.all([fetchAllIssues(), fetchAllPatches()])
+      const tasks = issuesAndPatches.flat()
 
-    return tasks
-  })
+      return tasks
+    },
+    { deep: false },
+  )
+  const areTasksPending = computed(() => tasksStatus.value === 'pending')
 
   async function refetchTask(task: Task): Promise<void> {
     if (!tasks.value) {
@@ -139,7 +144,7 @@ export function useTasksFetch() {
       return
     }
 
-    tasks.value[taskIndex] = refetchedTask
+    tasks.value = tasks.value.with(taskIndex, refetchedTask)
   }
 
   async function refetchSpecificTasks(tasksToRefetch: Task[]): Promise<void> {
@@ -151,8 +156,12 @@ export function useTasksFetch() {
   }
 
   async function fetchIssueByIdAndAddToTasks(id: string): Promise<void> {
+    if (tasks.value === null) {
+      return
+    }
+
     const issue = await fetchIssueById(id)
-    tasks.value?.push(issue)
+    tasks.value = [...tasks.value, issue]
   }
 
   return {

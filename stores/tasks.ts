@@ -51,10 +51,24 @@ export const useTasksStore = defineStore('tasks', () => {
       )
     },
     onMutate({ positionUpdates }) {
-      positionUpdates.forEach(({ task, labels, rpb }) => {
-        task.labels = labels
-        task.rpb = rpb
-      })
+      if (!tasks.value) {
+        return
+      }
+
+      for (const { task, labels, rpb } of positionUpdates) {
+        const taskIndex = tasks.value.indexOf(task)
+        if (taskIndex === -1) {
+          return
+        }
+
+        const newTask = {
+          ...task,
+          labels,
+          rpb,
+        }
+
+        tasks.value = tasks.value.with(taskIndex, newTask as Task)
+      }
     },
     onError(_, { positionUpdates, refetchAllTasksOnError }) {
       if (refetchAllTasksOnError) {
@@ -63,8 +77,8 @@ export const useTasksStore = defineStore('tasks', () => {
         return
       }
 
-      const tasksToRefresh = positionUpdates.map(({ task }) => task)
-      void refetchSpecificTasks(tasksToRefresh)
+      const tasksToRefetch = positionUpdates.map(({ task }) => task)
+      void refetchSpecificTasks(tasksToRefetch)
     },
   })
 
@@ -221,16 +235,23 @@ export const useTasksStore = defineStore('tasks', () => {
 
     const partialPriorityLabel = createPartialDataLabel('priority')
 
-    for (const task of tasks.value) {
+    tasks.value = tasks.value.map((task) => {
       const priorityLabelIndex = task.labels.findIndex((label) =>
         label.startsWith(partialPriorityLabel),
       )
 
-      if (priorityLabelIndex !== -1) {
-        task.labels.splice(priorityLabelIndex, 1)
-        task.rpb.priority = undefined
+      if (priorityLabelIndex === -1) {
+        return task
       }
-    }
+
+      const taskWithoutPriority = {
+        ...task,
+        labels: task.labels.toSpliced(priorityLabelIndex, 1),
+        rpb: { ...task.rpb, priority: undefined },
+      }
+
+      return taskWithoutPriority as Task
+    })
   }
 
   // Merge task-derived columns with existing columns
