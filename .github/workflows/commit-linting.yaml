@@ -1,5 +1,7 @@
 name: Commit Linting
 on:
+  push:
+    branches: [ '**' ]
   pull_request:
     branches: [ main ]
 
