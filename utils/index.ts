@@ -6,7 +6,7 @@ export function initializeArrayForKey<Value>(
     object[key] = []
   }
 
-  return object[key] as Value[]
+  return object[key]
 }
 
 export function overwriteMerge<T>(_: T, source: T): T {
