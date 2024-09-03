@@ -1,7 +1,6 @@
 <script setup lang="ts">
-import { VueDraggable } from 'vue-draggable-plus'
+import { type SortableEvent, VueDraggable } from 'vue-draggable-plus'
 import { elementIds } from '~/constants/elements'
-import type { VueDraggableEvent } from '~/types/vue-draggable-plus'
 
 const auth = useAuthStore()
 const tasks = useTasksStore()
@@ -15,7 +14,11 @@ watchEffect(() => {
   }
 })
 
-function handleMoveColumn({ oldIndex, newIndex }: VueDraggableEvent) {
+function handleMoveColumn({ oldIndex, newIndex }: SortableEvent) {
+  if (!oldIndex || !newIndex) {
+    throw new Error('Invalid column move event')
+  }
+
   const column = board.state.columns[oldIndex]
   if (!column) {
     return

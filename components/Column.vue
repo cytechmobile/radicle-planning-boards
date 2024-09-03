@@ -1,7 +1,6 @@
 <script setup lang="ts">
-import { VueDraggable } from 'vue-draggable-plus'
+import { type SortableEvent, VueDraggable } from 'vue-draggable-plus'
 import type { Task } from '../types/tasks'
-import type { VueDraggableEvent } from '~/types/vue-draggable-plus'
 import { doneTaskStatuses } from '~/constants/tasks'
 
 const props = defineProps<{
@@ -29,23 +28,28 @@ watchEffect(() => {
   }
 })
 
-function handleMoveTask(event: VueDraggableEvent) {
-  const { id, kind } = event.item.dataset
-  const { column } = event.to.dataset
+function handleMoveTask(event: SortableEvent) {
+  const { oldIndex, newIndex, item, to } = event
+  const { id, kind } = item.dataset
+  const { column } = to.dataset
+  if (!id || !kind || !column || oldIndex === undefined || newIndex === undefined) {
+    throw new Error('Invalid task move event')
+  }
+
   const task = props.tasks.find((task) => task.rpb.kind === kind && task.id === id)
-  if (!task || !column || (task.rpb.column === column && event.oldIndex === event.newIndex)) {
+  if (!task || !column || (task.rpb.column === column && oldIndex === newIndex)) {
     return
   }
 
-  void tasks.moveTask({
+  tasks.moveTask({
     task,
     column,
-    index: event.newIndex,
+    index: newIndex,
   })
 }
 
 function handleCreateIssue(title: string) {
-  void tasks.createIssue({ title, column: props.title })
+  tasks.createIssue({ title, column: props.title })
 }
 
 const columnIcon = computed(() => {
