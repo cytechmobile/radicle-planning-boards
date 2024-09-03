@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { Writable } from 'ts-essentials'
+import { assertUnreachable } from '~/utils/assertions'
 
 const board = useBoardStore()
 
@@ -14,19 +15,17 @@ const optionIcons = {
 
 const selected = computed(() => {
   const { taskKind } = board.state.filter
-  if (!taskKind) {
-    return 'All'
-  }
 
-  if (taskKind === 'issue') {
-    return 'Issues'
+  switch (taskKind) {
+    case undefined:
+      return 'All'
+    case 'issue':
+      return 'Issues'
+    case 'patch':
+      return 'Patches'
+    default:
+      return assertUnreachable(taskKind)
   }
-
-  if (taskKind === 'patch') {
-    return 'Patches'
-  }
-
-  throw new Error(`Invalid task kind: ${taskKind}`)
 })
 
 function handleChange(selected: (typeof options)[number]) {
@@ -41,7 +40,7 @@ function handleChange(selected: (typeof options)[number]) {
       board.state.filter.taskKind = 'patch'
       break
     default:
-      throw new Error(`Invalid selected option: ${selected}`)
+      assertUnreachable(selected)
   }
 }
 </script>

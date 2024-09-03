@@ -1,5 +1,6 @@
 import type { RadicleIssue, RadiclePatch } from '~/types/httpd'
 import type { Issue, Patch, Task } from '~/types/tasks'
+import { assertUnreachable } from '~/utils/assertions'
 
 export function useTasksFetch() {
   const { $httpd } = useNuxtApp()
@@ -77,7 +78,9 @@ export function useTasksFetch() {
   }
 
   async function updateTaskLabels(task: Task, labels: string[]) {
-    switch (task.rpb.kind) {
+    const { kind } = task.rpb
+
+    switch (kind) {
       case 'issue':
         return await $httpd(`/projects/{rid}/issues/{issue}`, {
           path: { rid: route.params.rid, issue: task.id },
@@ -97,7 +100,7 @@ export function useTasksFetch() {
           },
         })
       default:
-        throw new Error('Unsupported task kind')
+        return assertUnreachable(kind)
     }
   }
 
@@ -118,7 +121,9 @@ export function useTasksFetch() {
     }
 
     let refetchedTask: Task
-    switch (task.rpb.kind) {
+    const { kind } = task.rpb
+
+    switch (kind) {
       case 'issue':
         refetchedTask = await fetchIssueById(task.id)
         break
@@ -126,7 +131,7 @@ export function useTasksFetch() {
         refetchedTask = await fetchPatchById(task.id)
         break
       default:
-        throw new Error('Unsupported task kind')
+        assertUnreachable(kind)
     }
 
     const taskIndex = tasks.value.indexOf(task)
