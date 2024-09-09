@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { taskTruncatedIdLength } from '~/constants/tasks'
+import { truncatedHashLength } from '~/constants/config'
 import type { TaskHighlights } from '~/types/tasks'
 
 interface Props {
@@ -61,7 +61,7 @@ function truncateSegmentedText(segments: string[], limit: number): string[] {
 
       <pre
         class="text-xs font-medium text-rad-foreground-emphasized"
-      ><TextWithHighlights :content="highlights?.id ? truncateSegmentedText(highlights?.id, taskTruncatedIdLength) :  id.slice(0, taskTruncatedIdLength)" /></pre>
+      ><TextWithHighlights :content="highlights?.id ? truncateSegmentedText(highlights?.id, truncatedHashLength) :  id.slice(0, truncatedHashLength)" /></pre>
     </small>
 
     <h4>

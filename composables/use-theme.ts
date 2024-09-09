@@ -1,5 +1,3 @@
-import { useRadicleInterfaceMessage } from './use-radicle-interface-message'
-
 export function useTheme() {
   const isDark = useDark()
   const toggleDark = useToggle(isDark)
@@ -16,7 +14,8 @@ export function useTheme() {
     }
   })
 
-  useRadicleInterfaceMessage('theme', (message) => {
+  const { onHostAppMessage } = useHostAppMessaging()
+  onHostAppMessage('theme', (message) => {
     setTheme(message.theme)
   })
 }

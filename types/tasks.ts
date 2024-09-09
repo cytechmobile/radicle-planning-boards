@@ -2,7 +2,7 @@ import type { RadicleIssue, RadiclePatch } from './httpd'
 
 export interface TaskProperties {
   column: string
-  priority: number | null
+  priority: number | undefined
   /**
    * The date used to filter tasks by. (creation date for issues, latest revision date for patches)
    */

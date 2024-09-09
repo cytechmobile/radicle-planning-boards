@@ -1,17 +1,17 @@
 import { useStorage } from '@vueuse/core'
-import z from 'zod'
+import * as v from 'valibot'
 import deepMerge from 'deepmerge'
-import { initialColumns } from '~/constants/columns'
+import { initialColumns } from '~/constants/config'
 
-const boardStateSchema = z.object({
-  columns: z.array(z.string()),
-  filter: z.object({
-    taskKind: z.union([z.literal('issue'), z.literal('patch')]).optional(),
-    recentDoneTasks: z.boolean(),
+const boardStateSchema = v.object({
+  columns: v.array(v.string()),
+  filter: v.object({
+    taskKind: v.optional(v.picklist(['issue', 'patch'])),
+    recentDoneTasks: v.boolean(),
   }),
 })
 
-type BoardState = z.infer<typeof boardStateSchema>
+type BoardState = v.InferInput<typeof boardStateSchema>
 
 const initialBoardState: BoardState = {
   columns: initialColumns,
@@ -62,7 +62,7 @@ export const useBoardStore = defineStore('board', () => {
 
   function importState(stateString: string) {
     try {
-      state.value = boardStateSchema.parse(JSON.parse(stateString))
+      state.value = v.parse(boardStateSchema, JSON.parse(stateString))
     } catch (error) {
       throw new Error('Invalid state', { cause: error })
     }

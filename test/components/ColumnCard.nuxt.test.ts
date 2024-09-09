@@ -1,7 +1,7 @@
 import { screen } from '@testing-library/vue'
 import { renderSuspended } from '@nuxt/test-utils/runtime'
 import { ColumnCard } from '#components'
-import { taskTruncatedIdLength } from '~/constants/tasks'
+import { truncatedHashLength } from '~/constants/config'
 
 // TODO: zac write tests for highlighting
 describe('<ColumnCard />', () => {
@@ -23,7 +23,7 @@ describe('<ColumnCard />', () => {
     await renderSuspended(ColumnCard, { props })
 
     expect(screen.getByText(props.status.name)).toBeInTheDocument()
-    expect(screen.getByText(props.id.slice(0, taskTruncatedIdLength))).toBeInTheDocument()
+    expect(screen.getByText(props.id.slice(0, truncatedHashLength))).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: props.title })).toBeInTheDocument()
     props.labels.forEach((label) => {
       expect(screen.getByText(label)).toBeInTheDocument()

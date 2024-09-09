@@ -4,8 +4,8 @@ const emit = defineEmits<{
   close: []
 }>()
 
-const formRef = ref<HTMLFormElement | null>(null)
-const titleInputRef = ref<HTMLInputElement | null>(null)
+const formRef = ref<HTMLFormElement>()
+const titleInputRef = ref<HTMLInputElement>()
 const title = ref('')
 
 onClickOutside(formRef, () => {

@@ -26,7 +26,7 @@ const status = computed<ColumnCardStatus>(() => ({
   icon: statusIconMap[props.patch.state.status],
 }))
 
-const radicleInterfaceBaseUrl = useRadicleInterfaceBaseUrl()
+const hostAppBaseUrl = useHostAppBaseUrl()
 const isDebugging = useIsDebugging()
 
 // TODO: zac reduce duplication between ColumnIssueCard and ColumnPatchCard
@@ -58,7 +58,7 @@ const highlights = computed(() => {
 const href = computed(() =>
   new URL(
     `/nodes/${route.params.node}/${route.params.rid}/patches/${props.patch.id}`,
-    radicleInterfaceBaseUrl,
+    hostAppBaseUrl,
   ).toString(),
 )
 </script>

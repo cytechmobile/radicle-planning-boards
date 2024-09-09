@@ -6,8 +6,8 @@ export type PartialDataLabel = `${typeof dataLabelNamespace}:${DataLabelKind}`
 
 export type DataLabel = `${PartialDataLabel}:${string}`
 
-export function getDataLabelValue(label: string): string | null {
-  return label.split(':')[2] || null
+export function getDataLabelValue(label: string): string | undefined {
+  return label.split(':')[2]
 }
 
 export function createPartialDataLabel(type: DataLabelKind): PartialDataLabel {

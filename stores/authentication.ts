@@ -1,35 +1,33 @@
 import { useStorage } from '@vueuse/core'
 
 export const useAuthStore = defineStore('auth', () => {
+  const hostAppAuthToken = ref<string>()
   const isDebugging = useIsDebugging()
   const debuggingAuthToken = useStorage('RPB_config-auth-token', '')
 
-  const token = ref<string | null>(null)
-  const isAuthenticated = computed(() => !!token.value)
-  const postMessageToRadicleInterface = usePostMessageToRadicleInterface()
+  const authToken = computed(() => {
+    return isDebugging.value && debuggingAuthToken.value
+      ? debuggingAuthToken.value
+      : hostAppAuthToken.value
+  })
+  const isAuthenticated = computed(() => Boolean(authToken.value))
 
-  if (!token.value) {
-    postMessageToRadicleInterface({ type: 'request-auth-token' })
+  const { onHostAppMessage, notifyHostApp } = useHostAppMessaging()
+
+  if (!hostAppAuthToken.value) {
+    notifyHostApp({ type: 'request-auth-token' })
   }
 
-  useRadicleInterfaceMessage('set-auth-token', (message) => {
-    if (message.authToken && !(isDebugging.value && debuggingAuthToken.value)) {
-      token.value = message.authToken
-    }
+  onHostAppMessage('set-auth-token', (message) => {
+    hostAppAuthToken.value = message.authToken
   })
 
-  useRadicleInterfaceMessage('remove-auth-token', () => {
-    token.value = null
-  })
-
-  watchEffect(() => {
-    if (isDebugging.value && debuggingAuthToken.value) {
-      token.value = debuggingAuthToken.value
-    }
+  onHostAppMessage('remove-auth-token', () => {
+    hostAppAuthToken.value = undefined
   })
 
   const store = {
-    token,
+    token: authToken,
     isAuthenticated,
   }
 
