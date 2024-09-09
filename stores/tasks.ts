@@ -30,10 +30,7 @@ export const useTasksStore = defineStore('tasks', () => {
     }
 
     const tasksByColumn = orderTasksByColumn(
-      groupTasksByColumn({
-        tasks: filteredTasks.value,
-        columns: board.state.columns,
-      }),
+      groupTasksByColumn({ tasks: filteredTasks.value, columns: board.state.columns }),
     )
 
     return tasksByColumn
@@ -62,11 +59,7 @@ export const useTasksStore = defineStore('tasks', () => {
           return
         }
 
-        const newTask = {
-          ...task,
-          labels,
-          rpb,
-        }
+        const newTask = { ...task, labels, rpb }
 
         tasks.value = tasks.value.with(taskIndex, newTask as Task)
       }
@@ -172,15 +165,8 @@ export const useTasksStore = defineStore('tasks', () => {
 
         return {
           task,
-          labels: createUpdatedTaskLabels(task, {
-            priority,
-            column: newColumn,
-          }),
-          rpb: {
-            ...task.rpb,
-            priority,
-            column: newColumn,
-          },
+          labels: createUpdatedTaskLabels(task, { priority, column: newColumn }),
+          rpb: { ...task.rpb, priority, column: newColumn },
         }
       },
     )
@@ -207,9 +193,7 @@ export const useTasksStore = defineStore('tasks', () => {
 
       const { id } = await $httpd('/projects/{rid}/issues', {
         method: 'POST',
-        path: {
-          rid: route.params.rid,
-        },
+        path: { rid: route.params.rid },
         body: {
           title,
           description: '',
@@ -332,9 +316,7 @@ function useFetchedTasks() {
       patchStatuses.map(
         async (status) =>
           await $httpd('/projects/{rid}/patches', {
-            path: {
-              rid: route.params.rid,
-            },
+            path: { rid: route.params.rid },
             // @ts-expect-error - wrong type definition
             query: { perPage: 1000, state: status },
           }),
