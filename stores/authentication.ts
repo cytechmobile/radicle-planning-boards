@@ -12,10 +12,10 @@ export const useAuthStore = defineStore('auth', () => {
   })
   const isAuthenticated = computed(() => Boolean(authToken.value))
 
-  const { onHostAppMessage, postMessageToHostApp } = useHostAppMessage()
+  const { onHostAppMessage, notifyHostApp } = useHostAppMessaging()
 
   if (!hostAppAuthToken.value) {
-    postMessageToHostApp({ type: 'request-auth-token' })
+    notifyHostApp({ type: 'request-auth-token' })
   }
 
   onHostAppMessage('set-auth-token', (message) => {

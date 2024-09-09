@@ -14,7 +14,7 @@ export function useTheme() {
     }
   })
 
-  const { onHostAppMessage } = useHostAppMessage()
+  const { onHostAppMessage } = useHostAppMessaging()
   onHostAppMessage('theme', (message) => {
     setTheme(message.theme)
   })

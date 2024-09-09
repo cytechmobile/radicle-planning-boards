@@ -14,16 +14,16 @@ export const useQueryParamsStore = defineStore('query-params', () => {
   }
 
   const hostAppQueryParams = reactive<QueryParams>({})
-  const { onHostAppMessage, postMessageToHostApp } = useHostAppMessage()
+  const { onHostAppMessage, notifyHostApp } = useHostAppMessaging()
 
   onMounted(() => {
-    postMessageToHostApp({ type: 'request-query-params' })
+    notifyHostApp({ type: 'request-query-params' })
   })
 
   const { pause, resume } = watchPausable(
     hostAppQueryParams,
     () => {
-      postMessageToHostApp({
+      notifyHostApp({
         type: 'set-query-params',
         // ! Sending the reactive object directly causes an object cloning error
         queryParams: Object.assign({}, hostAppQueryParams),
