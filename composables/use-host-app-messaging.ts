@@ -31,14 +31,13 @@ const messageFromHostApp = v.union([
 export type MessageFromHostApp = v.InferInput<typeof messageFromHostApp>
 
 export function useHostAppMessaging() {
-  const { parentOrigin } = useRuntimeConfig().public
-
   function onHostAppMessage<MessageType extends MessageFromHostApp['type']>(
     type: MessageType,
     callback: (message: Extract<MessageFromHostApp, { type: MessageType }>) => void,
   ): void {
-    useEventListener('message', (event) => {
-      if (event.origin !== parentOrigin) {
+    useEventListener('message', async (event) => {
+      const { hostAppOrigin } = await resolveConfig()
+      if (event.origin !== hostAppOrigin) {
         return
       }
 
@@ -51,8 +50,9 @@ export function useHostAppMessaging() {
     })
   }
 
-  function notifyHostApp(message: MessageToHostApp): void {
-    globalThis.window.parent.postMessage(message, parentOrigin)
+  async function notifyHostApp(message: MessageToHostApp): Promise<void> {
+    const { hostAppOrigin } = await resolveConfig()
+    globalThis.window.parent.postMessage(message, hostAppOrigin)
   }
 
   return {

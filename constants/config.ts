@@ -6,6 +6,13 @@
 export const defaultRadicleExplorerBaseUrl = 'https://explorer.radicle.gr/'
 
 /**
+ * The default origin for the app hosting the iframe for this app
+ *
+ * Used for linking to the host app
+ */
+export const defaultHostAppOrigin = 'http://localhost:3080'
+
+/**
  * The length of the hash value to keep when shortening it.
  *
  * Used for visual reference and should not be used for machine matching.

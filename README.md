@@ -41,7 +41,7 @@ feature set and not require its own database.
 You will need two domains, one for the Radicle Planning Boards and another for the Radicle Explorer.
 
 1. Deploy the `radicle-planning-boards` repository
-    - Set the `NUXT_PUBLIC_PARENT_ORIGIN` environment variable to your Radicle Explorer domain
+    - Set the `NUXT_PUBLIC_HOST_APP_ORIGIN` environment variable to your Radicle Explorer domain
 2. Deploy the [radicle-interface-with-planning-boards](https://github.com/maninak/radicle-interface-with-planning-boards)
 repository
     - Update `src/config.json` with your Radicle Planning Boards domain e.g.
@@ -59,6 +59,23 @@ repository
       // ...
     }
     ```
+
+### Configuring at runtime
+
+You can overwrite `NUXT_PUBLIC_HOST_APP_ORIGIN` at runtime by creating a `config.json`
+file:
+
+- inside the `.output` directory during deployment,
+- or the `public` directory during development
+
+Example:
+
+```json
+// config.json
+{
+   "hostAppOrigin": "http://localhost:3080"
+}
+```
 
 ## Contributing
 

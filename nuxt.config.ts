@@ -1,6 +1,5 @@
 import process from 'node:process'
-
-const defaultParentOrigin = 'http://localhost:3080'
+import { defaultHostAppOrigin } from './constants/config'
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
@@ -20,11 +19,7 @@ export default defineNuxtConfig({
   ],
   experimental: { typedPages: true },
   devtools: { enabled: true },
-  runtimeConfig: {
-    public: {
-      parentOrigin: defaultParentOrigin,
-    },
-  },
+  runtimeConfig: { public: { hostAppOrigin: defaultHostAppOrigin } },
   app: {
     head: {
       bodyAttrs: {
@@ -40,7 +35,7 @@ export default defineNuxtConfig({
       contentSecurityPolicy: {
         'frame-ancestors': [
           "'self'",
-          process.env?.['NUXT_PUBLIC_PARENT_ORIGIN'] ?? defaultParentOrigin,
+          process.env?.['NUXT_PUBLIC_HOST_APP_ORIGIN'] ?? defaultHostAppOrigin,
         ],
       },
       xFrameOptions: false,
