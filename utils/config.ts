@@ -4,7 +4,7 @@ interface Config {
   hostAppOrigin: string
 }
 
-const jsonConfigSchema = v.object({ hostAppOrigin: v.optional(v.string()) })
+const configSchema = v.object({ hostAppOrigin: v.optional(v.string()) })
 
 let config: Config | undefined
 
@@ -14,11 +14,11 @@ export async function resolveConfig(): Promise<Config> {
   }
 
   const { hostAppOrigin: publicHostAppOrigin } = useRuntimeConfig().public
-  const jsonConfig = await $fetch('/config.json').catch(() => undefined)
-  const parseResult = v.safeParse(jsonConfigSchema, jsonConfig)
+  const fetchedConfig = await $fetch('/config.json').catch(() => undefined)
+  const configParseResult = v.safeParse(configSchema, fetchedConfig)
 
-  if (parseResult.success) {
-    const hostAppOrigin = parseResult.output.hostAppOrigin ?? publicHostAppOrigin
+  if (configParseResult.success) {
+    const hostAppOrigin = configParseResult.output.hostAppOrigin ?? publicHostAppOrigin
     config = { hostAppOrigin }
   } else {
     config = { hostAppOrigin: publicHostAppOrigin }
