@@ -20,8 +20,26 @@ export async function resolveConfig(): Promise<Config> {
   if (configParseResult.success) {
     const hostAppOrigin = configParseResult.output.hostAppOrigin ?? publicHostAppOrigin
     config = { hostAppOrigin }
+    // eslint-disable-next-line no-console
+    console.info('Successfully loaded config from "/config.json":', config)
   } else {
     config = { hostAppOrigin: publicHostAppOrigin }
+
+    if (typeof fetchedConfig === 'object') {
+      console.warn(
+        'Failed to parse config from "/config.json", using default config',
+        '\nDefault config:',
+        config,
+        '\nIssues with "/config.json":',
+        v.flatten(configParseResult.issues),
+      )
+    } else {
+      console.warn(
+        'Failed to load config from "/config.json", using default config',
+        '\nDefault config:',
+        config,
+      )
+    }
   }
 
   return config
