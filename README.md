@@ -38,11 +38,13 @@ feature set and not require its own database.
 
 ## Self hosting
 
-You will need two domains, one for the Radicle Planning Boards and another for the Radicle Explorer.
+You need to deploy two web apps, Radicle Planning Boards (this repository) and Radicle Explorer.
 
-1. Deploy the `radicle-planning-boards` repository
-    - Set the `NUXT_PUBLIC_HOST_APP_ORIGIN` environment variable to your Radicle Explorer domain
-2. Deploy the [radicle-interface-with-planning-boards](https://github.com/maninak/radicle-interface-with-planning-boards)
+1. Deploy this repository
+    - Set the `NUXT_PUBLIC_HOST_APP_ORIGIN` environment variable to the origin of your Radicle Explorer instance e.g.
+    `https://radicle-explorer.example.com`
+2. Deploy the
+[radicle-interface-with-planning-boards](https://explorer.radicle.gr/nodes/seed.radicle.gr/rad:z2Q1LsoAqoeSJeBwu92hjb7VPVkey)
 repository
     - Update `src/config.json` with your Radicle Planning Boards domain e.g.
 
@@ -60,22 +62,23 @@ repository
     }
     ```
 
-### Configuring at runtime
+### Configuring after building
 
-You can overwrite `NUXT_PUBLIC_HOST_APP_ORIGIN` at runtime by creating a `config.json`
-file:
+You can overwrite `NUXT_PUBLIC_HOST_APP_ORIGIN` after building, by creating a `config.json` file at the root of the
+`.output` directory.
 
-- inside the `.output` directory during deployment,
-- or the `public` directory during development
+This can be useful if you want to use the same build for multiple deployments.
 
 Example:
 
-```json
+```json5
 // config.json
 {
    "hostAppOrigin": "http://localhost:3080"
 }
 ```
+
+> Note: You can also do this during development by creating a `config.json` file inside the `public` directory
 
 ## Contributing
 
