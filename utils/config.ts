@@ -16,26 +16,27 @@ export async function resolveConfig(): Promise<Config> {
   const { hostAppOrigin: publicHostAppOrigin } = useRuntimeConfig().public
   const fetchedConfig = await $fetch('/config.json').catch(() => undefined)
   const configParseResult = v.safeParse(configSchema, fetchedConfig)
+  const configFileUrl = new URL('/config.json', globalThis.location.origin)
 
   if (configParseResult.success) {
     const hostAppOrigin = configParseResult.output.hostAppOrigin ?? publicHostAppOrigin
     config = { hostAppOrigin }
     // eslint-disable-next-line no-console
-    console.info('Successfully loaded config from "/config.json":', config)
+    console.info(`Successfully loaded config from "${configFileUrl}":`, config)
   } else {
     config = { hostAppOrigin: publicHostAppOrigin }
 
     if (typeof fetchedConfig === 'object') {
       console.warn(
-        'Failed to parse config from "/config.json", using default config',
+        `Failed parsing config from "${configFileUrl}". Falling back to default config`,
         '\nDefault config:',
         config,
-        '\nIssues with "/config.json":',
+        `\nIssues with "${configFileUrl}":`,
         v.flatten(configParseResult.issues),
       )
     } else {
       console.warn(
-        'Failed to load config from "/config.json", using default config',
+        `Failed loading config from "${configFileUrl}". Falling back to default config`,
         '\nDefault config:',
         config,
       )
