@@ -46,7 +46,7 @@ You need to deploy two web apps, Radicle Planning Boards (this repository) and R
 2. Deploy the
 [radicle-interface-with-planning-boards](https://explorer.radicle.gr/nodes/seed.radicle.gr/rad:z2Q1LsoAqoeSJeBwu92hjb7VPVkey)
 repository
-    - Update `src/config.json` with your Radicle Planning Boards domain e.g.
+    - Update `src/config.json` with the URL under which you are deploying Radicle Planning Boards e.g.:
 
     ```json5
     // src/config.json
