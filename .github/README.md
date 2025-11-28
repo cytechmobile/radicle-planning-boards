@@ -3,7 +3,7 @@ The original repo is hosted on: https://explorer.radicle.gr/nodes/seed.radicle.g
 Please report issues in the original repo.
 
 
-![hero](./public/hero.webp)
+![hero](../public/hero.webp)
 
 [![Netlify Status](https://api.netlify.com/api/v1/badges/c075cf10-4d89-44d1-bd53-44a58f9ef06f/deploy-status)](https://app.netlify.com/sites/chipper-wisp-c7553e/deploys)
 
