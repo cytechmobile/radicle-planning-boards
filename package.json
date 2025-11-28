@@ -29,7 +29,7 @@
     "@vueuse/nuxt": "^10.11.0",
     "deepmerge": "^4.3.1",
     "nuxt-icon": "^0.6.9",
-    "valibot": "^0.39.0",
+    "valibot": "^1.2.0",
     "vue-draggable-plus": "^0.5.0"
   },
   "devDependencies": {
